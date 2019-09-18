@@ -1,6 +1,7 @@
 #pragma once
 #include "src/GameEngine/hpp/State.hpp"
 #include "src/GameEngine/hpp/Game.hpp"
+#include <array>
 
 namespace hgw
 {
@@ -16,5 +17,7 @@ namespace hgw
 
 	private:
 		GameDataRef _data;
+
+		std::array<sf::RectangleShape, 10> verticalLines;
 	};
 }
