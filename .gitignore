@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# Vs created directories
+x64/
+.vs/
+Tetris/x64/
+
