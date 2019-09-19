@@ -5,6 +5,11 @@
 
 namespace hgw
 {
+	class Figure
+	{
+
+	};
+
 	class GameState : public State
 	{
 	public:
@@ -18,6 +23,9 @@ namespace hgw
 	private:
 		GameDataRef _data;
 
-		std::array<sf::RectangleShape, 10> verticalLines;
+		std::array<sf::RectangleShape, 11> verticalLines;
+		std::array<sf::RectangleShape, 21> horizontalLines;
+
+		std::vector<sf::RectangleShape> blocks;
 	};
 }
