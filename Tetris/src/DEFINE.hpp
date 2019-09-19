@@ -6,3 +6,5 @@
 
 #define APP_HEIGHT 900
 #define APP_WIDTH 800
+
+#define BLOCK_SIZE 30
