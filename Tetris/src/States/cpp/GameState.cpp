@@ -66,6 +66,45 @@ namespace hgw
 		}
 	}
 
+	void Figure::RotateLeft()
+	{
+
+	}
+
+	void Figure::RotateRight()
+	{
+
+	}
+
+	void Figure::AddToGrid(short grid_X, short grid_Y)
+	{
+		switch (_type_)
+		{
+		case hgw::Figure::I:
+			gridCoords[0] = std::make_pair(grid_X, grid_Y);
+			gridCoords[1] = std::make_pair(grid_X, grid_Y + BLOCK_SIZE);
+			gridCoords[2] = std::make_pair(grid_X, grid_Y + 2 * BLOCK_SIZE);
+			gridCoords[3] = std::make_pair(grid_X, grid_Y + 3 * BLOCK_SIZE);
+			break;
+		case hgw::Figure::T:
+			break;
+		case hgw::Figure::O:
+			break;
+		case hgw::Figure::L:
+			break;
+		case hgw::Figure::J:
+			break;
+		case hgw::Figure::S:
+			break;
+		case hgw::Figure::Z:
+			break;
+		default:
+			break;
+		}
+
+		gridCoords[0] = std::make_pair(grid_X, grid_Y);
+	}
+
 	GameState::GameState(GameDataRef _data)
 	{
 		this->_data = _data;
@@ -84,12 +123,6 @@ namespace hgw
 			horizontalLines[i].setSize(sf::Vector2f(300, 1));
 			horizontalLines[i].setPosition(verticalLines[0].getPosition().x, verticalLines[0].getPosition().y + i * 30);
 		}
-
-		sf::RectangleShape temp;
-		temp.setFillColor(sf::Color::Red);
-		temp.setSize(sf::Vector2f(30, 30));
-		temp.setPosition(sf::Vector2f(verticalLines[5].getPosition().x, horizontalLines[0].getPosition().y));
-		blocks.push_back(temp);
 	}
 
 	void GameState::HandleInput()
@@ -98,6 +131,7 @@ namespace hgw
 
 		while (_data->window.pollEvent(event))
 		{
+			std::cout << "X: " << _data->input.GetMousePosition(_data->window).x << "  Y: " << _data->input.GetMousePosition(_data->window).x << std::endl;
 			if (sf::Event::Closed == event.type)
 			{
 				_data->window.close();
@@ -108,17 +142,7 @@ namespace hgw
 
 	void GameState::Update(float dt)
 	{
-		static int clock = 0;
 
-		if (clock < 30)
-		{
-			clock++;
-		}
-		else
-		{
-			blocks[0].move(sf::Vector2f(0, 30));
-			clock = 0;
-		}
 	}
 
 	void GameState::Draw(float dt)
@@ -145,8 +169,6 @@ namespace hgw
 			_data->window.draw(S.blocks[i]);
 			_data->window.draw(Z.blocks[i]);
 		}
-
-		_data->window.draw(blocks[0]);
 
 		_data->window.display();
 	}

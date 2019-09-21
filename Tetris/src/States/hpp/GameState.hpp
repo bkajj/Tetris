@@ -2,6 +2,7 @@
 #include "src/GameEngine/hpp/State.hpp"
 #include "src/GameEngine/hpp/Game.hpp"
 #include <array>
+#include <vector>
 
 namespace hgw
 {
@@ -11,7 +12,17 @@ namespace hgw
 		enum FigureType { I, T, O, L, J, S, Z};
 		Figure(FigureType type, sf::Vector2f startPos, sf::Color color);
 
+		void RotateLeft();
+		void RotateRight();
+
+		void AddToGrid(short grid_X, short grid_Y);
+		
 		std::array<sf::RectangleShape, 4> blocks;
+		std::array<std::pair<short, short>, 4> gridCoords;
+	private:
+
+		short rotation = 0;
+
 		FigureType _type_;
 	};
 
@@ -28,10 +39,11 @@ namespace hgw
 	private:
 		GameDataRef _data;
 
+		std::vector<Figure> figures;
+		std::array<std::array<bool, 20>, 10> grid;
+
 		std::array<sf::RectangleShape, 11> verticalLines;
 		std::array<sf::RectangleShape, 21> horizontalLines;
-
-		std::vector<sf::RectangleShape> blocks;
 
 		Figure I = Figure(Figure::I, sf::Vector2f(400, 100), sf::Color::Red);
 		Figure T = Figure(Figure::T, sf::Vector2f(250, 100), sf::Color::White);
