@@ -10,4 +10,6 @@
 #define BLOCK_SIZE 30
 
 #define GRID_START_POS_X 250
-#define GRID_START_POS_Y 250
+#define GRID_START_POS_Y 100
+#define GRID_END_POS_Y 700
+#define GRID_END_POS_X 550

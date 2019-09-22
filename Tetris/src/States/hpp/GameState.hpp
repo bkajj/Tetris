@@ -11,6 +11,7 @@ namespace hgw
 	public:
 		enum FigureType { I, T, O, L, J, S, Z};
 		Figure(FigureType type, sf::Vector2f startPos, sf::Color color);
+		Figure() = default;
 
 		void RotateLeft();
 		void RotateRight();
@@ -19,10 +20,17 @@ namespace hgw
 		
 		std::array<sf::RectangleShape, 4> blocks;
 		std::array<std::pair<short, short>, 4> gridCoords;
+
+		sf::Vector2f leftPos, rightPos, downPos, upPos;
+		sf::Vector2f leftGridCoord, rightGridCoord, downGridCoord, upGridCoord;
+
+		sf::Color figureColor;
 	private:
 
 		short rotation = 0;
+		std::pair<short, short>* pivot;
 
+		
 		FigureType _type_;
 	};
 
@@ -36,21 +44,18 @@ namespace hgw
 		void Update(float dt);
 		void Draw(float dt);
 
+		bool willBlockOverlap();
+		int random(int min, int max);
+
 	private:
 		GameDataRef _data;
 
-		std::vector<Figure> figures;
-		std::array<std::array<bool, 20>, 10> grid;
+		sf::Clock gameClock;
 
+		Figure currentFigure;
+
+		std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> grid;
 		std::array<sf::RectangleShape, 11> verticalLines;
 		std::array<sf::RectangleShape, 21> horizontalLines;
-
-		Figure I = Figure(Figure::I, sf::Vector2f(400, 100), sf::Color::Red);
-		Figure T = Figure(Figure::T, sf::Vector2f(250, 100), sf::Color::White);
-		Figure O = Figure(Figure::O, sf::Vector2f(400, 190), sf::Color::Blue);
-		Figure L = Figure(Figure::L, sf::Vector2f(250, 130), sf::Color::Yellow);
-		Figure J = Figure(Figure::J, sf::Vector2f(400, 220), sf::Color::Magenta);
-		Figure S = Figure(Figure::S, sf::Vector2f(250, 310), sf::Color::Cyan);
-		Figure Z = Figure(Figure::Z, sf::Vector2f(400, 310), sf::Color::Green);
 	};
 }
