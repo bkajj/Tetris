@@ -19,16 +19,15 @@ namespace hgw
 		void AddToGrid(short grid_X, short grid_Y);
 		
 		std::array<sf::RectangleShape, 4> blocks;
-		std::array<std::pair<short, short>, 4> gridCoords;
+		std::array<sf::Vector2f, 4> gridCoords;
 
-		sf::Vector2f leftPos, rightPos, downPos, upPos;
 		sf::Vector2f leftGridCoord, rightGridCoord, downGridCoord, upGridCoord;
 
 		sf::Color figureColor;
 	private:
 
 		short rotation = 0;
-		std::pair<short, short>* pivot;
+		sf::Vector2f* pivot;
 
 		
 		FigureType _type_;
@@ -44,7 +43,9 @@ namespace hgw
 		void Update(float dt);
 		void Draw(float dt);
 
-		bool willBlockOverlap();
+		bool willBlockOverlapBlock(int offsetX, int offsetY);
+		bool willGridExceed_X(int offestX);
+		bool willGridExceed_Y(int offsetY);
 		int random(int min, int max);
 
 	private:
