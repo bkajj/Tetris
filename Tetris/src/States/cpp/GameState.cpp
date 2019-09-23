@@ -104,7 +104,22 @@ namespace hgw
 
 	void Figure::RotateLeft()
 	{
+		for (int i = 0; i < 4; i++)
+		{
+			if (_type_ != FigureType::O)
+			{
+				sf::Vector2f vec = sf::Vector2f(gridCoords[i].first, gridCoords[i].second);
+				sf::Vector2f piv = sf::Vector2f(pivot->first, pivot->second);
 
+				sf::Vector2f absVec = vec - piv;
+
+				sf::Vector2f rotVec = sf::Vector2f(-absVec.y, absVec.x);
+
+				sf::Vector2f vecPrim = rotVec + piv;
+				gridCoords[i] = std::make_pair(vecPrim.x, vecPrim.y);
+				blocks[i].setPosition(GRID_START_POS_X + gridCoords[i].first * BLOCK_SIZE, GRID_START_POS_Y + gridCoords[i].second * BLOCK_SIZE);
+			}	
+		}
 	}
 
 	void Figure::RotateRight()
@@ -260,6 +275,10 @@ namespace hgw
 				}
 				currentFigure.leftPos.x -= BLOCK_SIZE; //update border positons
 				currentFigure.rightPos.x -= BLOCK_SIZE;
+			}
+			else if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) //rotate left
+			{
+				currentFigure.RotateLeft();
 			}
 		}
 	}
