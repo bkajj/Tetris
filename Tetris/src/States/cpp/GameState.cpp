@@ -77,24 +77,28 @@ namespace hgw
 
 				gridCoords[i] = Vprim;
 
-				if (gridCoords[i].x < 0)
+				if (gridCoords[i].x < 0) //check if block exceeded leftmost grid piece
 				{
-					float offsetX = -gridCoords[i].x;
+					float offsetX = -gridCoords[i].x; //calculate offset and move figure by the offset
 					for (int j = 0; j < 4; j++)
 					{
 						gridCoords[j].x += offsetX;
+						
 					}
 				}
 
-				if (gridCoords[i].x > 9)
+				if (gridCoords[i].x > 9) //check if block exceeded rightmose grid piece
 				{
-					float offsetX = gridCoords[i].x - 9;
+					float offsetX = gridCoords[i].x - 9; //calculate offset and move figure by the offset
 					for (int j = 0; j < 4; j++)
 					{
 						gridCoords[j].x -= offsetX;
 					}
-				}
+				}			
+			}
 
+			for (int i = 0; i < 4; i++) //set position on screen
+			{
 				blocks[i].setPosition(GRID_START_POS_X + gridCoords[i].x * BLOCK_SIZE, GRID_START_POS_Y + gridCoords[i].y * BLOCK_SIZE);
 			}
 		}	
@@ -210,7 +214,8 @@ namespace hgw
 			{
 				currentFigure.RotateLeft();
 			}
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && !willGridExceed_X(1) && !willBlockOverlapBlock(1, 0)) //move right
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && !willGridExceed_X(1) && !willBlockOverlapBlock(1, 0)) //move right
 			{
 				for (int i = 0; i < 4; i++)
 				{
@@ -225,13 +230,14 @@ namespace hgw
 					currentFigure.blocks[i].move(-BLOCK_SIZE, 0); //move blocks to left by 30 
 					currentFigure.gridCoords[i].x--; //set proper grid coords
 				}
-			}
-			
+			}	
 		}
 	}
 
 	void GameState::Update(float dt)
 	{
+		
+
 		if (gameClock.getElapsedTime() >= sf::seconds(0.5) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) //Figure falling + fast fall
 		{
 			if (willGridExceed_Y(1) || willBlockOverlapBlock(0, 1))
