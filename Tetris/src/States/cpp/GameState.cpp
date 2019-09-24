@@ -9,8 +9,6 @@ namespace hgw
 {
 	Figure::Figure(Figure::FigureType type, sf::Vector2f startPos, sf::Color color) 
 	{
-		//TODO: maybe delete all Pos vars and do position checking from grid coordinates
-		//e.g: if(coord.y > 20) stop moving
 		figureColor = color;
 		_type_ = type;
 
@@ -69,7 +67,37 @@ namespace hgw
 
 	void Figure::RotateLeft()
 	{
+		if (_type_ != FigureType::O)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				sf::Vector2f VrelP = gridCoords[i] - *pivot; //calculate coords of block V relative to pivot
+				sf::Vector2f Vrot = sf::Vector2f(-VrelP.y, VrelP.x); //calculate coords of block V after rotation relative to pivot
+				sf::Vector2f Vprim = Vrot + *pivot; //calculate coords of block V relative to grid
 
+				gridCoords[i] = Vprim;
+
+				if (gridCoords[i].x < 0)
+				{
+					float offsetX = -gridCoords[i].x;
+					for (int j = 0; j < 4; j++)
+					{
+						gridCoords[j].x += offsetX;
+					}
+				}
+
+				if (gridCoords[i].x > 9)
+				{
+					float offsetX = gridCoords[i].x - 9;
+					for (int j = 0; j < 4; j++)
+					{
+						gridCoords[j].x -= offsetX;
+					}
+				}
+
+				blocks[i].setPosition(GRID_START_POS_X + gridCoords[i].x * BLOCK_SIZE, GRID_START_POS_Y + gridCoords[i].y * BLOCK_SIZE);
+			}
+		}	
 	}
 
 	void Figure::RotateRight()
@@ -178,7 +206,11 @@ namespace hgw
 				_data->window.close();
 			}
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && !willGridExceed_X(1) && !willBlockOverlapBlock(1, 0)) //move right
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			{
+				currentFigure.RotateLeft();
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && !willGridExceed_X(1) && !willBlockOverlapBlock(1, 0)) //move right
 			{
 				for (int i = 0; i < 4; i++)
 				{
@@ -194,6 +226,7 @@ namespace hgw
 					currentFigure.gridCoords[i].x--; //set proper grid coords
 				}
 			}
+			
 		}
 	}
 
