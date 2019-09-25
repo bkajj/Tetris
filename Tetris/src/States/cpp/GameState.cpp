@@ -3,6 +3,7 @@
 #include "src/DEFINE.hpp"
 #include <iostream>
 #include <chrono>
+#include <math.h>
 #include <random>
 
 namespace hgw
@@ -65,15 +66,25 @@ namespace hgw
 		}
 	}
 
-	void Figure::RotateLeft()
+	void Figure::Rotate(bool clockwise)
 	{
 		if (_type_ != FigureType::O)
 		{
 			for (int i = 0; i < 4; i++)
 			{
-				sf::Vector2f VrelP = gridCoords[i] - *pivot; //calculate coords of block V relative to pivot
-				sf::Vector2f Vrot = sf::Vector2f(-VrelP.y, VrelP.x); //calculate coords of block V after rotation relative to pivot
-				sf::Vector2f Vprim = Vrot + *pivot; //calculate coords of block V relative to grid
+				sf::Vector2f VrelP, Vrot, Vprim;
+				VrelP = gridCoords[i] - *pivot; //calculate coords of block V relative to pivot
+
+				if (clockwise)//calculate coords of block V after rotation relative to pivot
+				{
+					Vrot = sf::Vector2f(-VrelP.y, VrelP.x); 
+				}
+				else
+				{
+					Vrot = sf::Vector2f(VrelP.y, -VrelP.x);
+				}
+				
+				Vprim = Vrot + *pivot; //calculate coords of block V relative to grid
 
 				gridCoords[i] = Vprim;
 
@@ -94,7 +105,16 @@ namespace hgw
 					{
 						gridCoords[j].x -= offsetX;
 					}
-				}			
+				}	
+
+				if (gridCoords[i].y > 19)
+				{
+					float offsetY = gridCoords[i].y - 19;
+					for (int j = 0; j < 4; j++)
+					{
+						gridCoords[j].y -= offsetY;
+					}
+				}
 			}
 
 			for (int i = 0; i < 4; i++) //set position on screen
@@ -102,11 +122,6 @@ namespace hgw
 				blocks[i].setPosition(GRID_START_POS_X + gridCoords[i].x * BLOCK_SIZE, GRID_START_POS_Y + gridCoords[i].y * BLOCK_SIZE);
 			}
 		}	
-	}
-
-	void Figure::RotateRight()
-	{
-
 	}
 
 	void Figure::AddToGrid(short grid_X, short grid_Y)
@@ -210,34 +225,39 @@ namespace hgw
 				_data->window.close();
 			}
 
-			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			if (event.type == sf::Event::KeyPressed)
 			{
-				currentFigure.RotateLeft();
-			}
+				if (event.key.code == sf::Keyboard::X)
+				{
+					currentFigure.Rotate(true);				
+				}
+				else if (event.key.code == sf::Keyboard::Z)
+				{
+					currentFigure.Rotate(false);
+				}
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && !willGridExceed_X(1) && !willBlockOverlapBlock(1, 0)) //move right
-			{
-				for (int i = 0; i < 4; i++)
+				if (event.key.code == sf::Keyboard::Right && !willGridExceed_X(1) && !willBlockOverlapBlock(1, 0)) //move right
 				{
-					currentFigure.blocks[i].move(BLOCK_SIZE, 0); //move blocks to right by 30 
-					currentFigure.gridCoords[i].x++; //set proper grid coords
+					for (int i = 0; i < 4; i++)
+					{
+						currentFigure.blocks[i].move(BLOCK_SIZE, 0); //move blocks to right by 30 
+						currentFigure.gridCoords[i].x++; //set proper grid coords
+					}
 				}
-			}
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && !willGridExceed_X(-1) && !willBlockOverlapBlock(-1, 0)) //move left
-			{
-				for (int i = 0; i < 4; i++)
+				else if (event.key.code == sf::Keyboard::Left && !willGridExceed_X(-1) && !willBlockOverlapBlock(-1, 0)) //move left
 				{
-					currentFigure.blocks[i].move(-BLOCK_SIZE, 0); //move blocks to left by 30 
-					currentFigure.gridCoords[i].x--; //set proper grid coords
+					for (int i = 0; i < 4; i++)
+					{
+						currentFigure.blocks[i].move(-BLOCK_SIZE, 0); //move blocks to left by 30 
+						currentFigure.gridCoords[i].x--; //set proper grid coords
+					}
 				}
-			}	
+			}		
 		}
 	}
 
 	void GameState::Update(float dt)
 	{
-		
-
 		if (gameClock.getElapsedTime() >= sf::seconds(0.5) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) //Figure falling + fast fall
 		{
 			if (willGridExceed_Y(1) || willBlockOverlapBlock(0, 1))
@@ -252,12 +272,14 @@ namespace hgw
 				currentFigure = Figure(static_cast<Figure::FigureType>(nextFigure), sf::Vector2f(GRID_START_POS_X, GRID_START_POS_Y), nextColor);
 				currentFigure.AddToGrid(0, 0);
 			}
-
-			for (int i = 0; i < 4; i++)
+			else
 			{
-				currentFigure.blocks[i].move(0, BLOCK_SIZE); //move blocks down by 30
-				currentFigure.gridCoords[i].y++; //set proper grid coords
-			}
+				for (int i = 0; i < 4; i++)
+				{
+					currentFigure.blocks[i].move(0, BLOCK_SIZE); //move blocks down by 30
+					currentFigure.gridCoords[i].y++; //set proper grid coords
+				}
+			}	
 
 			gameClock.restart();
 		}

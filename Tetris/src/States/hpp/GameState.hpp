@@ -13,8 +13,7 @@ namespace hgw
 		Figure(FigureType type, sf::Vector2f startPos, sf::Color color);
 		Figure() = default;
 
-		void RotateLeft();
-		void RotateRight();
+		void Rotate(bool clockwise);
 
 		void AddToGrid(short grid_X, short grid_Y);
 		
@@ -47,6 +46,10 @@ namespace hgw
 		bool willGridExceed_X(int offestX);
 		bool willGridExceed_Y(int offsetY);
 		int random(int min, int max);
+		bool checkForRow()
+		{
+
+		}
 
 	private:
 		GameDataRef _data;
