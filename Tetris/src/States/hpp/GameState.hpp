@@ -46,10 +46,7 @@ namespace hgw
 		bool willGridExceed_X(int offestX);
 		bool willGridExceed_Y(int offsetY);
 		int random(int min, int max);
-		bool checkForRow()
-		{
-
-		}
+		std::vector<int> checkForRow();
 
 	private:
 		GameDataRef _data;

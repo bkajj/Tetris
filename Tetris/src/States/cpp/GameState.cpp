@@ -267,6 +267,30 @@ namespace hgw
 					grid[currentFigure.gridCoords[i].x][currentFigure.gridCoords[i].y] = std::make_pair(true, currentFigure.blocks[i]);
 				}
 
+				std::vector<int> filledRows = checkForRow();
+				int rowsLost = 0; //how much rows got destroyed on 1 figure place
+				if (filledRows.size() > 0)//if there is at least one row to destroy
+				{
+					for(int i = 0; i < filledRows.size(); i++) //iterates through destroyed rows Y indexes
+					{
+						for (int j = 0; j < 10; j++) //iterates through destroyed rows X indexes
+						{
+							for (int k = filledRows[i]; k > 0; k--) //move down all blocks from above deleted block
+							{
+								grid[j][k] = grid[j][k - 1];
+								grid[j][k].second.setPosition(grid[j][k].second.getPosition().x, grid[j][k].second.getPosition().y + BLOCK_SIZE);
+							}
+						}
+						rowsLost++;
+						if (i != filledRows.size() - 1)
+						{
+							filledRows[i + 1] += rowsLost; //change next filled row index, cause all block above target were moved down
+						}
+						
+					}
+					
+				}
+
 				int nextFigure = random(0, 6); //create next figure
 				sf::Color nextColor = sf::Color(random(0, 255), random(0, 255), random(0, 255), 255);
 				currentFigure = Figure(static_cast<Figure::FigureType>(nextFigure), sf::Vector2f(GRID_START_POS_X, GRID_START_POS_Y), nextColor);
@@ -283,6 +307,7 @@ namespace hgw
 
 			gameClock.restart();
 		}
+
 	}
 
 	void GameState::Draw(float dt)
@@ -351,6 +376,30 @@ namespace hgw
 			}
 		}
 		return false;
+	}
+
+	std::vector<int> GameState::checkForRow() //returns indexes of filled rows
+	{
+		std::vector<int> filledRows;
+		bool filled = true;
+
+		for (int i = 19; i >= 0; i--) //iterates through grid Ys
+		{
+			filled = true;
+			for (int j = 0; j < 10; j++) //iterates through grid Xs
+			{
+				if (grid[j][i].first == false) //if row is not filled -> skip i iteration
+				{
+					filled = false;
+					break;
+				}
+			}
+			if (filled)
+			{
+				filledRows.push_back(i);
+			}
+		}
+		return filledRows;
 	}
 
 	int GameState::random(int min, int max)
