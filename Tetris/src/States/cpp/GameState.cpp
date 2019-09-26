@@ -8,15 +8,17 @@
 
 namespace hgw
 {
-	Figure::Figure(Figure::FigureType type, sf::Vector2f startPos, sf::Color color) 
+	Figure::Figure(Figure::FigureType type, sf::Vector2f startPos, bool classicColor) 
 	{
-		figureColor = color;
 		_type_ = type;
 
 		for (int i = 0; i < 4; i++) //set size 30 x 30 and color
 		{
 			blocks[i].setSize(sf::Vector2f(BLOCK_SIZE, BLOCK_SIZE));
-			blocks[i].setFillColor(color);
+			if (!classicColor)
+			{
+				blocks[i].setFillColor(sf::Color(GameState::random(0, 255), GameState::random(0, 255), GameState::random(0, 255), 255));
+			}
 		}
 
 		switch (type) //create figure shape based on type
@@ -26,42 +28,91 @@ namespace hgw
 			blocks[1].setPosition(startPos.x + BLOCK_SIZE, startPos.y);
 			blocks[2].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y);
 			blocks[3].setPosition(startPos.x + 3 * BLOCK_SIZE, startPos.y);
+			if (classicColor)
+			{
+				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
+				{
+					blocks[i].setFillColor(sf::Color::Cyan); 
+				}
+			}
 			break;
 		case Figure::T:
 			blocks[0].setPosition(startPos.x, startPos.y + BLOCK_SIZE);
 			blocks[1].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
 			blocks[2].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y + BLOCK_SIZE);
 			blocks[3].setPosition(startPos.x + BLOCK_SIZE, startPos.y);
+			if (classicColor)
+			{
+				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
+				{
+					blocks[i].setFillColor(sf::Color(128, 0, 128, 255)); //purple
+				}
+			}
 			break;
 		case Figure::O:
 			blocks[0].setPosition(startPos.x, startPos.y);
 			blocks[1].setPosition(startPos.x + BLOCK_SIZE, startPos.y);
 			blocks[2].setPosition(startPos.x, startPos.y + BLOCK_SIZE);
 			blocks[3].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
+			if (classicColor)
+			{
+				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
+				{
+					blocks[i].setFillColor(sf::Color::Yellow);
+				}
+			}
 			break;
 		case Figure::L:
 			blocks[0].setPosition(startPos.x, startPos.y + BLOCK_SIZE);
 			blocks[1].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
 			blocks[2].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y + BLOCK_SIZE);
 			blocks[3].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y);
+			if (classicColor)
+			{
+				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
+				{
+					blocks[i].setFillColor(sf::Color(255, 165, 0, 255)); //orange
+				}
+			}
 			break;
 		case Figure::J:
 			blocks[0].setPosition(startPos.x, startPos.y);
 			blocks[1].setPosition(startPos.x, startPos.y + BLOCK_SIZE);
 			blocks[2].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
 			blocks[3].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y + BLOCK_SIZE);
+			if (classicColor)
+			{
+				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
+				{
+					blocks[i].setFillColor(sf::Color::Blue);
+				}
+			}
 			break;
 		case Figure::S:
 			blocks[0].setPosition(startPos.x, startPos.y + BLOCK_SIZE);
 			blocks[1].setPosition(startPos.x + BLOCK_SIZE, startPos.y);
 			blocks[2].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
 			blocks[3].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y);
+			if (classicColor)
+			{
+				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
+				{
+					blocks[i].setFillColor(sf::Color::Green);
+				}
+			}
 			break;
 		case Figure::Z:
 			blocks[0].setPosition(startPos.x, startPos.y);
 			blocks[1].setPosition(startPos.x + BLOCK_SIZE, startPos.y);
 			blocks[2].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
 			blocks[3].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y + BLOCK_SIZE);
+			if (classicColor)
+			{
+				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
+				{
+					blocks[i].setFillColor(sf::Color::Red);
+				}
+			}
 			break;
 		}
 	}
@@ -190,12 +241,12 @@ namespace hgw
 
 	Figure::FigureType GameState::randFigureType()
 	{
-		int roll = GameState::random(0, 7);
+		int roll = GameState::random(0, 6);
 		Figure::FigureType currType = static_cast<Figure::FigureType>(roll);
 
 		if (currType == lastType)
 		{
-			int reroll = GameState::random(0, 7);
+			int reroll = GameState::random(0, 6);
 			currType = static_cast<Figure::FigureType>(reroll);
 		}
 		return currType;
@@ -223,8 +274,8 @@ namespace hgw
 		
 		int figure = random(0, 6); //create new Figure with random color and random shape
 		sf::Color color = sf::Color(random(0, 255), random(0, 255), random(0, 255), 255);
-		currentFigure = Figure(static_cast<Figure::FigureType>(figure), sf::Vector2f(GRID_START_POS_X, GRID_START_POS_Y), color);
-		currentFigure.AddToGrid(0, 0);
+		currentFigure = Figure(static_cast<Figure::FigureType>(figure), sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y), true);
+		currentFigure.AddToGrid(3, 0);
 	}
 	
 	void GameState::HandleInput()
@@ -305,48 +356,37 @@ namespace hgw
 				lastType = currentFigure._type_;
 				Figure::FigureType nextFigureType = randFigureType();
 
-				//sf::Color nextColor = sf::Color(random(0, 255), random(0, 255), random(0, 255), 255); do a option that enables random colors
-				sf::Vector2f startPos;
+				sf::Vector2f startPos = sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y);
 				sf::Color nextColor;
 
 				switch (nextFigureType)
 				{
 				case hgw::Figure::I: 
-					startPos = sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y);
 					nextColor = sf::Color::Cyan;
 					break;
 				case hgw::Figure::T:
-					startPos = sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y);
 					nextColor = sf::Color(128, 0, 128, 255); //purple
 					break;
 				case hgw::Figure::O:
-					startPos = sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y);
 					nextColor = sf::Color::Yellow;
 					break;
 				case hgw::Figure::L:
-					startPos = sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y);
 					nextColor = sf::Color(255, 165, 0, 255); //orange
 					break;
 				case hgw::Figure::J:
-					startPos = sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y);
 					nextColor = sf::Color::Blue;
 					break;
 				case hgw::Figure::S:
-					startPos = sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y);
 					nextColor = sf::Color::Green;
 					break;
 				case hgw::Figure::Z:
-					startPos = sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y);
 					nextColor = sf::Color::Red;
 					break;
 				}
 
-				currentFigure = Figure(nextFigureType, startPos, nextColor);
-
-				//if (grid[][])
-				{
-
-				}
+				currentFigure = Figure(nextFigureType, startPos, true);
+				
+				std::cout << nextFigureType << std::endl;
 
 				currentFigure.AddToGrid(3, 0);
 			}

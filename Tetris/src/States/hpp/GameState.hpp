@@ -10,7 +10,7 @@ namespace hgw
 	{
 	public:
 		enum FigureType { I, T, O, L, J, S, Z};
-		Figure(FigureType type, sf::Vector2f startPos, sf::Color color);
+		Figure(FigureType type, sf::Vector2f startPos, bool classicColor);
 		Figure() = default;
 
 		void Rotate(bool clockwise);
