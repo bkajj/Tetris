@@ -23,15 +23,15 @@ namespace hgw
 		{
 		case Figure::I:
 			blocks[0].setPosition(startPos.x, startPos.y);
-			blocks[1].setPosition(startPos.x, startPos.y + BLOCK_SIZE);
-			blocks[2].setPosition(startPos.x, startPos.y + 2 * BLOCK_SIZE);
-			blocks[3].setPosition(startPos.x, startPos.y + 3 * BLOCK_SIZE);
+			blocks[1].setPosition(startPos.x + BLOCK_SIZE, startPos.y);
+			blocks[2].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y);
+			blocks[3].setPosition(startPos.x + 3 * BLOCK_SIZE, startPos.y);
 			break;
 		case Figure::T:
-			blocks[0].setPosition(startPos.x, startPos.y);
-			blocks[1].setPosition(startPos.x + BLOCK_SIZE, startPos.y);
-			blocks[2].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
-			blocks[3].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y);
+			blocks[0].setPosition(startPos.x, startPos.y + BLOCK_SIZE);
+			blocks[1].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
+			blocks[2].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y + BLOCK_SIZE);
+			blocks[3].setPosition(startPos.x + BLOCK_SIZE, startPos.y);
 			break;
 		case Figure::O:
 			blocks[0].setPosition(startPos.x, startPos.y);
@@ -40,16 +40,16 @@ namespace hgw
 			blocks[3].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
 			break;
 		case Figure::L:
-			blocks[0].setPosition(startPos.x, startPos.y);
-			blocks[1].setPosition(startPos.x, startPos.y + BLOCK_SIZE);
-			blocks[2].setPosition(startPos.x, startPos.y + 2 * BLOCK_SIZE);
-			blocks[3].setPosition(startPos.x + BLOCK_SIZE, startPos.y + 2 * BLOCK_SIZE);
+			blocks[0].setPosition(startPos.x, startPos.y + BLOCK_SIZE);
+			blocks[1].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
+			blocks[2].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y + BLOCK_SIZE);
+			blocks[3].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y);
 			break;
 		case Figure::J:
-			blocks[0].setPosition(startPos.x + BLOCK_SIZE, startPos.y);
-			blocks[1].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
-			blocks[2].setPosition(startPos.x + BLOCK_SIZE, startPos.y + 2 * BLOCK_SIZE);
-			blocks[3].setPosition(startPos.x, startPos.y + 2 * BLOCK_SIZE);
+			blocks[0].setPosition(startPos.x, startPos.y);
+			blocks[1].setPosition(startPos.x, startPos.y + BLOCK_SIZE);
+			blocks[2].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
+			blocks[3].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y + BLOCK_SIZE);
 			break;
 		case Figure::S:
 			blocks[0].setPosition(startPos.x, startPos.y + BLOCK_SIZE);
@@ -130,17 +130,17 @@ namespace hgw
 		{
 		case Figure::I:
 			gridCoords[0] = sf::Vector2f(grid_X, grid_Y);
-			gridCoords[1] = sf::Vector2f(grid_X, grid_Y + 1);
-			gridCoords[2] = sf::Vector2f(grid_X, grid_Y + 2);
-			gridCoords[3] = sf::Vector2f(grid_X, grid_Y + 3);
+			gridCoords[1] = sf::Vector2f(grid_X + 1, grid_Y);
+			gridCoords[2] = sf::Vector2f(grid_X + 2, grid_Y);
+			gridCoords[3] = sf::Vector2f(grid_X + 3, grid_Y);
 
 			pivot = &gridCoords[2]; //set pivot to rotate
 			break;
 		case Figure::T:
-			gridCoords[0] = sf::Vector2f(grid_X, grid_Y);
-			gridCoords[1] = sf::Vector2f(grid_X + 1, grid_Y);
-			gridCoords[2] = sf::Vector2f(grid_X + 2, grid_Y);
-			gridCoords[3] = sf::Vector2f(grid_X + 1, grid_Y + 1);
+			gridCoords[0] = sf::Vector2f(grid_X, grid_Y + 1);
+			gridCoords[1] = sf::Vector2f(grid_X + 1, grid_Y + 1);
+			gridCoords[2] = sf::Vector2f(grid_X + 2, grid_Y + 1);
+			gridCoords[3] = sf::Vector2f(grid_X + 1, grid_Y);
 
 			pivot = &gridCoords[3];
 			break;
@@ -153,18 +153,18 @@ namespace hgw
 			pivot = nullptr; //O Figure has no pivot/no rotation
 			break;
 		case Figure::L:
-			gridCoords[0] = sf::Vector2f(grid_X, grid_Y);
-			gridCoords[1] = sf::Vector2f(grid_X, grid_Y + 1);
-			gridCoords[2] = sf::Vector2f(grid_X, grid_Y + 2);
-			gridCoords[3] = sf::Vector2f(grid_X + 1, grid_Y + 2);
+			gridCoords[0] = sf::Vector2f(grid_X, grid_Y + 1);
+			gridCoords[1] = sf::Vector2f(grid_X + 1, grid_Y + 1);
+			gridCoords[2] = sf::Vector2f(grid_X + 2, grid_Y + 1);
+			gridCoords[3] = sf::Vector2f(grid_X + 2, grid_Y);
 
-			pivot = &gridCoords[2];
+			pivot = &gridCoords[1];
 			break;
 		case Figure::J:
-			gridCoords[0] = sf::Vector2f(grid_X + 1, grid_Y);
-			gridCoords[1] = sf::Vector2f(grid_X + 1, grid_Y + 1);
-			gridCoords[2] = sf::Vector2f(grid_X + 1, grid_Y + 2);
-			gridCoords[3] = sf::Vector2f(grid_X, grid_Y + 2);
+			gridCoords[0] = sf::Vector2f(grid_X, grid_Y);
+			gridCoords[1] = sf::Vector2f(grid_X, grid_Y + 1);
+			gridCoords[2] = sf::Vector2f(grid_X + 1, grid_Y + 1);
+			gridCoords[3] = sf::Vector2f(grid_X + 2, grid_Y + 1);
 
 			pivot = &gridCoords[2];
 			break;
@@ -186,6 +186,19 @@ namespace hgw
 			break;
 		}
 
+	}
+
+	Figure::FigureType GameState::randFigureType()
+	{
+		int roll = GameState::random(0, 7);
+		Figure::FigureType currType = static_cast<Figure::FigureType>(roll);
+
+		if (currType == lastType)
+		{
+			int reroll = GameState::random(0, 7);
+			currType = static_cast<Figure::FigureType>(reroll);
+		}
+		return currType;
 	}
 
 	GameState::GameState(GameDataRef _data)
@@ -286,15 +299,56 @@ namespace hgw
 						{
 							filledRows[i + 1] += rowsLost; //change next filled row index, cause all block above target were moved down
 						}
-						
-					}
-					
+					}		
 				}
 
-				int nextFigure = random(0, 6); //create next figure
-				sf::Color nextColor = sf::Color(random(0, 255), random(0, 255), random(0, 255), 255);
-				currentFigure = Figure(static_cast<Figure::FigureType>(nextFigure), sf::Vector2f(GRID_START_POS_X, GRID_START_POS_Y), nextColor);
-				currentFigure.AddToGrid(0, 0);
+				lastType = currentFigure._type_;
+				Figure::FigureType nextFigureType = randFigureType();
+
+				//sf::Color nextColor = sf::Color(random(0, 255), random(0, 255), random(0, 255), 255); do a option that enables random colors
+				sf::Vector2f startPos;
+				sf::Color nextColor;
+
+				switch (nextFigureType)
+				{
+				case hgw::Figure::I: 
+					startPos = sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y);
+					nextColor = sf::Color::Cyan;
+					break;
+				case hgw::Figure::T:
+					startPos = sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y);
+					nextColor = sf::Color(128, 0, 128, 255); //purple
+					break;
+				case hgw::Figure::O:
+					startPos = sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y);
+					nextColor = sf::Color::Yellow;
+					break;
+				case hgw::Figure::L:
+					startPos = sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y);
+					nextColor = sf::Color(255, 165, 0, 255); //orange
+					break;
+				case hgw::Figure::J:
+					startPos = sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y);
+					nextColor = sf::Color::Blue;
+					break;
+				case hgw::Figure::S:
+					startPos = sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y);
+					nextColor = sf::Color::Green;
+					break;
+				case hgw::Figure::Z:
+					startPos = sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y);
+					nextColor = sf::Color::Red;
+					break;
+				}
+
+				currentFigure = Figure(nextFigureType, startPos, nextColor);
+
+				//if (grid[][])
+				{
+
+				}
+
+				currentFigure.AddToGrid(3, 0);
 			}
 			else
 			{
@@ -376,6 +430,11 @@ namespace hgw
 			}
 		}
 		return false;
+	}
+
+	bool GameState::checkLoseGame()
+	{
+		return true;
 	}
 
 	std::vector<int> GameState::checkForRow() //returns indexes of filled rows

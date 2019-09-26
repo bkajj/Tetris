@@ -23,13 +23,9 @@ namespace hgw
 		sf::Vector2f leftGridCoord, rightGridCoord, downGridCoord, upGridCoord;
 
 		sf::Color figureColor;
-	private:
-
-		short rotation = 0;
-		sf::Vector2f* pivot;
-
-		
 		FigureType _type_;
+	private:
+		sf::Vector2f* pivot;
 	};
 
 	class GameState : public State
@@ -45,10 +41,13 @@ namespace hgw
 		bool willBlockOverlapBlock(int offsetX, int offsetY);
 		bool willGridExceed_X(int offestX);
 		bool willGridExceed_Y(int offsetY);
-		int random(int min, int max);
+		bool checkLoseGame();
+		static int random(int min, int max);
 		std::vector<int> checkForRow();
+		Figure::FigureType randFigureType();
 
 	private:
+		Figure::FigureType lastType;
 		GameDataRef _data;
 
 		sf::Clock gameClock;
