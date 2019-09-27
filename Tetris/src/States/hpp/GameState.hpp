@@ -41,7 +41,6 @@ namespace hgw
 		bool willBlockOverlapBlock(int offsetX, int offsetY);
 		bool willGridExceed_X(int offestX);
 		bool willGridExceed_Y(int offsetY);
-		bool checkLoseGame();
 		static int random(int min, int max);
 		std::vector<int> checkForRow();
 		Figure::FigureType randFigureType();

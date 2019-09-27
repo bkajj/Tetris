@@ -357,36 +357,15 @@ namespace hgw
 				Figure::FigureType nextFigureType = randFigureType();
 
 				sf::Vector2f startPos = sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y);
-				sf::Color nextColor;
-
-				switch (nextFigureType)
-				{
-				case hgw::Figure::I: 
-					nextColor = sf::Color::Cyan;
-					break;
-				case hgw::Figure::T:
-					nextColor = sf::Color(128, 0, 128, 255); //purple
-					break;
-				case hgw::Figure::O:
-					nextColor = sf::Color::Yellow;
-					break;
-				case hgw::Figure::L:
-					nextColor = sf::Color(255, 165, 0, 255); //orange
-					break;
-				case hgw::Figure::J:
-					nextColor = sf::Color::Blue;
-					break;
-				case hgw::Figure::S:
-					nextColor = sf::Color::Green;
-					break;
-				case hgw::Figure::Z:
-					nextColor = sf::Color::Red;
-					break;
-				}
-
 				currentFigure = Figure(nextFigureType, startPos, true);
 				
-				std::cout << nextFigureType << std::endl;
+				for (int i = 0; i < 10; i++)
+				{
+					if (grid[i][0].first == true)
+					{
+						_data->window.close();
+					}
+				}
 
 				currentFigure.AddToGrid(3, 0);
 			}
@@ -470,11 +449,6 @@ namespace hgw
 			}
 		}
 		return false;
-	}
-
-	bool GameState::checkLoseGame()
-	{
-		return true;
 	}
 
 	std::vector<int> GameState::checkForRow() //returns indexes of filled rows
