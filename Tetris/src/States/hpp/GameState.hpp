@@ -3,6 +3,7 @@
 #include "src/GameEngine/hpp/Game.hpp"
 #include <array>
 #include <vector>
+#include <unordered_map>
 
 namespace hgw
 {
@@ -14,8 +15,10 @@ namespace hgw
 		Figure() = default;
 
 		void Rotate(bool clockwise);
-
+		void moveFigure(sf::Vector2f offset);
+		bool testRotationOffset(int oldRotationState, int newRotationState);
 		void AddToGrid(short grid_X, short grid_Y);
+		static void setOffsetData();
 		
 		std::array<sf::RectangleShape, 4> blocks;
 		std::array<sf::Vector2f, 4> gridCoords;
@@ -24,8 +27,11 @@ namespace hgw
 
 		sf::Color figureColor;
 		FigureType _type_;
+
+		static std::map<std::pair<int, int>, sf::Vector2f> JLSTZ_offsetData, I_offsetData, O_offsetData;
 	private:
 		sf::Vector2f* pivot;
+		int rotationState = 0;
 	};
 
 	class GameState : public State
@@ -38,12 +44,15 @@ namespace hgw
 		void Update(float dt);
 		void Draw(float dt);
 
-		bool willBlockOverlapBlock(int offsetX, int offsetY);
-		bool willGridExceed_X(int offestX);
-		bool willGridExceed_Y(int offsetY);
+		static bool willBlockOverlapBlock(int offsetX, int offsetY);
+		static bool willGridExceed_X(int offestX);
+		static bool willGridExceed_Y(int offsetY);
+
 		static int random(int min, int max);
+		static int negMod(int val);
 		std::vector<int> checkForRow();
 		Figure::FigureType randFigureType();
+		static std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> grid;
 
 	private:
 		Figure::FigureType lastType;
@@ -51,9 +60,8 @@ namespace hgw
 
 		sf::Clock gameClock;
 
-		Figure currentFigure;
+		static Figure currentFigure;
 
-		std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> grid;
 		std::array<sf::RectangleShape, 11> verticalLines;
 		std::array<sf::RectangleShape, 21> horizontalLines;
 	};

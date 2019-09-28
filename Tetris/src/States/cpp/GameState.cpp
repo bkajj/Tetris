@@ -5,11 +5,14 @@
 #include <chrono>
 #include <math.h>
 #include <random>
+#include <map>
 
 namespace hgw
 {
 	Figure::Figure(Figure::FigureType type, sf::Vector2f startPos, bool classicColor) 
 	{
+		setOffsetData();
+
 		_type_ = type;
 
 		for (int i = 0; i < 4; i++) //set size 30 x 30 and color
@@ -121,6 +124,13 @@ namespace hgw
 	{
 		if (_type_ != FigureType::O)
 		{
+			int oldRotationState = rotationState;
+
+			if (clockwise) rotationState++;
+			else rotationState--;
+
+			rotationState = GameState::negMod(rotationState);
+
 			for (int i = 0; i < 4; i++)
 			{
 				sf::Vector2f VrelP, Vrot, Vprim;
@@ -128,51 +138,34 @@ namespace hgw
 
 				if (clockwise)//calculate coords of block V after rotation relative to pivot
 				{
-					Vrot = sf::Vector2f(-VrelP.y, VrelP.x); 
+					Vrot = sf::Vector2f(-VrelP.y, VrelP.x);
 				}
 				else
 				{
 					Vrot = sf::Vector2f(VrelP.y, -VrelP.x);
 				}
-				
+
 				Vprim = Vrot + *pivot; //calculate coords of block V relative to grid
 
 				gridCoords[i] = Vprim;
-
-				if (gridCoords[i].x < 0) //check if block exceeded leftmost grid piece
-				{
-					float offsetX = -gridCoords[i].x; //calculate offset and move figure by the offset
-					for (int j = 0; j < 4; j++)
-					{
-						gridCoords[j].x += offsetX;
-						
-					}
-				}
-
-				if (gridCoords[i].x > 9) //check if block exceeded rightmose grid piece
-				{
-					float offsetX = gridCoords[i].x - 9; //calculate offset and move figure by the offset
-					for (int j = 0; j < 4; j++)
-					{
-						gridCoords[j].x -= offsetX;
-					}
-				}	
-
-				if (gridCoords[i].y > 19)
-				{
-					float offsetY = gridCoords[i].y - 19;
-					for (int j = 0; j < 4; j++)
-					{
-						gridCoords[j].y -= offsetY;
-					}
-				}
 			}
 
-			for (int i = 0; i < 4; i++) //set position on screen
+			bool canOffset = testRotationOffset(oldRotationState, rotationState);
+
+			if (!canOffset)
 			{
-				blocks[i].setPosition(GRID_START_POS_X + gridCoords[i].x * BLOCK_SIZE, GRID_START_POS_Y + gridCoords[i].y * BLOCK_SIZE);
+				Rotate(!clockwise);
 			}
 		}	
+	}
+
+	void Figure::moveFigure(sf::Vector2f offset)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			gridCoords[i] += offset;
+			blocks[i].move(offset.x * BLOCK_SIZE, offset.y * BLOCK_SIZE);
+		}
 	}
 
 	void Figure::AddToGrid(short grid_X, short grid_Y)
@@ -239,6 +232,108 @@ namespace hgw
 
 	}
 
+	void Figure::setOffsetData()
+	{
+		JLSTZ_offsetData[std::make_pair(0, 0)] = sf::Vector2f(0, 0);
+		JLSTZ_offsetData[std::make_pair(0, 1)] = sf::Vector2f(0, 0);
+		JLSTZ_offsetData[std::make_pair(0, 2)] = sf::Vector2f(0, 0);
+		JLSTZ_offsetData[std::make_pair(0, 3)] = sf::Vector2f(0, 0);
+
+		JLSTZ_offsetData[std::make_pair(1, 0)] = sf::Vector2f(0, 0);
+		JLSTZ_offsetData[std::make_pair(1, 1)] = sf::Vector2f(1, 0);
+		JLSTZ_offsetData[std::make_pair(1, 2)] = sf::Vector2f(0, 0);
+		JLSTZ_offsetData[std::make_pair(1, 3)] = sf::Vector2f(-1, 0);
+
+		JLSTZ_offsetData[std::make_pair(2, 0)] = sf::Vector2f(0, 0);
+		JLSTZ_offsetData[std::make_pair(2, 1)] = sf::Vector2f(1, -1);
+		JLSTZ_offsetData[std::make_pair(2, 2)] = sf::Vector2f(0, 0);
+		JLSTZ_offsetData[std::make_pair(2, 3)] = sf::Vector2f(-1, -1);
+
+		JLSTZ_offsetData[std::make_pair(3, 0)] = sf::Vector2f(0, 0);
+		JLSTZ_offsetData[std::make_pair(3, 1)] = sf::Vector2f(0, 2);
+		JLSTZ_offsetData[std::make_pair(3, 2)] = sf::Vector2f(0, 0);
+		JLSTZ_offsetData[std::make_pair(3, 3)] = sf::Vector2f(0, 2);
+
+		JLSTZ_offsetData[std::make_pair(4, 0)] = sf::Vector2f(0, 0);
+		JLSTZ_offsetData[std::make_pair(4, 1)] = sf::Vector2f(1, 2);
+		JLSTZ_offsetData[std::make_pair(4, 2)] = sf::Vector2f(0, 0);
+		JLSTZ_offsetData[std::make_pair(4, 3)] = sf::Vector2f(-1, 2);
+
+
+		I_offsetData[std::make_pair(0, 0)] = sf::Vector2f(0, 0);
+		I_offsetData[std::make_pair(0, 1)] = sf::Vector2f(-1, 0);
+		I_offsetData[std::make_pair(0, 2)] = sf::Vector2f(-1, 1);
+		I_offsetData[std::make_pair(0, 3)] = sf::Vector2f(0, 1);
+
+		I_offsetData[std::make_pair(1, 0)] = sf::Vector2f(-1, 0);
+		I_offsetData[std::make_pair(1, 1)] = sf::Vector2f(0, 0);
+		I_offsetData[std::make_pair(1, 2)] = sf::Vector2f(1, 1);
+		I_offsetData[std::make_pair(1, 3)] = sf::Vector2f(0, 1);
+
+		I_offsetData[std::make_pair(2, 0)] = sf::Vector2f(2, 0);
+		I_offsetData[std::make_pair(2, 1)] = sf::Vector2f(0, 0);
+		I_offsetData[std::make_pair(2, 2)] = sf::Vector2f(-2, 1);
+		I_offsetData[std::make_pair(2, 3)] = sf::Vector2f(0, 1);
+
+		I_offsetData[std::make_pair(3, 0)] = sf::Vector2f(-1, 0);
+		I_offsetData[std::make_pair(3, 1)] = sf::Vector2f(0, 1);
+		I_offsetData[std::make_pair(3, 2)] = sf::Vector2f(1, 0);
+		I_offsetData[std::make_pair(3, 3)] = sf::Vector2f(0, -1);
+
+		I_offsetData[std::make_pair(4, 0)] = sf::Vector2f(2, 0);
+		I_offsetData[std::make_pair(4, 1)] = sf::Vector2f(0, -2);
+		I_offsetData[std::make_pair(4, 2)] = sf::Vector2f(-2, 0);
+		I_offsetData[std::make_pair(4, 3)] = sf::Vector2f(0, 2);
+
+		O_offsetData[std::make_pair(0, 0)] = sf::Vector2f(0, 0);
+		O_offsetData[std::make_pair(0, 1)] = sf::Vector2f(0, -1);
+		O_offsetData[std::make_pair(0, 2)] = sf::Vector2f(-1, -1);
+		O_offsetData[std::make_pair(0, 3)] = sf::Vector2f(-1, 0);
+	}
+
+	bool Figure::testRotationOffset(int oldRotationState, int newRotationState)
+	{
+		std::map<std::pair<int, int>, sf::Vector2f>* currOffsetData;
+
+		sf::Vector2f offsetVal1, offsetVal2;
+		sf::Vector2f endOffset = sf::Vector2f(0, 0);
+		bool isMovePossible = false;
+
+		if (_type_ == FigureType::I)
+		{
+			currOffsetData = &I_offsetData;
+		}
+		else
+		{
+			currOffsetData = &JLSTZ_offsetData;
+		}
+
+		for (int i = 0; i < 4; i++)
+		{
+			offsetVal1 = (*currOffsetData)[std::make_pair(i, oldRotationState)];
+			offsetVal2 = (*currOffsetData)[std::make_pair(i, newRotationState)];
+			endOffset = offsetVal1 - offsetVal2;
+
+			if (!GameState::willGridExceed_X(endOffset.x) && !GameState::willGridExceed_Y(endOffset.y) &&
+			    !GameState::willBlockOverlapBlock(endOffset.x, endOffset.y)) //if move possible
+			{
+				isMovePossible = true;
+				break;
+			}
+		}
+
+		for (int i = 0; i < 4; i++) //set position on screen
+		{
+			blocks[i].setPosition(GRID_START_POS_X + gridCoords[i].x * BLOCK_SIZE, GRID_START_POS_Y + gridCoords[i].y * BLOCK_SIZE);
+		}
+
+		if (isMovePossible)
+		{
+			moveFigure(endOffset);
+		}
+		return isMovePossible;
+	}
+
 	Figure::FigureType GameState::randFigureType()
 	{
 		int roll = GameState::random(0, 6);
@@ -302,19 +397,11 @@ namespace hgw
 
 				if (event.key.code == sf::Keyboard::Right && !willGridExceed_X(1) && !willBlockOverlapBlock(1, 0)) //move right
 				{
-					for (int i = 0; i < 4; i++)
-					{
-						currentFigure.blocks[i].move(BLOCK_SIZE, 0); //move blocks to right by 30 
-						currentFigure.gridCoords[i].x++; //set proper grid coords
-					}
+					currentFigure.moveFigure(sf::Vector2f(1, 0));
 				}
 				else if (event.key.code == sf::Keyboard::Left && !willGridExceed_X(-1) && !willBlockOverlapBlock(-1, 0)) //move left
 				{
-					for (int i = 0; i < 4; i++)
-					{
-						currentFigure.blocks[i].move(-BLOCK_SIZE, 0); //move blocks to left by 30 
-						currentFigure.gridCoords[i].x--; //set proper grid coords
-					}
+					currentFigure.moveFigure(sf::Vector2f(-1, 0));
 				}
 			}		
 		}
@@ -371,11 +458,7 @@ namespace hgw
 			}
 			else
 			{
-				for (int i = 0; i < 4; i++)
-				{
-					currentFigure.blocks[i].move(0, BLOCK_SIZE); //move blocks down by 30
-					currentFigure.gridCoords[i].y++; //set proper grid coords
-				}
+				currentFigure.moveFigure(sf::Vector2f(0, 1));
 			}	
 
 			gameClock.restart();
@@ -403,14 +486,20 @@ namespace hgw
 			}
 		}
 
-		for (int i = 0; i < 11; i++) //draw grid
+		_data->window.draw(verticalLines[0]);
+		_data->window.draw(verticalLines[10]);
+
+		_data->window.draw(horizontalLines[0]);
+		_data->window.draw(horizontalLines[20]);
+
+		/*for (int i = 0; i < 11; i++) //draw grid
 		{
 			_data->window.draw(verticalLines[i]);
 		}
 		for (int i = 0; i < 21; i++)
 		{
 			_data->window.draw(horizontalLines[i]);
-		}
+		}*/
 
 		_data->window.display();
 	}
@@ -482,4 +571,21 @@ namespace hgw
 		std::uniform_int<int> distrib(min, max);
 		return distrib(gen);
 	}
+
+	int GameState::negMod(int val)
+	{
+		if (val < 0)
+		{
+			return val % 4 + 4;
+		}
+		return val % 4;
+	}
+
+	//static variables
+	std::map<std::pair<int, int>, sf::Vector2f> Figure::I_offsetData;
+	std::map<std::pair<int, int>, sf::Vector2f> Figure::O_offsetData;
+	std::map<std::pair<int, int>, sf::Vector2f> Figure::JLSTZ_offsetData;
+
+	std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> GameState::grid;
+	Figure GameState::currentFigure;
 }
