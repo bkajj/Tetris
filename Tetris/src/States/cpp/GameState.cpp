@@ -148,6 +148,16 @@ namespace hgw
 				Vprim = Vrot + *pivot; //calculate coords of block V relative to grid
 
 				gridCoords[i] = Vprim;
+				
+			}
+
+			if (_type_ == FigureType::I && rotationState == 2)
+			{
+				for (int i = 0; i < 4; i++)
+				{
+					gridCoords[i].x -= 2;
+				}
+
 			}
 
 			bool canOffset = testRotationOffset(oldRotationState, rotationState);
@@ -344,7 +354,8 @@ namespace hgw
 			int reroll = GameState::random(0, 6);
 			currType = static_cast<Figure::FigureType>(reroll);
 		}
-		return currType;
+		//return currType;
+		return Figure::FigureType::I;
 	}
 
 	GameState::GameState(GameDataRef _data)
@@ -486,20 +497,20 @@ namespace hgw
 			}
 		}
 
-		_data->window.draw(verticalLines[0]);
-		_data->window.draw(verticalLines[10]);
+		//_data->window.draw(verticalLines[0]);
+		//_data->window.draw(verticalLines[10]);
 
-		_data->window.draw(horizontalLines[0]);
-		_data->window.draw(horizontalLines[20]);
+		//_data->window.draw(horizontalLines[0]);
+		//_data->window.draw(horizontalLines[20]);
 
-		/*for (int i = 0; i < 11; i++) //draw grid
+		for (int i = 0; i < 11; i++) //draw grid
 		{
 			_data->window.draw(verticalLines[i]);
 		}
 		for (int i = 0; i < 21; i++)
 		{
 			_data->window.draw(horizontalLines[i]);
-		}*/
+		}
 
 		_data->window.display();
 	}

@@ -31,6 +31,7 @@ namespace hgw
 		static std::map<std::pair<int, int>, sf::Vector2f> JLSTZ_offsetData, I_offsetData, O_offsetData;
 	private:
 		sf::Vector2f* pivot;
+		sf::Vector2f I_case_pivot;
 		int rotationState = 0;
 	};
 
