@@ -151,15 +151,6 @@ namespace hgw
 				
 			}
 
-			if (_type_ == FigureType::I && rotationState == 2)
-			{
-				for (int i = 0; i < 4; i++)
-				{
-					gridCoords[i].x -= 2;
-				}
-
-			}
-
 			bool canOffset = testRotationOffset(oldRotationState, rotationState);
 
 			if (!canOffset)
@@ -188,7 +179,7 @@ namespace hgw
 			gridCoords[2] = sf::Vector2f(grid_X + 2, grid_Y);
 			gridCoords[3] = sf::Vector2f(grid_X + 3, grid_Y);
 
-			pivot = &gridCoords[2]; //set pivot to rotate
+			pivot = &gridCoords[1]; //set pivot to rotate
 			break;
 		case Figure::T:
 			gridCoords[0] = sf::Vector2f(grid_X, grid_Y + 1);
@@ -294,11 +285,6 @@ namespace hgw
 		I_offsetData[std::make_pair(4, 1)] = sf::Vector2f(0, -2);
 		I_offsetData[std::make_pair(4, 2)] = sf::Vector2f(-2, 0);
 		I_offsetData[std::make_pair(4, 3)] = sf::Vector2f(0, 2);
-
-		O_offsetData[std::make_pair(0, 0)] = sf::Vector2f(0, 0);
-		O_offsetData[std::make_pair(0, 1)] = sf::Vector2f(0, -1);
-		O_offsetData[std::make_pair(0, 2)] = sf::Vector2f(-1, -1);
-		O_offsetData[std::make_pair(0, 3)] = sf::Vector2f(-1, 0);
 	}
 
 	bool Figure::testRotationOffset(int oldRotationState, int newRotationState)
@@ -594,7 +580,6 @@ namespace hgw
 
 	//static variables
 	std::map<std::pair<int, int>, sf::Vector2f> Figure::I_offsetData;
-	std::map<std::pair<int, int>, sf::Vector2f> Figure::O_offsetData;
 	std::map<std::pair<int, int>, sf::Vector2f> Figure::JLSTZ_offsetData;
 
 	std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> GameState::grid;
