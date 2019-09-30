@@ -11,13 +11,13 @@ namespace hgw
 	{
 	public:
 		enum FigureType { I, T, O, L, J, S, Z};
-		Figure(FigureType type, sf::Vector2f startPos, bool classicColor);
+		Figure(FigureType type, sf::Vector2f startPos, bool classicColor, bool isGhostPiece);
 		Figure() = default;
 
 		void Rotate(bool clockwise);
 		void moveFigure(sf::Vector2f offset);
 		bool testRotationOffset(int oldRotationState, int newRotationState);
-		void AddToGrid(short grid_X, short grid_Y);
+		void AddToGrid(short grid_X, short grid_Y, bool isGhostPiece);
 		static void setOffsetData();
 		
 		std::array<sf::RectangleShape, 4> blocks;
@@ -45,6 +45,7 @@ namespace hgw
 		void Draw(float dt);
 
 		static bool willBlockOverlapBlock(int offsetX, int offsetY);
+		static bool willBlockOverlapBlock(std::array<sf::Vector2f, 4> coords);
 		static bool willGridExceed_X(int offestX);
 		static bool willGridExceed_Y(int offsetY);
 
@@ -60,7 +61,7 @@ namespace hgw
 
 		sf::Clock gameClock;
 
-		static Figure currentFigure;
+		static Figure currentFigure, ghostFigure;
 
 		std::array<sf::RectangleShape, 11> verticalLines;
 		std::array<sf::RectangleShape, 21> horizontalLines;

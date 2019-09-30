@@ -9,7 +9,7 @@
 
 namespace hgw
 {
-	Figure::Figure(Figure::FigureType type, sf::Vector2f startPos, bool classicColor) 
+	Figure::Figure(Figure::FigureType type, sf::Vector2f startPos, bool classicColor = true, bool isGhostPiece = false)
 	{
 		setOffsetData();
 
@@ -118,6 +118,22 @@ namespace hgw
 			}
 			break;
 		}
+
+		if (isGhostPiece)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				gridCoords[i].y = GRID_START_POS_Y + 19 * BLOCK_SIZE;
+			}
+
+			while (GameState::willBlockOverlapBlock(0, 0))
+			{
+				for (int i = 0; i < 4; i++)
+				{
+					gridCoords[i].y--;
+				}
+			}
+		}
 	}
 
 	void Figure::Rotate(bool clockwise)
@@ -169,7 +185,7 @@ namespace hgw
 		}
 	}
 
-	void Figure::AddToGrid(short grid_X, short grid_Y)
+	void Figure::AddToGrid(short grid_X, short grid_Y, bool isGhostPiece = false)
 	{
 		switch (_type_) //set block coordinates on grid
 		{
@@ -231,6 +247,21 @@ namespace hgw
 			break;
 		}
 
+		if (isGhostPiece)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				gridCoords[i].y = 19;
+			}
+
+			while (GameState::willBlockOverlapBlock(0,0))
+			{
+				for (int i = 0; i < 4; i++)
+				{
+					gridCoords[i].y--;
+				}
+			}
+		}
 	}
 
 	void Figure::setOffsetData()
@@ -330,6 +361,7 @@ namespace hgw
 		return isMovePossible;
 	}
 
+
 	Figure::FigureType GameState::randFigureType()
 	{
 		int roll = GameState::random(0, 6);
@@ -340,8 +372,7 @@ namespace hgw
 			int reroll = GameState::random(0, 6);
 			currType = static_cast<Figure::FigureType>(reroll);
 		}
-		//return currType;
-		return Figure::FigureType::I;
+		return currType;
 	}
 
 	GameState::GameState(GameDataRef _data)
@@ -366,8 +397,8 @@ namespace hgw
 		
 		int figure = random(0, 6); //create new Figure with random color and random shape
 		sf::Color color = sf::Color(random(0, 255), random(0, 255), random(0, 255), 255);
-		currentFigure = Figure(static_cast<Figure::FigureType>(figure), sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y), true);
 		currentFigure.AddToGrid(3, 0);
+		currentFigure = Figure(static_cast<Figure::FigureType>(figure), sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y), true);
 	}
 	
 	void GameState::HandleInput()
@@ -506,6 +537,18 @@ namespace hgw
 		for (int i = 0; i < 4; i++)
 		{
 			if (grid[currentFigure.gridCoords[i].x + offsetX][currentFigure.gridCoords[i].y + offsetY].first == true)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool GameState::willBlockOverlapBlock(std::array<sf::Vector2f, 4> coords)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			if (grid[coords[i].x][coords[i].y].first == true)
 			{
 				return true;
 			}
