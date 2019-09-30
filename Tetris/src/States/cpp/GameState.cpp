@@ -9,6 +9,164 @@
 
 namespace hgw
 {
+	Figure::Figure(Figure::FigureType type, sf::Vector2f startCoords, bool classicColor = true, bool isGhostPiece = false)
+	{
+		setOffsetData();
+
+		_type_ = type;
+
+		switch (_type_) //set block coordinates on grid
+		{
+		case Figure::I:
+			gridCoords[0] = sf::Vector2f(startCoords.x, startCoords.y);
+			gridCoords[1] = sf::Vector2f(startCoords.x + 1, startCoords.y);
+			gridCoords[2] = sf::Vector2f(startCoords.x + 2, startCoords.y);
+			gridCoords[3] = sf::Vector2f(startCoords.x + 3, startCoords.y);
+
+			pivot = &gridCoords[1]; //set pivot to rotate
+
+			if (classicColor) //set color
+			{
+				for (int i = 0; i < 4; i++)
+				{
+					blocks[i].setFillColor(sf::Color::Cyan);
+				}
+			}			
+			break;
+		case Figure::T:
+			gridCoords[0] = sf::Vector2f(startCoords.x, startCoords.y + 1);
+			gridCoords[1] = sf::Vector2f(startCoords.x + 1, startCoords.y + 1);
+			gridCoords[2] = sf::Vector2f(startCoords.x + 2, startCoords.y + 1);
+			gridCoords[3] = sf::Vector2f(startCoords.x + 1, startCoords.y);
+
+			pivot = &gridCoords[3];
+
+			if (classicColor)
+			{
+				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
+				{
+					blocks[i].setFillColor(sf::Color(128, 0, 128, 255)); //purple
+				}
+			}
+			break;
+		case Figure::O:
+			gridCoords[0] = sf::Vector2f(startCoords.x, startCoords.y);
+			gridCoords[1] = sf::Vector2f(startCoords.x + 1, startCoords.y);
+			gridCoords[2] = sf::Vector2f(startCoords.x, startCoords.y + 1);
+			gridCoords[3] = sf::Vector2f(startCoords.x + 1, startCoords.y + 1);
+
+			pivot = nullptr; //O Figure has no pivot/no rotation
+
+			if (classicColor)
+			{
+				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
+				{
+					blocks[i].setFillColor(sf::Color::Yellow);
+				}
+			}
+			break;
+		case Figure::L:
+			gridCoords[0] = sf::Vector2f(startCoords.x, startCoords.y + 1);
+			gridCoords[1] = sf::Vector2f(startCoords.x + 1, startCoords.y + 1);
+			gridCoords[2] = sf::Vector2f(startCoords.x + 2, startCoords.y + 1);
+			gridCoords[3] = sf::Vector2f(startCoords.x + 2, startCoords.y);
+
+			pivot = &gridCoords[1];
+
+			if (classicColor)
+			{
+				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
+				{
+					blocks[i].setFillColor(sf::Color(255, 165, 0, 255)); //orange
+				}
+			}
+			break;
+		case Figure::J:
+			gridCoords[0] = sf::Vector2f(startCoords.x, startCoords.y);
+			gridCoords[1] = sf::Vector2f(startCoords.x, startCoords.y + 1);
+			gridCoords[2] = sf::Vector2f(startCoords.x + 1, startCoords.y + 1);
+			gridCoords[3] = sf::Vector2f(startCoords.x + 2, startCoords.y + 1);
+
+			pivot = &gridCoords[2];
+
+			if (classicColor)
+			{
+				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
+				{
+					blocks[i].setFillColor(sf::Color::Blue);
+				}
+			}
+			break;
+		case Figure::S:
+			gridCoords[0] = sf::Vector2f(startCoords.x, startCoords.y + 1);
+			gridCoords[1] = sf::Vector2f(startCoords.x + 1, startCoords.y);
+			gridCoords[2] = sf::Vector2f(startCoords.x + 1, startCoords.y + 1);
+			gridCoords[3] = sf::Vector2f(startCoords.x + 2, startCoords.y);
+
+			pivot = &gridCoords[2];
+
+			if (classicColor)
+			{
+				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
+				{
+					blocks[i].setFillColor(sf::Color::Green);
+				}
+			}
+			break;
+		case Figure::Z:
+			gridCoords[0] = sf::Vector2f(startCoords.x, startCoords.y);
+			gridCoords[1] = sf::Vector2f(startCoords.x + 1, startCoords.y);
+			gridCoords[2] = sf::Vector2f(startCoords.x + 1, startCoords.y + 1);
+			gridCoords[3] = sf::Vector2f(startCoords.x + 2, startCoords.y + 1);
+
+			pivot = &gridCoords[2];
+
+			if (classicColor)
+			{
+				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
+				{
+					blocks[i].setFillColor(sf::Color::Red);
+				}
+			}
+			break;
+		}
+
+		if (!classicColor) //set random color if enabled
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				blocks[i].setFillColor(sf::Color(GameState::random(0, 255), GameState::random(0, 255), GameState::random(0, 255), 255));
+			}
+		}
+
+		if (isGhostPiece) //in case of ghost piece
+		{
+			for (int i = 0; i < 4; i++) //move all blocks to downmost layer
+			{
+				gridCoords[i].y = 19;
+			}
+
+			updateGhostCoords(); //move up by 1, stop when blocks dont overlap
+
+			for (int i = 0; i < 4; i++)
+			{
+				blocks[i].setFillColor(sf::Color(blocks[i].getFillColor().r, blocks[i].getFillColor().g, 
+												 blocks[i].getFillColor().b, 100)); //add opacity to color
+
+			}
+		}
+
+		for (int i = 0; i < 4; i++)
+		{
+			blocks[i].setSize(sf::Vector2f(BLOCK_SIZE, BLOCK_SIZE));
+
+			blocks[i].setPosition(GRID_START_POS_X + gridCoords[i].x * BLOCK_SIZE,
+								  GRID_START_POS_Y + gridCoords[i].y * BLOCK_SIZE);
+		}
+
+	}
+
+	/*
 	Figure::Figure(Figure::FigureType type, sf::Vector2f startPos, bool classicColor = true, bool isGhostPiece = false)
 	{
 		setOffsetData();
@@ -135,6 +293,18 @@ namespace hgw
 			}
 		}
 	}
+	*/
+
+	void Figure::updateGhostCoords()
+	{
+		while (GameState::willBlockOverlapBlock(0, 0)) //move up by 1, stop when blocks dont overlap
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				gridCoords[i].y--;
+			}
+		}
+	}
 
 	void Figure::Rotate(bool clockwise)
 	{
@@ -176,12 +346,28 @@ namespace hgw
 		}	
 	}
 
-	void Figure::moveFigure(sf::Vector2f offset)
+	void Figure::moveFigure(sf::Vector2f offset, bool isGhostPiece = false)
 	{
-		for (int i = 0; i < 4; i++)
+		if (isGhostPiece)
 		{
-			gridCoords[i] += offset;
-			blocks[i].move(offset.x * BLOCK_SIZE, offset.y * BLOCK_SIZE);
+			for (int i = 0; i < 4; i++)
+			{
+				gridCoords[i] += offset;
+			}
+			updateGhostCoords();
+			for (int i = 0; i < 4; i++)
+			{
+				blocks[i].setPosition(GRID_START_POS_X + gridCoords[i].x * BLOCK_SIZE,
+					GRID_START_POS_Y + gridCoords[i].y * BLOCK_SIZE);
+			}
+		}
+		else
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				gridCoords[i] += offset;
+				blocks[i].move(offset.x * BLOCK_SIZE, offset.y * BLOCK_SIZE);
+			}
 		}
 	}
 
@@ -396,9 +582,9 @@ namespace hgw
 		gameClock.restart(); //start clock that moves blocks
 		
 		int figure = random(0, 6); //create new Figure with random color and random shape
-		sf::Color color = sf::Color(random(0, 255), random(0, 255), random(0, 255), 255);
-		currentFigure.AddToGrid(3, 0);
-		currentFigure = Figure(static_cast<Figure::FigureType>(figure), sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y), true);
+		//sf::Color color = sf::Color(random(0, 255), random(0, 255), random(0, 255), 255);
+		currentFigure = Figure(static_cast<Figure::FigureType>(figure), sf::Vector2f(3, 0), true, false);
+		ghostFigure = Figure(static_cast<Figure::FigureType>(figure), sf::Vector2f(3, 0), true, true);
 	}
 	
 	void GameState::HandleInput()
@@ -417,19 +603,23 @@ namespace hgw
 				if (event.key.code == sf::Keyboard::X)
 				{
 					currentFigure.Rotate(true);				
+					ghostFigure.Rotate(true);				
 				}
 				else if (event.key.code == sf::Keyboard::Z)
 				{
 					currentFigure.Rotate(false);
+					ghostFigure.Rotate(true);
 				}
 
 				if (event.key.code == sf::Keyboard::Right && !willGridExceed_X(1) && !willBlockOverlapBlock(1, 0)) //move right
 				{
 					currentFigure.moveFigure(sf::Vector2f(1, 0));
+					ghostFigure.moveFigure(sf::Vector2f(1, 0));
 				}
 				else if (event.key.code == sf::Keyboard::Left && !willGridExceed_X(-1) && !willBlockOverlapBlock(-1, 0)) //move left
 				{
 					currentFigure.moveFigure(sf::Vector2f(-1, 0));
+					ghostFigure.moveFigure(sf::Vector2f(-1, 0));
 				}
 			}		
 		}
@@ -498,9 +688,10 @@ namespace hgw
 	{
 		_data->window.clear();
 		
-		for (auto &block : currentFigure.blocks) //draw current figure
+		for (int i = 0; i < 4; i++) //draw current figure and ghost figure
 		{
-			_data->window.draw(block);
+			_data->window.draw(currentFigure.blocks[i]);
+			_data->window.draw(ghostFigure.blocks[i]);
 		}
 
 		for (int i = 0; i < 10; i++) //draw solid blocks
@@ -627,4 +818,5 @@ namespace hgw
 
 	std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> GameState::grid;
 	Figure GameState::currentFigure;
+	Figure GameState::ghostFigure;
 }

@@ -15,9 +15,11 @@ namespace hgw
 		Figure() = default;
 
 		void Rotate(bool clockwise);
-		void moveFigure(sf::Vector2f offset);
+		void moveFigure(sf::Vector2f offset, bool isGhostPiece);
 		bool testRotationOffset(int oldRotationState, int newRotationState);
 		void AddToGrid(short grid_X, short grid_Y, bool isGhostPiece);
+		void updateGhostCoords();
+
 		static void setOffsetData();
 		
 		std::array<sf::RectangleShape, 4> blocks;
