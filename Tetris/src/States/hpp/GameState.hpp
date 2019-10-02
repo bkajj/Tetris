@@ -24,7 +24,7 @@ namespace hgw
 
 		void setColor(sf::Color color);
 		void updateGhostCoords();
-		void instaFall();
+		static void instaPlace();
 
 		static void setOffsetData();
 		
@@ -54,19 +54,21 @@ namespace hgw
 
 		static int random(int min, int max);
 		static int negMod(int val);
+		static void setNextFigure(bool classicColor);
 
-		std::vector<int> checkForRow();
-		Figure::FigureType randFigureType();
+		static std::vector<int> checkForRow();
+		static void destroyFilledRows();
+		static Figure::FigureType randFigureType();
 
 		static std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> grid;
 		static Figure currentFigure, ghostFigure;
 
 	private:
-		Figure::FigureType lastType;
+		static Figure::FigureType lastType;
 		GameDataRef _data;
 
 		sf::Clock gameClock;
-		bool isDownKeyPressed= false;
+		bool isDownKeyPressed = false;
 
 
 		std::array<sf::RectangleShape, 11> verticalLines;

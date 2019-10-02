@@ -156,6 +156,15 @@ namespace hgw
 		moveFigure(sf::Vector2f(0, -1));
 	}
 
+	void Figure::instaPlace()
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			GameState::currentFigure.blocks[i].setPosition(GameState::ghostFigure.blocks[i].getPosition());
+			GameState::currentFigure.gridCoords[i] = GameState::ghostFigure.gridCoords[i];
+		}
+	}
+
 	void Figure::Rotate(bool clockwise)
 	{
 		if (_type_ != FigureType::O)
@@ -184,7 +193,6 @@ namespace hgw
 				Vprim = Vrot + *pivot; //calculate coords of block V relative to grid
 
 				gridCoords[i] = Vprim;
-
 			}
 
 			bool canOffset = testRotationOffset(oldRotationState, rotationState);
@@ -406,8 +414,27 @@ namespace hgw
 					currentFigure.Rotate(false);
 					ghostFigure.updateGhostCoords();
 				}
+				else if (event.key.code == sf::Keyboard::Space)
+				{
+					Figure::instaPlace();
 
-				if (event.key.code == sf::Keyboard::Right && !currentFigure.willGridExceed_X(1) && !currentFigure.willBlockOverlapBlock(1, 0)) //move right
+					for (int i = 0; i < 4; i++) //add to grid
+					{
+						grid[currentFigure.gridCoords[i].x][currentFigure.gridCoords[i].y] = std::make_pair(true, currentFigure.blocks[i]);
+					}
+
+					destroyFilledRows(); //clear lines
+					setNextFigure(true);
+
+					for (int i = 0; i < 10; i++) //check for lose condition
+					{
+						if (grid[i][0].first == true)
+						{
+							_data->window.close();
+						}
+					}
+				}
+				else if (event.key.code == sf::Keyboard::Right && !currentFigure.willGridExceed_X(1) && !currentFigure.willBlockOverlapBlock(1, 0)) //move right
 				{
 					currentFigure.moveFigure(sf::Vector2f(1, 0));
 					ghostFigure.moveFigure(sf::Vector2f(1, 0));
@@ -439,38 +466,9 @@ namespace hgw
 				{
 					grid[currentFigure.gridCoords[i].x][currentFigure.gridCoords[i].y] = std::make_pair(true, currentFigure.blocks[i]);
 				}
-
-				std::vector<int> filledRows = checkForRow();
-				int rowsLost = 0; //how much rows got destroyed on 1 figure place
-				if (filledRows.size() > 0)//if there is at least one row to destroy
-				{
-					for (int i = 0; i < filledRows.size(); i++) //iterates through destroyed rows Y indexes
-					{
-						for (int j = 0; j < 10; j++) //iterates through destroyed rows X indexes
-						{
-							for (int k = filledRows[i]; k > 0; k--) //move down all blocks from above deleted block
-							{
-								grid[j][k] = grid[j][k - 1];
-								grid[j][k].second.setPosition(grid[j][k].second.getPosition().x, grid[j][k].second.getPosition().y + BLOCK_SIZE);
-							}
-						}
-						rowsLost++;
-						if (i != filledRows.size() - 1)
-						{
-							filledRows[i + 1] += rowsLost; //change next filled row index, cause all block above target were moved down
-						}
-					}
-				}
-
-				lastType = currentFigure._type_;
-				Figure::FigureType nextFigureType = randFigureType();
-
-				currentFigure.Init(nextFigureType, sf::Vector2f(3, 0), true, false);
-
-				ghostFigure.Init(nextFigureType, sf::Vector2f(3, 0), true, true);
-				ghostFigure.setColor(sf::Color(currentFigure.figureColor.r, currentFigure.figureColor.g,
-											   currentFigure.figureColor.b, currentFigure.figureColor.a - 175));
-				ghostFigure.updateGhostCoords();
+		
+				destroyFilledRows();//clear lines
+				setNextFigure(true);
 
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 				{
@@ -481,7 +479,7 @@ namespace hgw
 					isDownKeyPressed = false;
 				}
 
-				for (int i = 0; i < 10; i++)
+				for (int i = 0; i < 10; i++) //check for lose condition
 				{
 					if (grid[i][0].first == true)
 					{
@@ -493,10 +491,8 @@ namespace hgw
 			{
 				currentFigure.moveFigure(sf::Vector2f(0, 1));
 			}
-
 			gameClock.restart();
 		}
-
 	}
 
 	void GameState::Draw(float dt)
@@ -536,6 +532,31 @@ namespace hgw
 		}
 
 		_data->window.display();
+	}
+
+	void GameState::destroyFilledRows()
+	{
+		std::vector<int> filledRows = checkForRow();
+		int rowsLost = 0; //how much rows got destroyed on 1 figure place
+		if (filledRows.size() > 0)//if there is at least one row to destroy
+		{
+			for (int i = 0; i < filledRows.size(); i++) //iterates through destroyed rows Y indexes
+			{
+				for (int j = 0; j < 10; j++) //iterates through destroyed rows X indexes
+				{
+					for (int k = filledRows[i]; k > 0; k--) //move down all blocks from above deleted block
+					{
+						grid[j][k] = grid[j][k - 1];
+						grid[j][k].second.setPosition(grid[j][k].second.getPosition().x, grid[j][k].second.getPosition().y + BLOCK_SIZE);
+					}
+				}
+				rowsLost++;
+				if (i != filledRows.size() - 1)
+				{
+					filledRows[i + 1] += rowsLost; //change next filled row index, cause all block above target were moved down
+				}
+			}
+		}
 	}
 
 	std::vector<int> GameState::checkForRow() //returns indexes of filled rows
@@ -578,6 +599,19 @@ namespace hgw
 		}
 		return val % 4;
 	}
+
+	void GameState::setNextFigure(bool classicColor)
+	{
+		lastType = currentFigure._type_;
+		Figure::FigureType nextFigureType = randFigureType();
+
+		currentFigure.Init(nextFigureType, sf::Vector2f(3, 0), classicColor, false);
+
+		ghostFigure.Init(nextFigureType, sf::Vector2f(3, 0), classicColor, true);
+		ghostFigure.setColor(sf::Color(currentFigure.figureColor.r, currentFigure.figureColor.g,
+			currentFigure.figureColor.b, currentFigure.figureColor.a - 175));
+		ghostFigure.updateGhostCoords();
+	}
 #pragma endregion
 
 	//static variables
@@ -588,4 +622,5 @@ namespace hgw
 
 	Figure GameState::currentFigure;
 	Figure GameState::ghostFigure;
+	Figure::FigureType GameState::lastType;
 }
