@@ -11,28 +11,34 @@ namespace hgw
 	{
 	public:
 		enum FigureType { I, T, O, L, J, S, Z};
-		Figure(FigureType type, sf::Vector2f startPos, bool classicColor, bool isGhostPiece);
-		Figure() = default;
+		Figure();
 
+		void Init(Figure::FigureType type, sf::Vector2f startCoords, bool classicColor, bool isGhostPiece);
 		void Rotate(bool clockwise);
-		void moveFigure(sf::Vector2f offset, bool isGhostPiece);
+		void moveFigure(sf::Vector2f offset);
 		bool testRotationOffset(int oldRotationState, int newRotationState);
-		void AddToGrid(short grid_X, short grid_Y, bool isGhostPiece);
+
+		bool willBlockOverlapBlock(int offsetX, int offsetY);
+		bool willGridExceed_X(int offestX);
+		bool willGridExceed_Y(int offsetY);
+
+		void setColor(sf::Color color);
 		void updateGhostCoords();
+		void instaFall();
 
 		static void setOffsetData();
 		
 		std::array<sf::RectangleShape, 4> blocks;
 		std::array<sf::Vector2f, 4> gridCoords;
 
-		sf::Vector2f leftGridCoord, rightGridCoord, downGridCoord, upGridCoord;
-
 		sf::Color figureColor;
 		FigureType _type_;
-
+		
 		static std::map<std::pair<int, int>, sf::Vector2f> JLSTZ_offsetData, I_offsetData;
 	private:
 		sf::Vector2f* pivot;
+
+		bool isGhost;
 		int rotationState = 0;
 	};
 
@@ -46,24 +52,22 @@ namespace hgw
 		void Update(float dt);
 		void Draw(float dt);
 
-		static bool willBlockOverlapBlock(int offsetX, int offsetY);
-		static bool willBlockOverlapBlock(std::array<sf::Vector2f, 4> coords);
-		static bool willGridExceed_X(int offestX);
-		static bool willGridExceed_Y(int offsetY);
-
 		static int random(int min, int max);
 		static int negMod(int val);
+
 		std::vector<int> checkForRow();
 		Figure::FigureType randFigureType();
+
 		static std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> grid;
+		static Figure currentFigure, ghostFigure;
 
 	private:
 		Figure::FigureType lastType;
 		GameDataRef _data;
 
 		sf::Clock gameClock;
+		bool isDownKeyPressed= false;
 
-		static Figure currentFigure, ghostFigure;
 
 		std::array<sf::RectangleShape, 11> verticalLines;
 		std::array<sf::RectangleShape, 21> horizontalLines;
