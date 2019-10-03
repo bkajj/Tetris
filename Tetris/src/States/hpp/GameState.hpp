@@ -18,9 +18,9 @@ namespace hgw
 		void moveFigure(sf::Vector2f offset);
 		bool testRotationOffset(int oldRotationState, int newRotationState);
 
-		bool willBlockOverlapBlock(int offsetX, int offsetY);
-		bool willGridExceed_X(int offestX);
-		bool willGridExceed_Y(int offsetY);
+		bool willBlockOverlapBlock(float offsetX, float offsetY);
+		bool willGridExceed_X(float offestX);
+		bool willGridExceed_Y(float offsetY);
 
 		void setColor(sf::Color color);
 		void updateGhostCoords();

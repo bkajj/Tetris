@@ -9,6 +9,7 @@
 
 namespace hgw
 {
+	//typedef grid_size_type std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10>::size_type
 #pragma region Figure
 	Figure::Figure()
 	{
@@ -213,11 +214,11 @@ namespace hgw
 		}
 	}
 
-	bool Figure::willBlockOverlapBlock(int offsetX, int offsetY)
+	bool Figure::willBlockOverlapBlock(float offsetX, float offsetY)
 	{
 		for (int i = 0; i < 4; i++)
 		{
-			if (GameState::grid[gridCoords[i].x + offsetX][gridCoords[i].y + offsetY].first == true)
+			if (GameState::grid[to_uns(gridCoords[i].x + offsetX)][to_uns(gridCoords[i].y + offsetY)].first == true)
 			{
 				return true;
 			}
@@ -225,7 +226,7 @@ namespace hgw
 		return false;
 	}
 
-	bool Figure::willGridExceed_X(int offestX)
+	bool Figure::willGridExceed_X(float offestX)
 	{
 		for (int i = 0; i < 4; i++)
 		{
@@ -237,7 +238,7 @@ namespace hgw
 		return false;
 	}
 
-	bool Figure::willGridExceed_Y(int offsetY)
+	bool Figure::willGridExceed_Y(float offsetY)
 	{
 		for (int i = 0; i < 4; i++)
 		{
@@ -371,7 +372,7 @@ namespace hgw
 		for (int i = 0; i < 11; i++) //draw a grid
 		{
 			verticalLines[i].setSize(sf::Vector2f(1, 600));
-			verticalLines[i].setPosition(sf::Vector2f(APP_WIDTH / 2 + i * 30 - 150, 100));
+			verticalLines[i].setPosition(sf::Vector2f(static_cast<float>(APP_WIDTH / 2 + i * 30 - 150), 100));
 		}
 		for (int i = 0; i < 21; i++)
 		{
@@ -420,7 +421,7 @@ namespace hgw
 
 					for (int i = 0; i < 4; i++) //add to grid
 					{
-						grid[currentFigure.gridCoords[i].x][currentFigure.gridCoords[i].y] = std::make_pair(true, currentFigure.blocks[i]);
+						grid[to_uns(currentFigure.gridCoords[i].x)][to_uns(currentFigure.gridCoords[i].y)] = std::make_pair(true, currentFigure.blocks[i]);
 					}
 
 					destroyFilledRows(); //clear lines
@@ -464,7 +465,7 @@ namespace hgw
 			{
 				for (int i = 0; i < 4; i++) //add to grid
 				{
-					grid[currentFigure.gridCoords[i].x][currentFigure.gridCoords[i].y] = std::make_pair(true, currentFigure.blocks[i]);
+					grid[to_uns(currentFigure.gridCoords[i].x)][to_uns(currentFigure.gridCoords[i].y)] = std::make_pair(true, currentFigure.blocks[i]);
 				}
 		
 				destroyFilledRows();//clear lines
@@ -585,7 +586,7 @@ namespace hgw
 
 	int GameState::random(int min, int max)
 	{
-		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+		unsigned seed = static_cast<unsigned>(std::chrono::system_clock::now().time_since_epoch().count());
 		std::mt19937 gen(seed);
 		std::uniform_int<int> distrib(min, max);
 		return distrib(gen);

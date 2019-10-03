@@ -16,3 +16,5 @@
 
 #define EMPTY_GRID_PLACE std::pair<bool, sf::RectangleShape>(false, sf::RectangleShape())
 #define FILLED_GRID_PLACE std::pair<bool, sf::RectangleShape>(true, sf::RectangleShape(sf::Vector2f(BLOCK_SIZE, BLOCK_SIZE)))
+
+#define to_uns(x) static_cast<unsigned>(x)
