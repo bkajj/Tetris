@@ -1,15 +1,14 @@
 #include "src/States/hpp/GameState.hpp"
 #include "src/GameEngine/hpp/Game.hpp"
+#include "src/States/hpp/GameOverState.hpp"
 #include "src/DEFINE.hpp"
 #include <iostream>
 #include <chrono>
-#include <math.h>
 #include <random>
 #include <map>
 
 namespace hgw
 {
-	//typedef grid_size_type std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10>::size_type
 #pragma region Figure
 	Figure::Figure()
 	{
@@ -418,7 +417,7 @@ namespace hgw
 				else if (event.key.code == sf::Keyboard::Space)
 				{
 					Figure::instaPlace();
-
+					//!!!! array subscript out of range somehere here
 					for (int i = 0; i < 4; i++) //add to grid
 					{
 						grid[to_uns(currentFigure.gridCoords[i].x)][to_uns(currentFigure.gridCoords[i].y)] = std::make_pair(true, currentFigure.blocks[i]);
@@ -431,7 +430,7 @@ namespace hgw
 					{
 						if (grid[i][0].first == true)
 						{
-							_data->window.close();
+							_data->machine.AddState(StateRef(new GameOverState(_data)));
 						}
 					}
 				}
@@ -463,6 +462,7 @@ namespace hgw
 		{
 			if (currentFigure.willGridExceed_Y(1) || currentFigure.willBlockOverlapBlock(0, 1))
 			{
+				//!!!! array subscript out of range somehere here
 				for (int i = 0; i < 4; i++) //add to grid
 				{
 					grid[to_uns(currentFigure.gridCoords[i].x)][to_uns(currentFigure.gridCoords[i].y)] = std::make_pair(true, currentFigure.blocks[i]);
@@ -484,7 +484,16 @@ namespace hgw
 				{
 					if (grid[i][0].first == true)
 					{
-						_data->window.close();
+						//clear grid
+						for (int i = 0; i < 10; i++)
+						{
+							for (int j = 0; j < 20; j++)
+							{
+								grid[i][j] = std::make_pair(false, sf::RectangleShape());
+							}
+						}
+
+						_data->machine.AddState(StateRef(new GameOverState(_data)));
 					}
 				}
 			}

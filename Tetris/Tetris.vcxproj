@@ -133,6 +133,7 @@
     <ClCompile Include="src\Main.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">P:\VisualC++\Libs\SFML-2.5.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="src\States\cpp\GameOverState.cpp" />
     <ClCompile Include="src\States\cpp\GameState.cpp" />
     <ClCompile Include="src\States\cpp\MenuState.cpp" />
     <ClCompile Include="src\States\cpp\SettingsState.cpp" />
@@ -147,6 +148,7 @@
     <ClInclude Include="src\GameEngine\hpp\SoundManager.hpp" />
     <ClInclude Include="src\GameEngine\hpp\State.hpp" />
     <ClInclude Include="src\GameEngine\hpp\StateMachine.hpp" />
+    <ClInclude Include="src\States\hpp\GameOverState.hpp" />
     <ClInclude Include="src\States\hpp\GameState.hpp" />
     <ClInclude Include="src\States\hpp\MenuState.hpp" />
     <ClInclude Include="src\States\hpp\SettingsState.hpp" />
