@@ -19,7 +19,7 @@ namespace hgw
 	{
 		setOffsetData();
 
-		_type_ = type;
+		_type_ = I;
 
 		switch (_type_) //set block coordinates on grid
 		{
@@ -165,7 +165,7 @@ namespace hgw
 		}
 	}
 
-	void Figure::Rotate(bool clockwise)
+	void Figure::Rotate(bool clockwise, bool shouldOffest)
 	{
 		if (_type_ != FigureType::O)
 		{
@@ -195,12 +195,15 @@ namespace hgw
 				gridCoords[i] = Vprim;
 			}
 
-			bool canOffset = testRotationOffset(oldRotationState, rotationState);
-
-			if (!canOffset)
+			if (shouldOffest)
 			{
-				Rotate(!clockwise);
-			}
+				bool canOffset = testRotationOffset(oldRotationState, rotationState);
+
+				if (!canOffset)
+				{
+					Rotate(!clockwise, false);
+				}
+			}	
 		}
 	}
 
@@ -346,6 +349,19 @@ namespace hgw
 		return isMovePossible;
 	}
 
+	bool Figure::areCoordsGood()
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			if (gridCoords[i].x < 0 || gridCoords[i].x > 9 || 
+				gridCoords[i].y < 0 || gridCoords[i].y > 19)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	Figure::FigureType GameState::randFigureType()
 	{
 		int roll = GameState::random(0, 6);
@@ -404,23 +420,17 @@ namespace hgw
 
 			if (event.type == sf::Event::KeyPressed)
 			{
-				if (event.key.code == sf::Keyboard::X)
+				if (event.key.code == sf::Keyboard::Space)
 				{
-					currentFigure.Rotate(true);
-					ghostFigure.updateGhostCoords();
-				}
-				else if (event.key.code == sf::Keyboard::Z)
-				{
-					currentFigure.Rotate(false);
-					ghostFigure.updateGhostCoords();
-				}
-				else if (event.key.code == sf::Keyboard::Space)
-				{
+					//insta place with rotation causes errors
 					Figure::instaPlace();
-					//!!!! array subscript out of range somehere here
-					for (int i = 0; i < 4; i++) //add to grid
+					//!!!! array subscript out of range somehere here // probably not not
+					if (currentFigure.areCoordsGood())
 					{
-						grid[to_uns(currentFigure.gridCoords[i].x)][to_uns(currentFigure.gridCoords[i].y)] = std::make_pair(true, currentFigure.blocks[i]);
+						for (int i = 0; i < 4; i++) //add to grid
+						{
+							grid[to_uns(currentFigure.gridCoords[i].x)][to_uns(currentFigure.gridCoords[i].y)] = std::make_pair(true, currentFigure.blocks[i]);
+						}
 					}
 
 					destroyFilledRows(); //clear lines
@@ -430,10 +440,29 @@ namespace hgw
 					{
 						if (grid[i][0].first == true)
 						{
+							//clear grid
+							for (int i = 0; i < 10; i++)
+							{
+								for (int j = 0; j < 20; j++)
+								{
+									grid[i][j] = std::make_pair(false, sf::RectangleShape());
+								}
+							}
+
 							_data->machine.AddState(StateRef(new GameOverState(_data)));
 						}
 					}
 				}
+				else if (event.key.code == sf::Keyboard::X)
+				{
+					currentFigure.Rotate(true, true);
+					ghostFigure.updateGhostCoords();
+				}
+				else if (event.key.code == sf::Keyboard::Z)
+				{
+					currentFigure.Rotate(false, true);
+					ghostFigure.updateGhostCoords();
+				}			
 				else if (event.key.code == sf::Keyboard::Right && !currentFigure.willGridExceed_X(1) && !currentFigure.willBlockOverlapBlock(1, 0)) //move right
 				{
 					currentFigure.moveFigure(sf::Vector2f(1, 0));
@@ -462,13 +491,16 @@ namespace hgw
 		{
 			if (currentFigure.willGridExceed_Y(1) || currentFigure.willBlockOverlapBlock(0, 1))
 			{
-				//!!!! array subscript out of range somehere here
-				for (int i = 0; i < 4; i++) //add to grid
+				//!!!! array subscript out of range somehere here // probably not not
+				if (currentFigure.areCoordsGood())
 				{
-					grid[to_uns(currentFigure.gridCoords[i].x)][to_uns(currentFigure.gridCoords[i].y)] = std::make_pair(true, currentFigure.blocks[i]);
+					for (int i = 0; i < 4; i++) //add to grid
+					{
+						grid[to_uns(currentFigure.gridCoords[i].x)][to_uns(currentFigure.gridCoords[i].y)] = std::make_pair(true, currentFigure.blocks[i]);
+					}
 				}
 		
-				destroyFilledRows();//clear lines
+				destroyFilledRows(); //clear lines
 				setNextFigure(true);
 
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
@@ -622,6 +654,7 @@ namespace hgw
 			currentFigure.figureColor.b, currentFigure.figureColor.a - 175));
 		ghostFigure.updateGhostCoords();
 	}
+
 #pragma endregion
 
 	//static variables

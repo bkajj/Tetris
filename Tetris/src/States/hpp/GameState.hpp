@@ -14,7 +14,7 @@ namespace hgw
 		Figure();
 
 		void Init(Figure::FigureType type, sf::Vector2f startCoords, bool classicColor, bool isGhostPiece);
-		void Rotate(bool clockwise);
+		void Rotate(bool clockwise, bool shouldOffest);
 		void moveFigure(sf::Vector2f offset);
 		bool testRotationOffset(int oldRotationState, int newRotationState);
 
@@ -24,6 +24,7 @@ namespace hgw
 
 		void setColor(sf::Color color);
 		void updateGhostCoords();
+		bool areCoordsGood();
 		static void instaPlace();
 
 		static void setOffsetData();
