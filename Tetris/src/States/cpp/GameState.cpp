@@ -9,11 +9,17 @@
 
 namespace hgw
 {
-	Figure::Figure(Figure::FigureType type, sf::Vector2f startCoords, bool classicColor = true, bool isGhostPiece = false)
+#pragma region Figure
+	Figure::Figure()
+	{
+
+	}
+
+	void Figure::Init(Figure::FigureType type, sf::Vector2f startCoords, bool classicColor = true, bool isGhostPiece = false)
 	{
 		setOffsetData();
 
-		_type_ = I;
+		_type_ = GameState::randFigureType();
 
 		switch (_type_) //set block coordinates on grid
 		{
@@ -27,11 +33,8 @@ namespace hgw
 
 			if (classicColor) //set color
 			{
-				for (int i = 0; i < 4; i++)
-				{
-					blocks[i].setFillColor(sf::Color::Cyan);
-				}
-			}			
+				setColor(sf::Color::Cyan);
+			}
 			break;
 		case Figure::T:
 			gridCoords[0] = sf::Vector2f(startCoords.x, startCoords.y + 1);
@@ -43,10 +46,7 @@ namespace hgw
 
 			if (classicColor)
 			{
-				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
-				{
-					blocks[i].setFillColor(sf::Color(128, 0, 128, 255)); //purple
-				}
+				setColor(sf::Color(128, 0, 128, 255));//purple
 			}
 			break;
 		case Figure::O:
@@ -59,10 +59,7 @@ namespace hgw
 
 			if (classicColor)
 			{
-				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
-				{
-					blocks[i].setFillColor(sf::Color::Yellow);
-				}
+				setColor(sf::Color::Yellow);
 			}
 			break;
 		case Figure::L:
@@ -75,10 +72,7 @@ namespace hgw
 
 			if (classicColor)
 			{
-				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
-				{
-					blocks[i].setFillColor(sf::Color(255, 165, 0, 255)); //orange
-				}
+				setColor(sf::Color(255, 165, 0, 255)); //orange
 			}
 			break;
 		case Figure::J:
@@ -91,10 +85,7 @@ namespace hgw
 
 			if (classicColor)
 			{
-				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
-				{
-					blocks[i].setFillColor(sf::Color::Blue);
-				}
+				setColor(sf::Color::Blue);
 			}
 			break;
 		case Figure::S:
@@ -107,10 +98,7 @@ namespace hgw
 
 			if (classicColor)
 			{
-				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
-				{
-					blocks[i].setFillColor(sf::Color::Green);
-				}
+				setColor(sf::Color::Green);
 			}
 			break;
 		case Figure::Z:
@@ -123,187 +111,49 @@ namespace hgw
 
 			if (classicColor)
 			{
-				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
-				{
-					blocks[i].setFillColor(sf::Color::Red);
-				}
+				setColor(sf::Color::Red);
 			}
 			break;
 		}
 
 		if (!classicColor) //set random color if enabled
 		{
-			for (int i = 0; i < 4; i++)
-			{
-				blocks[i].setFillColor(sf::Color(GameState::random(0, 255), GameState::random(0, 255), GameState::random(0, 255), 255));
-			}
+			setColor(sf::Color(GameState::random(0, 255), GameState::random(0, 255), GameState::random(0, 255), 255));
 		}
 
-		if (isGhostPiece) //in case of ghost piece
-		{
-			for (int i = 0; i < 4; i++) //move all blocks to downmost layer
-			{
-				gridCoords[i].y = 19;
-			}
-
-			updateGhostCoords(); //move up by 1, stop when blocks dont overlap
-
-			for (int i = 0; i < 4; i++)
-			{
-				blocks[i].setFillColor(sf::Color(blocks[i].getFillColor().r, blocks[i].getFillColor().g, 
-												 blocks[i].getFillColor().b, 100)); //add opacity to color
-
-			}
-		}
 
 		for (int i = 0; i < 4; i++)
 		{
 			blocks[i].setSize(sf::Vector2f(BLOCK_SIZE, BLOCK_SIZE));
 
 			blocks[i].setPosition(GRID_START_POS_X + gridCoords[i].x * BLOCK_SIZE,
-								  GRID_START_POS_Y + gridCoords[i].y * BLOCK_SIZE);
+				GRID_START_POS_Y + gridCoords[i].y * BLOCK_SIZE);
 		}
 
 	}
 
-	/*
-	Figure::Figure(Figure::FigureType type, sf::Vector2f startPos, bool classicColor = true, bool isGhostPiece = false)
+	void Figure::setColor(sf::Color color)
 	{
-		setOffsetData();
-
-		_type_ = type;
-
-		for (int i = 0; i < 4; i++) //set size 30 x 30 and color
+		figureColor = color;
+		for (int i = 0; i < 4; i++)
 		{
-			blocks[i].setSize(sf::Vector2f(BLOCK_SIZE, BLOCK_SIZE));
-			if (!classicColor)
-			{
-				blocks[i].setFillColor(sf::Color(GameState::random(0, 255), GameState::random(0, 255), GameState::random(0, 255), 255));
-			}
-		}
-
-		switch (type) //create figure shape based on type
-		{
-		case Figure::I:
-			blocks[0].setPosition(startPos.x, startPos.y);
-			blocks[1].setPosition(startPos.x + BLOCK_SIZE, startPos.y);
-			blocks[2].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y);
-			blocks[3].setPosition(startPos.x + 3 * BLOCK_SIZE, startPos.y);
-			if (classicColor)
-			{
-				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
-				{
-					blocks[i].setFillColor(sf::Color::Cyan); 
-				}
-			}
-			break;
-		case Figure::T:
-			blocks[0].setPosition(startPos.x, startPos.y + BLOCK_SIZE);
-			blocks[1].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
-			blocks[2].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y + BLOCK_SIZE);
-			blocks[3].setPosition(startPos.x + BLOCK_SIZE, startPos.y);
-			if (classicColor)
-			{
-				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
-				{
-					blocks[i].setFillColor(sf::Color(128, 0, 128, 255)); //purple
-				}
-			}
-			break;
-		case Figure::O:
-			blocks[0].setPosition(startPos.x, startPos.y);
-			blocks[1].setPosition(startPos.x + BLOCK_SIZE, startPos.y);
-			blocks[2].setPosition(startPos.x, startPos.y + BLOCK_SIZE);
-			blocks[3].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
-			if (classicColor)
-			{
-				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
-				{
-					blocks[i].setFillColor(sf::Color::Yellow);
-				}
-			}
-			break;
-		case Figure::L:
-			blocks[0].setPosition(startPos.x, startPos.y + BLOCK_SIZE);
-			blocks[1].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
-			blocks[2].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y + BLOCK_SIZE);
-			blocks[3].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y);
-			if (classicColor)
-			{
-				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
-				{
-					blocks[i].setFillColor(sf::Color(255, 165, 0, 255)); //orange
-				}
-			}
-			break;
-		case Figure::J:
-			blocks[0].setPosition(startPos.x, startPos.y);
-			blocks[1].setPosition(startPos.x, startPos.y + BLOCK_SIZE);
-			blocks[2].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
-			blocks[3].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y + BLOCK_SIZE);
-			if (classicColor)
-			{
-				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
-				{
-					blocks[i].setFillColor(sf::Color::Blue);
-				}
-			}
-			break;
-		case Figure::S:
-			blocks[0].setPosition(startPos.x, startPos.y + BLOCK_SIZE);
-			blocks[1].setPosition(startPos.x + BLOCK_SIZE, startPos.y);
-			blocks[2].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
-			blocks[3].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y);
-			if (classicColor)
-			{
-				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
-				{
-					blocks[i].setFillColor(sf::Color::Green);
-				}
-			}
-			break;
-		case Figure::Z:
-			blocks[0].setPosition(startPos.x, startPos.y);
-			blocks[1].setPosition(startPos.x + BLOCK_SIZE, startPos.y);
-			blocks[2].setPosition(startPos.x + BLOCK_SIZE, startPos.y + BLOCK_SIZE);
-			blocks[3].setPosition(startPos.x + 2 * BLOCK_SIZE, startPos.y + BLOCK_SIZE);
-			if (classicColor)
-			{
-				for (int i = 0; i < 4; i++) //set size 30 x 30 and color
-				{
-					blocks[i].setFillColor(sf::Color::Red);
-				}
-			}
-			break;
-		}
-
-		if (isGhostPiece)
-		{
-			for (int i = 0; i < 4; i++)
-			{
-				gridCoords[i].y = GRID_START_POS_Y + 19 * BLOCK_SIZE;
-			}
-
-			while (GameState::willBlockOverlapBlock(0, 0))
-			{
-				for (int i = 0; i < 4; i++)
-				{
-					gridCoords[i].y--;
-				}
-			}
+			blocks[i].setFillColor(color);
 		}
 	}
-	*/
 
 	void Figure::updateGhostCoords()
 	{
-		while (GameState::willBlockOverlapBlock(0, 0)) //move up by 1, stop when blocks dont overlap
+		gridCoords = GameState::currentFigure.gridCoords;
+		for (int i = 0; i < 4; i++)
 		{
-			for (int i = 0; i < 4; i++)
-			{
-				gridCoords[i].y--;
-			}
+			blocks[i].setPosition(GameState::currentFigure.blocks[i].getPosition());
 		}
+
+		while (!willGridExceed_X(0) && !willGridExceed_Y(0) && !willBlockOverlapBlock(0, 0))
+		{
+			moveFigure(sf::Vector2f(0, 1));
+		}
+		moveFigure(sf::Vector2f(0, -1));
 	}
 
 	void Figure::instaPlace()
@@ -343,15 +193,15 @@ namespace hgw
 				Vprim = Vrot + *pivot; //calculate coords of block V relative to grid
 
 				gridCoords[i] = Vprim;
-<<<<<<< HEAD
-=======
-				
->>>>>>> parent of f47acf4... Refactored code a little bit, added ghost piece
+			}
+
+			for (int i = 0; i < 4; i++) //set position on screen
+			{
+				blocks[i].setPosition(GRID_START_POS_X + gridCoords[i].x * BLOCK_SIZE, GRID_START_POS_Y + gridCoords[i].y * BLOCK_SIZE);
 			}
 
 			if (shouldOffest)
 			{
-<<<<<<< HEAD
 				bool canOffset = testRotationOffset(oldRotationState, rotationState);
 
 				if (!canOffset)
@@ -360,29 +210,15 @@ namespace hgw
 				}
 			}	
 		}
-=======
-				Rotate(!clockwise);
-			}
-		}	
->>>>>>> parent of f47acf4... Refactored code a little bit, added ghost piece
 	}
 
-	void Figure::moveFigure(sf::Vector2f offset, bool isGhostPiece = false)
+	void Figure::moveFigure(sf::Vector2f offset)
 	{
-		if (isGhostPiece)
+		for (int i = 0; i < 4; i++)
 		{
-			for (int i = 0; i < 4; i++)
-			{
-				gridCoords[i] += offset;
-			}
-			updateGhostCoords();
-			for (int i = 0; i < 4; i++)
-			{
-				blocks[i].setPosition(GRID_START_POS_X + gridCoords[i].x * BLOCK_SIZE,
-					GRID_START_POS_Y + gridCoords[i].y * BLOCK_SIZE);
-			}
+			gridCoords[i] += offset;
+			blocks[i].move(offset.x * BLOCK_SIZE, offset.y * BLOCK_SIZE);
 		}
-<<<<<<< HEAD
 	}
 
 	bool Figure::willBlockOverlapBlock(float offsetX, float offsetY)
@@ -390,105 +226,35 @@ namespace hgw
 		for (int i = 0; i < 4; i++)
 		{
 			if (GameState::grid[to_uns(gridCoords[i].x + offsetX)][to_uns(gridCoords[i].y + offsetY)].first == true)
-=======
-		else
-		{
-			for (int i = 0; i < 4; i++)
->>>>>>> parent of f47acf4... Refactored code a little bit, added ghost piece
 			{
-				gridCoords[i] += offset;
-				blocks[i].move(offset.x * BLOCK_SIZE, offset.y * BLOCK_SIZE);
+				return true;
 			}
 		}
+		return false;
 	}
 
-<<<<<<< HEAD
 	bool Figure::willGridExceed_X(float offestX)
-=======
-	void Figure::AddToGrid(short grid_X, short grid_Y, bool isGhostPiece = false)
->>>>>>> parent of f47acf4... Refactored code a little bit, added ghost piece
 	{
-		switch (_type_) //set block coordinates on grid
+		for (int i = 0; i < 4; i++)
 		{
-		case Figure::I:
-			gridCoords[0] = sf::Vector2f(grid_X, grid_Y);
-			gridCoords[1] = sf::Vector2f(grid_X + 1, grid_Y);
-			gridCoords[2] = sf::Vector2f(grid_X + 2, grid_Y);
-			gridCoords[3] = sf::Vector2f(grid_X + 3, grid_Y);
-
-			pivot = &gridCoords[1]; //set pivot to rotate
-			break;
-		case Figure::T:
-			gridCoords[0] = sf::Vector2f(grid_X, grid_Y + 1);
-			gridCoords[1] = sf::Vector2f(grid_X + 1, grid_Y + 1);
-			gridCoords[2] = sf::Vector2f(grid_X + 2, grid_Y + 1);
-			gridCoords[3] = sf::Vector2f(grid_X + 1, grid_Y);
-
-			pivot = &gridCoords[3];
-			break;
-		case Figure::O:
-			gridCoords[0] = sf::Vector2f(grid_X, grid_Y);
-			gridCoords[1] = sf::Vector2f(grid_X + 1, grid_Y);
-			gridCoords[2] = sf::Vector2f(grid_X, grid_Y + 1);
-			gridCoords[3] = sf::Vector2f(grid_X + 1, grid_Y + 1);
-
-			pivot = nullptr; //O Figure has no pivot/no rotation
-			break;
-		case Figure::L:
-			gridCoords[0] = sf::Vector2f(grid_X, grid_Y + 1);
-			gridCoords[1] = sf::Vector2f(grid_X + 1, grid_Y + 1);
-			gridCoords[2] = sf::Vector2f(grid_X + 2, grid_Y + 1);
-			gridCoords[3] = sf::Vector2f(grid_X + 2, grid_Y);
-
-			pivot = &gridCoords[1];
-			break;
-		case Figure::J:
-			gridCoords[0] = sf::Vector2f(grid_X, grid_Y);
-			gridCoords[1] = sf::Vector2f(grid_X, grid_Y + 1);
-			gridCoords[2] = sf::Vector2f(grid_X + 1, grid_Y + 1);
-			gridCoords[3] = sf::Vector2f(grid_X + 2, grid_Y + 1);
-
-			pivot = &gridCoords[2];
-			break;
-		case Figure::S:
-			gridCoords[0] = sf::Vector2f(grid_X, grid_Y + 1);
-			gridCoords[1] = sf::Vector2f(grid_X + 1, grid_Y);
-			gridCoords[2] = sf::Vector2f(grid_X + 1, grid_Y + 1);
-			gridCoords[3] = sf::Vector2f(grid_X + 2, grid_Y);
-
-			pivot = &gridCoords[2];
-			break;
-		case Figure::Z:
-			gridCoords[0] = sf::Vector2f(grid_X, grid_Y);
-			gridCoords[1] = sf::Vector2f(grid_X + 1, grid_Y);
-			gridCoords[2] = sf::Vector2f(grid_X + 1, grid_Y + 1);
-			gridCoords[3] = sf::Vector2f(grid_X + 2, grid_Y + 1);
-
-			pivot = &gridCoords[2];
-			break;
+			if (gridCoords[i].x + offestX < 0 || gridCoords[i].x + offestX > 9)
+			{
+				return true;
+			}
 		}
+		return false;
+	}
 
-<<<<<<< HEAD
 	bool Figure::willGridExceed_Y(float offsetY)
 	{
 		for (int i = 0; i < 4; i++)
-=======
-		if (isGhostPiece)
->>>>>>> parent of f47acf4... Refactored code a little bit, added ghost piece
 		{
-			for (int i = 0; i < 4; i++)
+			if (gridCoords[i].y + offsetY < 0 || gridCoords[i].y + offsetY > 19)
 			{
-				gridCoords[i].y = 19;
-			}
-
-			while (GameState::willBlockOverlapBlock(0,0))
-			{
-				for (int i = 0; i < 4; i++)
-				{
-					gridCoords[i].y--;
-				}
+				return true;
 			}
 		}
+		return false;
 	}
 
 	void Figure::setOffsetData()
@@ -562,23 +328,18 @@ namespace hgw
 			currOffsetData = &JLSTZ_offsetData;
 		}
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 5; i++)
 		{
 			offsetVal1 = (*currOffsetData)[std::make_pair(i, oldRotationState)];
 			offsetVal2 = (*currOffsetData)[std::make_pair(i, newRotationState)];
 			endOffset = offsetVal1 - offsetVal2;
 
-			if (!GameState::willGridExceed_X(endOffset.x) && !GameState::willGridExceed_Y(endOffset.y) &&
-			    !GameState::willBlockOverlapBlock(endOffset.x, endOffset.y)) //if move possible
+			if (!willGridExceed_X(endOffset.x) && !willGridExceed_Y(endOffset.y) &&
+				!willBlockOverlapBlock(endOffset.x, endOffset.y)) //if move possible
 			{
 				isMovePossible = true;
 				break;
 			}
-		}
-
-		for (int i = 0; i < 4; i++) //set position on screen
-		{
-			blocks[i].setPosition(GRID_START_POS_X + gridCoords[i].x * BLOCK_SIZE, GRID_START_POS_Y + gridCoords[i].y * BLOCK_SIZE);
 		}
 
 		if (isMovePossible)
@@ -588,7 +349,6 @@ namespace hgw
 		return isMovePossible;
 	}
 
-<<<<<<< HEAD
 	bool Figure::areCoordsGood()
 	{
 		for (int i = 0; i < 4; i++)
@@ -601,8 +361,6 @@ namespace hgw
 		}
 		return true;
 	}
-=======
->>>>>>> parent of f47acf4... Refactored code a little bit, added ghost piece
 
 	Figure::FigureType GameState::randFigureType()
 	{
@@ -616,10 +374,12 @@ namespace hgw
 		}
 		return currType;
 	}
+#pragma endregion
 
-	GameState::GameState(GameDataRef _data)
+#pragma region GameState
+	GameState::GameState(GameDataRef data)
 	{
-		this->_data = _data;
+		_data = data;
 	}
 
 	void GameState::Init()
@@ -627,11 +387,7 @@ namespace hgw
 		for (int i = 0; i < 11; i++) //draw a grid
 		{
 			verticalLines[i].setSize(sf::Vector2f(1, 600));
-<<<<<<< HEAD
 			verticalLines[i].setPosition(sf::Vector2f(static_cast<float>(APP_WIDTH / 2 + i * 30 - 150), 100));
-=======
-			verticalLines[i].setPosition(sf::Vector2f(APP_WIDTH / 2 + i*30 - 150, 100));
->>>>>>> parent of f47acf4... Refactored code a little bit, added ghost piece
 		}
 		for (int i = 0; i < 21; i++)
 		{
@@ -640,13 +396,17 @@ namespace hgw
 		}
 
 		gameClock.restart(); //start clock that moves blocks
-		
-		int figure = random(0, 6); //create new Figure with random color and random shape
-		//sf::Color color = sf::Color(random(0, 255), random(0, 255), random(0, 255), 255);
-		currentFigure = Figure(static_cast<Figure::FigureType>(figure), sf::Vector2f(3, 0), true, false);
-		ghostFigure = Figure(static_cast<Figure::FigureType>(figure), sf::Vector2f(3, 0), true, true);
+
+		Figure::FigureType figure = randFigureType();
+
+		currentFigure.Init(figure, sf::Vector2f(3, 0), true, false);
+
+		ghostFigure.Init(figure, sf::Vector2f(3, 0), true, true);
+		ghostFigure.setColor(sf::Color(currentFigure.figureColor.r, currentFigure.figureColor.g,
+									   currentFigure.figureColor.b, currentFigure.figureColor.a - 175));
+		ghostFigure.updateGhostCoords();
 	}
-	
+
 	void GameState::HandleInput()
 	{
 		sf::Event event;
@@ -662,7 +422,6 @@ namespace hgw
 			{
 				if (event.key.code == sf::Keyboard::Space)
 				{
-<<<<<<< HEAD
 					//insta place with rotation causes errors
 					Figure::instaPlace();
 					//!!!! array subscript out of range somehere here // probably not not
@@ -705,41 +464,36 @@ namespace hgw
 					ghostFigure.updateGhostCoords();
 				}			
 				else if (event.key.code == sf::Keyboard::Right && !currentFigure.willGridExceed_X(1) && !currentFigure.willBlockOverlapBlock(1, 0)) //move right
-=======
-					currentFigure.Rotate(true);				
-					ghostFigure.Rotate(true);				
-				}
-				else if (event.key.code == sf::Keyboard::Z)
-				{
-					currentFigure.Rotate(false);
-					ghostFigure.Rotate(true);
-				}
-
-				if (event.key.code == sf::Keyboard::Right && !willGridExceed_X(1) && !willBlockOverlapBlock(1, 0)) //move right
->>>>>>> parent of f47acf4... Refactored code a little bit, added ghost piece
 				{
 					currentFigure.moveFigure(sf::Vector2f(1, 0));
 					ghostFigure.moveFigure(sf::Vector2f(1, 0));
+					ghostFigure.updateGhostCoords();
 				}
-				else if (event.key.code == sf::Keyboard::Left && !willGridExceed_X(-1) && !willBlockOverlapBlock(-1, 0)) //move left
+				else if (event.key.code == sf::Keyboard::Left && !currentFigure.willGridExceed_X(-1) && !currentFigure.willBlockOverlapBlock(-1, 0)) //move left
 				{
 					currentFigure.moveFigure(sf::Vector2f(-1, 0));
 					ghostFigure.moveFigure(sf::Vector2f(-1, 0));
+					ghostFigure.updateGhostCoords();
 				}
-			}		
+			}
+
+			if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Down)
+			{
+				isDownKeyPressed = false;
+			}
 		}
 	}
 
 	void GameState::Update(float dt)
 	{
-		if (gameClock.getElapsedTime() >= sf::seconds(0.5) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) //Figure falling + fast fall
+		if ((gameClock.getElapsedTime() >= sf::seconds(0.5) || 
+			(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !isDownKeyPressed))) //Figure falling + fast fall
 		{
-			if (willGridExceed_Y(1) || willBlockOverlapBlock(0, 1))
+			if (currentFigure.willGridExceed_Y(1) || currentFigure.willBlockOverlapBlock(0, 1))
 			{
 				//!!!! array subscript out of range somehere here // probably not not
 				if (currentFigure.areCoordsGood())
 				{
-<<<<<<< HEAD
 					for (int i = 0; i < 4; i++) //add to grid
 					{
 						grid[to_uns(currentFigure.gridCoords[i].x)][to_uns(currentFigure.gridCoords[i].y)] = std::make_pair(true, currentFigure.blocks[i]);
@@ -759,40 +513,6 @@ namespace hgw
 				}
 
 				for (int i = 0; i < 10; i++) //check for lose condition
-=======
-					grid[currentFigure.gridCoords[i].x][currentFigure.gridCoords[i].y] = std::make_pair(true, currentFigure.blocks[i]);
-				}
-
-				std::vector<int> filledRows = checkForRow();
-				int rowsLost = 0; //how much rows got destroyed on 1 figure place
-				if (filledRows.size() > 0)//if there is at least one row to destroy
-				{
-					for(int i = 0; i < filledRows.size(); i++) //iterates through destroyed rows Y indexes
-					{
-						for (int j = 0; j < 10; j++) //iterates through destroyed rows X indexes
-						{
-							for (int k = filledRows[i]; k > 0; k--) //move down all blocks from above deleted block
-							{
-								grid[j][k] = grid[j][k - 1];
-								grid[j][k].second.setPosition(grid[j][k].second.getPosition().x, grid[j][k].second.getPosition().y + BLOCK_SIZE);
-							}
-						}
-						rowsLost++;
-						if (i != filledRows.size() - 1)
-						{
-							filledRows[i + 1] += rowsLost; //change next filled row index, cause all block above target were moved down
-						}
-					}		
-				}
-
-				lastType = currentFigure._type_;
-				Figure::FigureType nextFigureType = randFigureType();
-
-				sf::Vector2f startPos = sf::Vector2f(GRID_START_POS_X + 3 * BLOCK_SIZE, GRID_START_POS_Y);
-				currentFigure = Figure(nextFigureType, startPos, true);
-				
-				for (int i = 0; i < 10; i++)
->>>>>>> parent of f47acf4... Refactored code a little bit, added ghost piece
 				{
 					if (grid[i][0].first == true)
 					{
@@ -808,18 +528,11 @@ namespace hgw
 						_data->machine.AddState(StateRef(new GameOverState(_data)));
 					}
 				}
-
-				currentFigure.AddToGrid(3, 0);
 			}
 			else
 			{
 				currentFigure.moveFigure(sf::Vector2f(0, 1));
-<<<<<<< HEAD
 			}
-=======
-			}	
-
->>>>>>> parent of f47acf4... Refactored code a little bit, added ghost piece
 			gameClock.restart();
 		}
 	}
@@ -827,7 +540,7 @@ namespace hgw
 	void GameState::Draw(float dt)
 	{
 		_data->window.clear();
-		
+
 		for (int i = 0; i < 4; i++) //draw current figure and ghost figure
 		{
 			_data->window.draw(currentFigure.blocks[i]);
@@ -863,7 +576,6 @@ namespace hgw
 		_data->window.display();
 	}
 
-<<<<<<< HEAD
 	void GameState::destroyFilledRows()
 	{
 		std::vector<int> filledRows = checkForRow();
@@ -887,54 +599,6 @@ namespace hgw
 				}
 			}
 		}
-=======
-	bool GameState::willBlockOverlapBlock(int offsetX, int offsetY)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			if (grid[currentFigure.gridCoords[i].x + offsetX][currentFigure.gridCoords[i].y + offsetY].first == true)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	bool GameState::willBlockOverlapBlock(std::array<sf::Vector2f, 4> coords)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			if (grid[coords[i].x][coords[i].y].first == true)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	bool GameState::willGridExceed_X(int offestX)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			if (currentFigure.gridCoords[i].x + offestX < 0 || currentFigure.gridCoords[i].x + offestX > 9)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	bool GameState::willGridExceed_Y(int offsetY)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			if (currentFigure.gridCoords[i].y + offsetY < 0 || currentFigure.gridCoords[i].y + offsetY > 19)
-			{
-				return true;
-			}
-		}
-		return false;
->>>>>>> parent of f47acf4... Refactored code a little bit, added ghost piece
 	}
 
 	std::vector<int> GameState::checkForRow() //returns indexes of filled rows
@@ -977,7 +641,6 @@ namespace hgw
 		}
 		return val % 4;
 	}
-<<<<<<< HEAD
 
 	void GameState::setNextFigure(bool classicColor)
 	{
@@ -993,14 +656,13 @@ namespace hgw
 	}
 
 #pragma endregion
-=======
->>>>>>> parent of f47acf4... Refactored code a little bit, added ghost piece
 
 	//static variables
 	std::map<std::pair<int, int>, sf::Vector2f> Figure::I_offsetData;
 	std::map<std::pair<int, int>, sf::Vector2f> Figure::JLSTZ_offsetData;
 
 	std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> GameState::grid;
+
 	Figure GameState::currentFigure;
 	Figure GameState::ghostFigure;
 	Figure::FigureType GameState::lastType;
