@@ -144,22 +144,22 @@ namespace hgw
 
 	void Figure::updateGhostCoords()
 	{
-		gridCoords = GameState::currentFigure.gridCoords;
+		gridCoords = GameState::currentFigure.gridCoords; //set coord of ghost figure to current figure
 		for (int i = 0; i < 4; i++)
 		{
 			blocks[i].setPosition(GameState::currentFigure.blocks[i].getPosition());
 		}
 
-		while (!willGridExceed_X(0) && !willGridExceed_Y(0) && !willBlockOverlapBlock(0, 0))
+		while (!willGridExceed_X(0) && !willGridExceed_Y(0) && !willBlockOverlapBlock(0, 0)) //if move possible, move down
 		{
 			moveFigure(sf::Vector2f(0, 1));
 		}
-		moveFigure(sf::Vector2f(0, -1));
+		moveFigure(sf::Vector2f(0, -1)); //adjust height
 	}
 
 	void Figure::instaPlace()
 	{
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++) //set current figure coords and position to ghost's
 		{
 			GameState::currentFigure.blocks[i].setPosition(GameState::ghostFigure.blocks[i].getPosition());
 			GameState::currentFigure.gridCoords[i] = GameState::ghostFigure.gridCoords[i];
@@ -168,7 +168,7 @@ namespace hgw
 
 	void Figure::Rotate(bool clockwise, bool shouldOffest)
 	{
-		if (_type_ != FigureType::O)
+		if (_type_ != FigureType::O) //O figure dont rotate
 		{
 			int oldRotationState = rotationState;
 
@@ -201,13 +201,13 @@ namespace hgw
 				blocks[i].setPosition(GRID_START_POS_X + gridCoords[i].x * BLOCK_SIZE, GRID_START_POS_Y + gridCoords[i].y * BLOCK_SIZE);
 			}
 
-			if (shouldOffest)
+			if (shouldOffest) //if this rotation isnt performed to revert last rotation
 			{
-				bool canOffset = testRotationOffset(oldRotationState, rotationState);
+				bool canOffset = testRotationOffset(oldRotationState, rotationState); //test if can offset and offset
 
 				if (!canOffset)
 				{
-					Rotate(!clockwise, false);
+					Rotate(!clockwise, false); //if can't offset perform revert rotation
 				}
 			}	
 		}
@@ -260,6 +260,7 @@ namespace hgw
 
 	void Figure::setOffsetData()
 	{
+		//data got from harddrop.com
 		JLSTZ_offsetData[std::make_pair(0, 0)] = sf::Vector2f(0, 0);
 		JLSTZ_offsetData[std::make_pair(0, 1)] = sf::Vector2f(0, 0);
 		JLSTZ_offsetData[std::make_pair(0, 2)] = sf::Vector2f(0, 0);
@@ -314,11 +315,11 @@ namespace hgw
 
 	bool Figure::testRotationOffset(int oldRotationState, int newRotationState)
 	{
-		std::map<std::pair<int, int>, sf::Vector2f>* currOffsetData;
+		//pointer to proper offset data, to avoid copying whole map evert time (i think that is what would happend)
+		std::map<std::pair<int, int>, sf::Vector2f>* currOffsetData; 
 
 		sf::Vector2f offsetVal1, offsetVal2;
 		sf::Vector2f endOffset = sf::Vector2f(0, 0);
-		bool isMovePossible = false;
 
 		if (_type_ == FigureType::I)
 		{
@@ -329,25 +330,20 @@ namespace hgw
 			currOffsetData = &JLSTZ_offsetData;
 		}
 
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 5; i++) //test 5 offsets
 		{
-			offsetVal1 = (*currOffsetData)[std::make_pair(i, oldRotationState)];
-			offsetVal2 = (*currOffsetData)[std::make_pair(i, newRotationState)];
+			offsetVal1 = (*currOffsetData)[std::make_pair(i, oldRotationState)]; //get data for old rotation state, for current test
+			offsetVal2 = (*currOffsetData)[std::make_pair(i, newRotationState)]; //get data for current rotation state, for current test
 			endOffset = offsetVal1 - offsetVal2;
 
 			if (!willGridExceed_X(endOffset.x) && !willGridExceed_Y(endOffset.y) &&
 				!willBlockOverlapBlock(endOffset.x, endOffset.y)) //if move possible
 			{
-				isMovePossible = true;
-				break;
+				moveFigure(endOffset);
+				return true;
 			}
 		}
-
-		if (isMovePossible)
-		{
-			moveFigure(endOffset);
-		}
-		return isMovePossible;
+		return false; //move not possible
 	}
 
 	bool Figure::areCoordsGood()
@@ -365,10 +361,10 @@ namespace hgw
 
 	Figure::FigureType GameState::randFigureType()
 	{
-		int roll = GameState::random(0, 6);
+		int roll = GameState::random(0, 6); //"roll" figure type
 		Figure::FigureType currType = static_cast<Figure::FigureType>(roll);
 
-		if (currType == lastType)
+		if (currType == lastType) //"reroll" if last one was the same
 		{
 			int reroll = GameState::random(0, 6);
 			currType = static_cast<Figure::FigureType>(reroll);
@@ -400,10 +396,11 @@ namespace hgw
 
 		Figure::FigureType figure = randFigureType();
 
-		currentFigure.Init(figure, sf::Vector2f(3, 0), true, false);
+		//used Init cause in this particular case constructor was causing bugs
+		currentFigure.Init(figure, sf::Vector2f(3, 0), true, false); //create current figure
 
-		ghostFigure.Init(figure, sf::Vector2f(3, 0), true, true);
-		ghostFigure.setColor(sf::Color(currentFigure.figureColor.r, currentFigure.figureColor.g,
+		ghostFigure.Init(figure, sf::Vector2f(3, 0), true, true); //create ghost figure
+		ghostFigure.setColor(sf::Color(currentFigure.figureColor.r, currentFigure.figureColor.g, //set ghosts figure color to more transparent
 									   currentFigure.figureColor.b, currentFigure.figureColor.a - 175));
 		ghostFigure.updateGhostCoords();
 	}
@@ -423,9 +420,8 @@ namespace hgw
 			{
 				if (event.key.code == sf::Keyboard::Space)
 				{
-					//insta place with rotation causes errors
 					Figure::instaPlace();
-					//!!!! array subscript out of range somehere here // probably not not
+
 					if (currentFigure.areCoordsGood())
 					{
 						for (int i = 0; i < 4; i++) //add to grid
@@ -435,13 +431,13 @@ namespace hgw
 					}
 
 					destroyFilledRows(); //clear lines
-					setNextFigure(true);
+					setNextFigures(true); //create next figures
 
 					for (int i = 0; i < 10; i++) //check for lose condition
 					{
 						if (grid[i][0].first == true)
 						{
-							//clear grid
+							//clear grid, cause it's static
 							for (int i = 0; i < 10; i++)
 							{
 								for (int j = 0; j < 20; j++)
@@ -454,12 +450,12 @@ namespace hgw
 						}
 					}
 				}
-				else if (event.key.code == sf::Keyboard::X)
+				else if (event.key.code == sf::Keyboard::X) //clockwise rotation
 				{
-					currentFigure.Rotate(true, true);
+					currentFigure.Rotate(true, true); 
 					ghostFigure.updateGhostCoords();
 				}
-				else if (event.key.code == sf::Keyboard::Z)
+				else if (event.key.code == sf::Keyboard::Z) //counterclockwise rotation
 				{
 					currentFigure.Rotate(false, true);
 					ghostFigure.updateGhostCoords();
@@ -467,18 +463,16 @@ namespace hgw
 				else if (event.key.code == sf::Keyboard::Right && !currentFigure.willGridExceed_X(1) && !currentFigure.willBlockOverlapBlock(1, 0)) //move right
 				{
 					currentFigure.moveFigure(sf::Vector2f(1, 0));
-					ghostFigure.moveFigure(sf::Vector2f(1, 0));
 					ghostFigure.updateGhostCoords();
 				}
 				else if (event.key.code == sf::Keyboard::Left && !currentFigure.willGridExceed_X(-1) && !currentFigure.willBlockOverlapBlock(-1, 0)) //move left
 				{
 					currentFigure.moveFigure(sf::Vector2f(-1, 0));
-					ghostFigure.moveFigure(sf::Vector2f(-1, 0));
 					ghostFigure.updateGhostCoords();
 				}
 			}
 
-			if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Down)
+			if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Down) //down key release
 			{
 				isDownKeyPressed = false;
 			}
@@ -487,13 +481,11 @@ namespace hgw
 
 	void GameState::Update(float dt)
 	{
-		std::cout << currentFigure.rotationState << std::endl;
 		if ((gameClock.getElapsedTime() >= sf::seconds(0.5) || 
 			(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !isDownKeyPressed))) //Figure falling + fast fall
 		{
-			if (currentFigure.willGridExceed_Y(1) || currentFigure.willBlockOverlapBlock(0, 1))
+			if (currentFigure.willGridExceed_Y(1) || currentFigure.willBlockOverlapBlock(0, 1)) //if figure stopped
 			{
-				//!!!! array subscript out of range somehere here // probably not not
 				if (currentFigure.areCoordsGood())
 				{
 					for (int i = 0; i < 4; i++) //add to grid
@@ -503,8 +495,9 @@ namespace hgw
 				}
 		
 				destroyFilledRows(); //clear lines
-				setNextFigure(true);
+				setNextFigures(true); //create next figures
 
+				//isDownKeyPressed is needed for stopping next figure from fast falling when holding down key
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 				{
 					isDownKeyPressed = true;
@@ -635,7 +628,7 @@ namespace hgw
 		return distrib(gen);
 	}
 
-	int GameState::negMod(int val)
+	int GameState::negMod(int val) //modulo that works for negative numbers as well
 	{
 		if (val < 0)
 		{
@@ -644,7 +637,7 @@ namespace hgw
 		return val % 4;
 	}
 
-	void GameState::setNextFigure(bool classicColor)
+	void GameState::setNextFigures(bool classicColor) //create and set next figures (ghost and current)
 	{
 		lastType = currentFigure._type_;
 		Figure::FigureType nextFigureType = randFigureType();
