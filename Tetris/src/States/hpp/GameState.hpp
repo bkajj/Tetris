@@ -36,11 +36,12 @@ namespace hgw
 		FigureType _type_;
 		
 		static std::map<std::pair<int, int>, sf::Vector2f> JLSTZ_offsetData, I_offsetData;
+		int rotationState = 0;
 	private:
 		sf::Vector2f* pivot;
 
 		bool isGhost;
-		int rotationState = 0;
+		
 	};
 
 	class GameState : public State

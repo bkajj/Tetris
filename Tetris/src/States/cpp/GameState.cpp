@@ -20,6 +20,7 @@ namespace hgw
 		setOffsetData();
 
 		_type_ = GameState::randFigureType();
+		rotationState = 0;
 
 		switch (_type_) //set block coordinates on grid
 		{
@@ -486,6 +487,7 @@ namespace hgw
 
 	void GameState::Update(float dt)
 	{
+		std::cout << currentFigure.rotationState << std::endl;
 		if ((gameClock.getElapsedTime() >= sf::seconds(0.5) || 
 			(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !isDownKeyPressed))) //Figure falling + fast fall
 		{
