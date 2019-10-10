@@ -36,6 +36,7 @@ namespace hgw
 		sf::Color figureColor;
 		FigureType _type_;
 		int rotationState = 0;
+
 	private:
 
 		sf::Vector2f* pivot;
@@ -63,7 +64,11 @@ namespace hgw
 		static std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> grid;
 		static Figure currentFigure, ghostFigure;
 
+		static int rowsCleaned;
+		static unsigned long score;
+
 	private:
+		static sf::Text rowsCleanedtext;
 		static Figure::FigureType lastType;
 		GameDataRef _data;
 

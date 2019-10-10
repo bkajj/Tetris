@@ -381,7 +381,7 @@ namespace hgw
 
 	void GameState::Init()
 	{
-		for (int i = 0; i < 11; i++) //draw a grid
+		for (int i = 0; i < 11; i++) //set grid
 		{
 			verticalLines[i].setSize(sf::Vector2f(1, 600));
 			verticalLines[i].setPosition(sf::Vector2f(static_cast<float>(APP_WIDTH / 2 + i * 30 - 150), 100));
@@ -391,6 +391,12 @@ namespace hgw
 			horizontalLines[i].setSize(sf::Vector2f(300, 1));
 			horizontalLines[i].setPosition(verticalLines[0].getPosition().x, verticalLines[0].getPosition().y + i * 30);
 		}
+		_data->graphics.LoadFont("font", FONT_PATH);
+		rowsCleanedtext.setFont(_data->graphics.GetFont("font"));
+		rowsCleanedtext.setCharacterSize(50);
+		rowsCleanedtext.setString("Score: 0");
+
+		rowsCleanedtext.setPosition((APP_WIDTH - rowsCleanedtext.getGlobalBounds().width) / 2, 0);
 
 		gameClock.restart(); //start clock that moves blocks
 
@@ -568,6 +574,8 @@ namespace hgw
 			_data->window.draw(horizontalLines[i]);
 		}
 
+		_data->window.draw(rowsCleanedtext);
+
 		_data->window.display();
 	}
 
@@ -593,7 +601,26 @@ namespace hgw
 					filledRows[i + 1] += rowsLost; //change next filled row index, cause all block above target were moved down
 				}
 			}
-		}
+
+			rowsCleaned += rowsLost;
+
+			switch (rowsLost)
+			{
+			case 1:
+				score += 40;
+			case 2:
+				score += 100;
+				break;
+			case 3:
+				score += 300;
+				break;
+			case 4:
+				score += 1200;
+			}
+
+			//GameState::rowsCleanedtext.setString("Score: " + score); causes nice bug
+			GameState::rowsCleanedtext.setString("Score: " + std::to_string(score));
+		}		
 	}
 
 	std::vector<int> GameState::checkForRow() //returns indexes of filled rows
@@ -661,4 +688,8 @@ namespace hgw
 	Figure GameState::currentFigure;
 	Figure GameState::ghostFigure;
 	Figure::FigureType GameState::lastType;
+
+	int GameState::rowsCleaned;
+	unsigned long GameState::score;
+	sf::Text GameState::rowsCleanedtext;
 }
