@@ -2,6 +2,7 @@
 #include "src/GameEngine/hpp/State.hpp"
 #include "src/GameEngine/hpp/Game.hpp"
 #include <array>
+#include <fstream>
 #include <unordered_map>
 
 namespace hgw
@@ -24,9 +25,10 @@ namespace hgw
 		bool willGridExceed_X(float offestX);
 		bool willGridExceed_Y(float offsetY);
 			
-		static void instaPlace();
+		void instaPlace();
 		void setColor(sf::Color color);
-		static void setOffsetData();
+		void setOffsetData();
+		FigureType randFigureType();
 			
 		static std::map<std::pair<int, int>, sf::Vector2f> JLSTZ_offsetData, I_offsetData;
 
@@ -53,23 +55,24 @@ namespace hgw
 		void Update(float dt);
 		void Draw(float dt);
 
-		static int random(int min, int max);
-		static int negMod(int val);
-		static Figure::FigureType randFigureType();
+		void setNextFigures(bool classicColor);
+		std::vector<int> checkForRow();
+		void destroyFilledRows();
 
-		static void setNextFigures(bool classicColor);
-		static std::vector<int> checkForRow();
-		static void destroyFilledRows();
+		void updateHighScore(unsigned long newHS);
+		unsigned long getHighScoreFromFile();
 		
 		static std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> grid;
 		static Figure currentFigure, ghostFigure;
 
-		static int rowsCleaned;
-		static unsigned long score;
+		int rowsCleaned;
+		unsigned long score;
+		unsigned long highScore;
+		std::fstream dataFile;
 
-	private:
-		static sf::Text rowsCleanedtext;
 		static Figure::FigureType lastType;
+	private:
+		sf::Text scoreText, highScoreText;
 		GameDataRef _data;
 
 		sf::Clock gameClock;
@@ -78,4 +81,7 @@ namespace hgw
 		std::array<sf::RectangleShape, 11> verticalLines;
 		std::array<sf::RectangleShape, 21> horizontalLines;
 	};
+
+	int random(int min, int max);
+	int negMod(int val);
 }

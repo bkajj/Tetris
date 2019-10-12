@@ -6,6 +6,7 @@
 #include <chrono>
 #include <random>
 #include <map>
+#include <filesystem>
 
 namespace hgw
 {
@@ -19,7 +20,7 @@ namespace hgw
 	{
 		setOffsetData();
 
-		_type_ = GameState::randFigureType();
+		_type_ = randFigureType();
 		rotationState = 0;
 
 		switch (_type_) //set block coordinates on grid
@@ -119,7 +120,7 @@ namespace hgw
 
 		if (!classicColor) //set random color if enabled
 		{
-			setColor(sf::Color(GameState::random(0, 255), GameState::random(0, 255), GameState::random(0, 255), 255));
+			setColor(sf::Color(random(0, 255), random(0, 255), random(0, 255), 255));
 		}
 
 
@@ -175,7 +176,7 @@ namespace hgw
 			if (clockwise) rotationState++;
 			else rotationState--;
 
-			rotationState = GameState::negMod(rotationState);
+			rotationState = negMod(rotationState);
 
 			for (int i = 0; i < 4; i++)
 			{
@@ -359,14 +360,14 @@ namespace hgw
 		return true;
 	}
 
-	Figure::FigureType GameState::randFigureType()
+	Figure::FigureType Figure::randFigureType()
 	{
-		int roll = GameState::random(0, 6); //"roll" figure type
+		int roll = random(0, 6); //"roll" figure type
 		Figure::FigureType currType = static_cast<Figure::FigureType>(roll);
 
-		if (currType == lastType) //"reroll" if last one was the same
+		if (currType == GameState::lastType) //"reroll" if last one was the same
 		{
-			int reroll = GameState::random(0, 6);
+			int reroll = random(0, 6);
 			currType = static_cast<Figure::FigureType>(reroll);
 		}
 		return currType;
@@ -381,6 +382,8 @@ namespace hgw
 
 	void GameState::Init()
 	{
+		highScore = getHighScoreFromFile();
+
 		for (int i = 0; i < 11; i++) //set grid
 		{
 			verticalLines[i].setSize(sf::Vector2f(1, 600));
@@ -392,15 +395,21 @@ namespace hgw
 			horizontalLines[i].setPosition(verticalLines[0].getPosition().x, verticalLines[0].getPosition().y + i * 30);
 		}
 		_data->graphics.LoadFont("font", FONT_PATH);
-		rowsCleanedtext.setFont(_data->graphics.GetFont("font"));
-		rowsCleanedtext.setCharacterSize(50);
-		rowsCleanedtext.setString("Score: 0");
 
-		rowsCleanedtext.setPosition((APP_WIDTH - rowsCleanedtext.getGlobalBounds().width) / 2, 0);
+		scoreText.setFont(_data->graphics.GetFont("font"));
+		scoreText.setCharacterSize(50);
+		scoreText.setString("Score: 0");
+
+		highScoreText.setFont(_data->graphics.GetFont("font"));
+		highScoreText.setCharacterSize(50);
+		highScoreText.setString("High score: " + std::to_string(highScore));
+
+		scoreText.setPosition((APP_WIDTH - scoreText.getGlobalBounds().width) / 2, 0);
+		highScoreText.setPosition((APP_WIDTH - highScoreText.getGlobalBounds().width) / 2, horizontalLines[20].getPosition().y);
 
 		gameClock.restart(); //start clock that moves blocks
 
-		Figure::FigureType figure = randFigureType();
+		Figure::FigureType figure = currentFigure.randFigureType();
 
 		//used Init cause in this particular case constructor was causing bugs
 		currentFigure.Init(figure, sf::Vector2f(3, 0), true, false); //create current figure
@@ -426,7 +435,7 @@ namespace hgw
 			{
 				if (event.key.code == sf::Keyboard::Space)
 				{
-					Figure::instaPlace();
+					currentFigure.instaPlace();
 
 					if (currentFigure.areCoordsGood())
 					{
@@ -574,7 +583,8 @@ namespace hgw
 			_data->window.draw(horizontalLines[i]);
 		}
 
-		_data->window.draw(rowsCleanedtext);
+		_data->window.draw(scoreText);
+		_data->window.draw(highScoreText);
 
 		_data->window.display();
 	}
@@ -608,6 +618,7 @@ namespace hgw
 			{
 			case 1:
 				score += 40;
+				break;
 			case 2:
 				score += 100;
 				break;
@@ -618,8 +629,13 @@ namespace hgw
 				score += 1200;
 			}
 
-			//GameState::rowsCleanedtext.setString("Score: " + score); causes nice bug
-			GameState::rowsCleanedtext.setString("Score: " + std::to_string(score));
+			//GameState::rowsCleanedtext.setString("Score: " + score);// causes nice bug
+			GameState::scoreText.setString("Score: " + std::to_string(score));
+
+			if (score > highScore)
+			{
+				updateHighScore(score);
+			}
 		}		
 	}
 
@@ -647,7 +663,7 @@ namespace hgw
 		return filledRows;
 	}
 
-	int GameState::random(int min, int max)
+	int random(int min, int max)
 	{
 		unsigned seed = static_cast<unsigned>(std::chrono::system_clock::now().time_since_epoch().count());
 		std::mt19937 gen(seed);
@@ -655,7 +671,7 @@ namespace hgw
 		return distrib(gen);
 	}
 
-	int GameState::negMod(int val) //modulo that works for negative numbers as well
+	int negMod(int val) //modulo that works for negative numbers as well
 	{
 		if (val < 0)
 		{
@@ -667,7 +683,7 @@ namespace hgw
 	void GameState::setNextFigures(bool classicColor) //create and set next figures (ghost and current)
 	{
 		lastType = currentFigure._type_;
-		Figure::FigureType nextFigureType = randFigureType();
+		Figure::FigureType nextFigureType = currentFigure.randFigureType();
 
 		currentFigure.Init(nextFigureType, sf::Vector2f(3, 0), classicColor, false);
 
@@ -677,8 +693,61 @@ namespace hgw
 		ghostFigure.updateGhostCoords();
 	}
 
-#pragma endregion
+	void GameState::updateHighScore(unsigned long newHS)
+	{
+		std::fstream newFile;
+		highScore = newHS;
 
+		newFile.open("tempData.dat", std::fstream::out | std::ios::binary);
+		dataFile.open("data.dat", std::fstream::out | std::ios::binary);
+
+		if (!dataFile.fail() && !newFile.fail())
+		{
+			newFile << "highscore " + std::to_string(highScore) << "\n";
+
+			std::string line;
+			while (std::getline(dataFile, line)) //copy all lines from data to newFile except highscore
+			{
+				if (line.find("highscore") == std::string::npos)
+				{
+					newFile << line << "\n";
+				}
+			}
+
+			dataFile.close();
+			newFile.close();
+
+			std::experimental::filesystem::remove("data.dat"); //remove data file
+			std::experimental::filesystem::rename("tempData.dat", "data.dat"); //rename tempData file to data
+		}
+
+		dataFile.close();
+		newFile.close();		
+	}
+
+	unsigned long GameState::getHighScoreFromFile()
+	{
+		dataFile.open("data.dat", std::fstream::out | std::fstream::in | std::fstream::binary);
+
+		if (dataFile.good())
+		{
+			std::string line;
+			while (std::getline(dataFile, line))
+			{
+				if (line.find("highscore") != std::string::npos) //if this line contatins "highscore"
+				{
+					std::string score = line.erase(0, 10); //10, cause "highscore " has 10 chars
+					dataFile.close();
+					return std::stoul(score);
+				}
+			}
+		}
+		dataFile.close();
+		return 0;
+	}
+
+#pragma endregion
+	
 	//static variables
 	std::map<std::pair<int, int>, sf::Vector2f> Figure::I_offsetData;
 	std::map<std::pair<int, int>, sf::Vector2f> Figure::JLSTZ_offsetData;
@@ -688,8 +757,10 @@ namespace hgw
 	Figure GameState::currentFigure;
 	Figure GameState::ghostFigure;
 	Figure::FigureType GameState::lastType;
-
+	/*
 	int GameState::rowsCleaned;
 	unsigned long GameState::score;
-	sf::Text GameState::rowsCleanedtext;
+	unsigned long GameState::highScore;
+	sf::Text GameState::scoreText;
+	sf::Text GameState::highScoreText;*/
 }
