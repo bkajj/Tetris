@@ -61,6 +61,7 @@ namespace hgw
 
 		void updateHighScore(unsigned long newHS);
 		unsigned long getHighScoreFromFile();
+		std::string insertZeros(int score);
 		
 		static std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> grid;
 		static Figure currentFigure, ghostFigure;

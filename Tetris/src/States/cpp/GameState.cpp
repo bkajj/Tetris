@@ -398,14 +398,16 @@ namespace hgw
 
 		scoreText.setFont(_data->graphics.GetFont("font"));
 		scoreText.setCharacterSize(50);
-		scoreText.setString("Score: 0");
+		scoreText.setLineSpacing(0.75f);
+		scoreText.setString("Score:\n000000");
 
 		highScoreText.setFont(_data->graphics.GetFont("font"));
 		highScoreText.setCharacterSize(50);
-		highScoreText.setString("High score: " + std::to_string(highScore));
+		highScoreText.setLineSpacing(0.75f);
+		highScoreText.setString("Top:\n" + insertZeros(highScore));
 
-		scoreText.setPosition((APP_WIDTH - scoreText.getGlobalBounds().width) / 2, 0);
-		highScoreText.setPosition((APP_WIDTH - highScoreText.getGlobalBounds().width) / 2, horizontalLines[20].getPosition().y);
+		highScoreText.setPosition(verticalLines[10].getPosition().x + 15, 0);
+		scoreText.setPosition(verticalLines[10].getPosition().x + 15, 90);
 
 		dropClock.restart(); //start clock that moves blocks horizontally
 		moveClock.restart(); //start clock that moves blocks vertically
@@ -636,24 +638,25 @@ namespace hgw
 			switch (rowsLost)
 			{
 			case 1:
-				score += 40;
+				score += 40 * (currLvl + 1);
 				break;
 			case 2:
-				score += 100;
+				score += 100 * (currLvl + 1);
 				break;
 			case 3:
-				score += 300;
+				score += 300 * (currLvl + 1);
 				break;
 			case 4:
-				score += 1200;
+				score += 1200 * (currLvl + 1);
 			}
 
 			//GameState::rowsCleanedtext.setString("Score: " + score);// causes nice bug
-			GameState::scoreText.setString("Score: " + std::to_string(score));
+			GameState::scoreText.setString("Score:\n" + insertZeros(score));
 
 			if (score > highScore)
 			{
 				updateHighScore(score);
+				highScoreText.setString("Top:\n" + insertZeros(score));
 			}
 
 			if (rowsCleaned % 10 == 0) //increase level if needed
@@ -768,6 +771,15 @@ namespace hgw
 		}
 		dataFile.close();
 		return 0;
+	}
+
+	std::string GameState::insertZeros(int score)
+	{
+		std::string scoreString = std::to_string(score);
+		int zerosToInsert = 6 - scoreString.size();
+		scoreString.insert(0, zerosToInsert, '0');
+
+		return scoreString;
 	}
 
 #pragma endregion
