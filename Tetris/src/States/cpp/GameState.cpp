@@ -407,7 +407,8 @@ namespace hgw
 		scoreText.setPosition((APP_WIDTH - scoreText.getGlobalBounds().width) / 2, 0);
 		highScoreText.setPosition((APP_WIDTH - highScoreText.getGlobalBounds().width) / 2, horizontalLines[20].getPosition().y);
 
-		gameClock.restart(); //start clock that moves blocks
+		dropClock.restart(); //start clock that moves blocks horizontally
+		moveClock.restart(); //start clock that moves blocks vertically
 
 		Figure::FigureType figure = currentFigure.randFigureType();
 
@@ -475,16 +476,7 @@ namespace hgw
 					currentFigure.Rotate(false, true);
 					ghostFigure.updateGhostCoords();
 				}			
-				else if (event.key.code == sf::Keyboard::Right && !currentFigure.willGridExceed_X(1) && !currentFigure.willBlockOverlapBlock(1, 0)) //move right
-				{
-					currentFigure.moveFigure(sf::Vector2f(1, 0));
-					ghostFigure.updateGhostCoords();
-				}
-				else if (event.key.code == sf::Keyboard::Left && !currentFigure.willGridExceed_X(-1) && !currentFigure.willBlockOverlapBlock(-1, 0)) //move left
-				{
-					currentFigure.moveFigure(sf::Vector2f(-1, 0));
-					ghostFigure.updateGhostCoords();
-				}
+				
 			}
 
 			if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Down) //down key release
@@ -506,7 +498,7 @@ namespace hgw
 			speed = 1;
 		}
 		
-		if ((gameClock.getElapsedTime() >= sf::seconds(speed * dt) || 
+		if ((dropClock.getElapsedTime() >= sf::seconds(speed * dt) || 
 			(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !isDownKeyPressed))) //Figure falling + fast fall
 		{
 			if (currentFigure.willGridExceed_Y(1) || currentFigure.willBlockOverlapBlock(0, 1)) //if figure stopped
@@ -553,7 +545,24 @@ namespace hgw
 			{
 				currentFigure.moveFigure(sf::Vector2f(0, 1));
 			}
-			gameClock.restart();
+			dropClock.restart();
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && moveClock.getElapsedTime() >= sf::seconds(dt * 6) &&
+			!currentFigure.willGridExceed_X(1) && !currentFigure.willBlockOverlapBlock(1, 0)) //move right
+		{
+			currentFigure.moveFigure(sf::Vector2f(1, 0));
+			ghostFigure.updateGhostCoords();
+
+			moveClock.restart();
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && moveClock.getElapsedTime() >= sf::seconds(dt * 6) &&
+			!currentFigure.willGridExceed_X(-1) && !currentFigure.willBlockOverlapBlock(-1, 0)) //move left
+		{
+			currentFigure.moveFigure(sf::Vector2f(-1, 0));
+			ghostFigure.updateGhostCoords();
+
+			moveClock.restart();
 		}
 	}
 

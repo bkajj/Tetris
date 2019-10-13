@@ -77,7 +77,7 @@ namespace hgw
 		sf::Text scoreText, highScoreText;
 		GameDataRef _data;
 
-		sf::Clock gameClock;
+		sf::Clock dropClock, moveClock;
 		bool isDownKeyPressed = false;
 
 		std::array<sf::RectangleShape, 11> verticalLines;
