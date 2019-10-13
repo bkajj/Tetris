@@ -28,6 +28,7 @@ namespace hgw
 		void instaPlace();
 		void setColor(sf::Color color);
 		void setOffsetData();
+		FigureType randFigureType(FigureType notToRepeatType);
 		FigureType randFigureType();
 			
 		static std::map<std::pair<int, int>, sf::Vector2f> JLSTZ_offsetData, I_offsetData;
@@ -64,18 +65,17 @@ namespace hgw
 		std::string insertZeros(int score);
 		
 		static std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> grid;
-		static Figure currentFigure, ghostFigure;
+		static Figure currentFigure, ghostFigure, nextFigure;
 
 		int rowsCleaned;
 		unsigned long score;
 		unsigned long highScore;
 		std::fstream dataFile;
 
-		static Figure::FigureType lastType;
 	private:
 		std::array<int, 30> level = { 48, 43, 38, 33, 28, 23, 18, 13, 8, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1 };
 		unsigned int currLvl = 0;
-		sf::Text scoreText, highScoreText;
+		sf::Text scoreText, highScoreText, nextFigureText;
 		GameDataRef _data;
 
 		sf::Clock dropClock, moveClock;

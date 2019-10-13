@@ -20,7 +20,7 @@ namespace hgw
 	{
 		setOffsetData();
 
-		_type_ = randFigureType();
+		_type_ = type;
 		rotationState = 0;
 
 		switch (_type_) //set block coordinates on grid
@@ -360,16 +360,24 @@ namespace hgw
 		return true;
 	}
 
+	Figure::FigureType Figure::randFigureType(FigureType notToRepeatType)
+	{
+		int roll = random(0, 6); //"roll" figure type
+		Figure::FigureType currType = static_cast<Figure::FigureType>(roll);
+
+		if (currType == notToRepeatType) //"reroll" if last one was the same
+		{
+			int reroll = random(0, 6);
+			currType = static_cast<Figure::FigureType>(reroll);
+		}
+		return currType;
+	}
+
 	Figure::FigureType Figure::randFigureType()
 	{
 		int roll = random(0, 6); //"roll" figure type
 		Figure::FigureType currType = static_cast<Figure::FigureType>(roll);
 
-		if (currType == GameState::lastType) //"reroll" if last one was the same
-		{
-			int reroll = random(0, 6);
-			currType = static_cast<Figure::FigureType>(reroll);
-		}
 		return currType;
 	}
 #pragma endregion
@@ -406,21 +414,29 @@ namespace hgw
 		highScoreText.setLineSpacing(0.75f);
 		highScoreText.setString("Top:\n" + insertZeros(highScore));
 
-		highScoreText.setPosition(verticalLines[10].getPosition().x + 15, 0);
-		scoreText.setPosition(verticalLines[10].getPosition().x + 15, 90);
+		nextFigureText.setFont(_data->graphics.GetFont("font"));
+		nextFigureText.setCharacterSize(50);
+		nextFigureText.setString("Next:");
+
+		highScoreText.setPosition(verticalLines[10].getPosition().x + 50, 0);
+		scoreText.setPosition(verticalLines[10].getPosition().x + 50, 90);
+		nextFigureText.setPosition(verticalLines[10].getPosition().x + 50, scoreText.getPosition().y + 200);
 
 		dropClock.restart(); //start clock that moves blocks horizontally
 		moveClock.restart(); //start clock that moves blocks vertically
 
-		Figure::FigureType figure = currentFigure.randFigureType();
+		Figure::FigureType figureType = currentFigure.randFigureType();
+		Figure::FigureType nextType = nextFigure.randFigureType(figureType);
 
 		//used Init cause in this particular case constructor was causing bugs
-		currentFigure.Init(figure, sf::Vector2f(3, 0), true, false); //create current figure
+		currentFigure.Init(figureType, sf::Vector2f(3, 0), true, false); //create current figure
 
-		ghostFigure.Init(figure, sf::Vector2f(3, 0), true, true); //create ghost figure
+		ghostFigure.Init(figureType, sf::Vector2f(3, 0), true, true); //create ghost figure
 		ghostFigure.setColor(sf::Color(currentFigure.figureColor.r, currentFigure.figureColor.g, //set ghosts figure color to more transparent
 									   currentFigure.figureColor.b, currentFigure.figureColor.a - 175));
 		ghostFigure.updateGhostCoords();
+
+		nextFigure.Init(nextType, sf::Vector2f(12, 9), true, false);
 	}
 
 	void GameState::HandleInput()
@@ -576,6 +592,7 @@ namespace hgw
 		{
 			_data->window.draw(currentFigure.blocks[i]);
 			_data->window.draw(ghostFigure.blocks[i]);
+			_data->window.draw(nextFigure.blocks[i]);
 		}
 
 		for (int i = 0; i < 10; i++) //draw solid blocks
@@ -606,6 +623,7 @@ namespace hgw
 
 		_data->window.draw(scoreText);
 		_data->window.draw(highScoreText);
+		_data->window.draw(nextFigureText);
 
 		_data->window.display();
 	}
@@ -709,15 +727,15 @@ namespace hgw
 
 	void GameState::setNextFigures(bool classicColor) //create and set next figures (ghost and current)
 	{
-		lastType = currentFigure._type_;
-		Figure::FigureType nextFigureType = currentFigure.randFigureType();
+		currentFigure.Init(nextFigure._type_, sf::Vector2f(3, 0), classicColor, false);
 
-		currentFigure.Init(nextFigureType, sf::Vector2f(3, 0), classicColor, false);
-
-		ghostFigure.Init(nextFigureType, sf::Vector2f(3, 0), classicColor, true);
+		ghostFigure.Init(nextFigure._type_, sf::Vector2f(3, 0), classicColor, true);
 		ghostFigure.setColor(sf::Color(currentFigure.figureColor.r, currentFigure.figureColor.g,
 			currentFigure.figureColor.b, currentFigure.figureColor.a - 175));
 		ghostFigure.updateGhostCoords();
+		
+		Figure::FigureType nextType = nextFigure.randFigureType(currentFigure._type_);
+		nextFigure.Init(nextType, sf::Vector2f(12, 9), true, false);
 	}
 
 	void GameState::updateHighScore(unsigned long newHS)
@@ -792,7 +810,7 @@ namespace hgw
 
 	Figure GameState::currentFigure;
 	Figure GameState::ghostFigure;
-	Figure::FigureType GameState::lastType;
+	Figure GameState::nextFigure;
 	/*
 	int GameState::rowsCleaned;
 	unsigned long GameState::score;
