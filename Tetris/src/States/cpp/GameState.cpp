@@ -496,7 +496,17 @@ namespace hgw
 
 	void GameState::Update(float dt)
 	{
-		if ((gameClock.getElapsedTime() >= sf::seconds(0.5) || 
+		int speed;
+		if (currLvl < 30)
+		{
+			speed = level[currLvl];
+		}
+		else
+		{
+			speed = 1;
+		}
+		
+		if ((gameClock.getElapsedTime() >= sf::seconds(speed * dt) || 
 			(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !isDownKeyPressed))) //Figure falling + fast fall
 		{
 			if (currentFigure.willGridExceed_Y(1) || currentFigure.willBlockOverlapBlock(0, 1)) //if figure stopped
@@ -635,6 +645,11 @@ namespace hgw
 			if (score > highScore)
 			{
 				updateHighScore(score);
+			}
+
+			if (rowsCleaned % 10 == 0) //increase level if needed
+			{
+				currLvl++;
 			}
 		}		
 	}
