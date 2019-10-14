@@ -412,15 +412,20 @@ namespace hgw
 		highScoreText.setFont(_data->graphics.GetFont("font"));
 		highScoreText.setCharacterSize(50);
 		highScoreText.setLineSpacing(0.75f);
-		highScoreText.setString("Top:\n" + insertZeros(highScore));
+		highScoreText.setString("Top:\n" + insertZeros(highScore, 6));
 
 		nextFigureText.setFont(_data->graphics.GetFont("font"));
 		nextFigureText.setCharacterSize(50);
 		nextFigureText.setString("Next:");
 
+		linesText.setFont(_data->graphics.GetFont("font"));
+		linesText.setCharacterSize(50);
+		linesText.setString("Lines: 000");
+
 		highScoreText.setPosition(verticalLines[10].getPosition().x + 50, 0);
 		scoreText.setPosition(verticalLines[10].getPosition().x + 50, 90);
 		nextFigureText.setPosition(verticalLines[10].getPosition().x + 50, scoreText.getPosition().y + 200);
+		linesText.setPosition((APP_WIDTH - linesText.getGlobalBounds().width) / 2, 0);
 
 		dropClock.restart(); //start clock that moves blocks horizontally
 		moveClock.restart(); //start clock that moves blocks vertically
@@ -624,6 +629,7 @@ namespace hgw
 		_data->window.draw(scoreText);
 		_data->window.draw(highScoreText);
 		_data->window.draw(nextFigureText);
+		_data->window.draw(linesText);
 
 		_data->window.display();
 	}
@@ -669,18 +675,20 @@ namespace hgw
 			}
 
 			//GameState::rowsCleanedtext.setString("Score: " + score);// causes nice bug
-			GameState::scoreText.setString("Score:\n" + insertZeros(score));
+			GameState::scoreText.setString("Score:\n" + insertZeros(score, 6));
 
 			if (score > highScore)
 			{
 				updateHighScore(score);
-				highScoreText.setString("Top:\n" + insertZeros(score));
+				highScoreText.setString("Top:\n" + insertZeros(score, 6));
 			}
 
 			if (rowsCleaned % 10 == 0) //increase level if needed
 			{
 				currLvl++;
 			}
+
+			linesText.setString("Lines: " + insertZeros(rowsCleaned, 3));
 		}		
 	}
 
@@ -791,10 +799,10 @@ namespace hgw
 		return 0;
 	}
 
-	std::string GameState::insertZeros(int score)
+	std::string GameState::insertZeros(int value, int digits)
 	{
-		std::string scoreString = std::to_string(score);
-		int zerosToInsert = 6 - scoreString.size();
+		std::string scoreString = std::to_string(value);
+		int zerosToInsert = digits - scoreString.size();
 		scoreString.insert(0, zerosToInsert, '0');
 
 		return scoreString;
