@@ -402,6 +402,7 @@ namespace hgw
 			horizontalLines[i].setSize(sf::Vector2f(300, 1));
 			horizontalLines[i].setPosition(verticalLines[0].getPosition().x, verticalLines[0].getPosition().y + i * 30);
 		}
+
 		_data->graphics.LoadFont("font", FONT_PATH);
 
 		scoreText.setFont(_data->graphics.GetFont("font"));
@@ -426,6 +427,32 @@ namespace hgw
 		scoreText.setPosition(verticalLines[10].getPosition().x + 50, 90);
 		nextFigureText.setPosition(verticalLines[10].getPosition().x + 50, scoreText.getPosition().y + 200);
 		linesText.setPosition((APP_WIDTH - linesText.getGlobalBounds().width) / 2, 0);
+
+		stats[Figure::I].first.Init(Figure::I, sf::Vector2f(12, 0), true, false);
+		stats[Figure::O].first.Init(Figure::I, sf::Vector2f(10, 0), true, false);
+		stats[Figure::Z].first.Init(Figure::I, sf::Vector2f(8, 0), true, false);
+		stats[Figure::S].first.Init(Figure::I, sf::Vector2f(6, 0), true, false);
+		stats[Figure::L].first.Init(Figure::I, sf::Vector2f(4, 0), true, false);
+		stats[Figure::J].first.Init(Figure::I, sf::Vector2f(2, 0), true, false);
+		stats[Figure::T].first.Init(Figure::I, sf::Vector2f(0, 0), true, false);
+
+		for (auto &fig : stats)
+		{
+			fig.second.second = 0;
+		}
+
+		for (int typeAsInt = 0; typeAsInt < 7; typeAsInt++)
+		{
+			std::string figClearedOfType = insertZeros(stats[static_cast<Figure::FigureType>(typeAsInt)].second, 3);
+			Figure fig = stats[static_cast<Figure::FigureType>(typeAsInt)].first;
+
+			eachStatText[static_cast<Figure::FigureType>(typeAsInt)].setFont(_data->graphics.GetFont("font"));
+			eachStatText[static_cast<Figure::FigureType>(typeAsInt)].setCharacterSize(50);	
+			eachStatText[static_cast<Figure::FigureType>(typeAsInt)].setString(figClearedOfType);
+
+			eachStatText[static_cast<Figure::FigureType>(typeAsInt)].setPosition(fig.blocks[3].getPosition() + sf::Vector2f(50, 0));
+		}
+
 
 		dropClock.restart(); //start clock that moves blocks horizontally
 		moveClock.restart(); //start clock that moves blocks vertically
@@ -624,6 +651,19 @@ namespace hgw
 		for (int i = 0; i < 21; i++)
 		{
 			_data->window.draw(horizontalLines[i]);
+		}
+
+		for (auto &n : eachStatText)
+		{
+			_data->window.draw(n.second);
+		}
+
+		for (auto &n : stats)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				_data->window.draw(n.second.first.blocks[i]);
+			}
 		}
 
 		_data->window.draw(scoreText);
