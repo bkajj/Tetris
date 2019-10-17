@@ -423,18 +423,24 @@ namespace hgw
 		linesText.setCharacterSize(50);
 		linesText.setString("Lines: 000");
 
+		statsText.setFont(_data->graphics.GetFont("font"));
+		statsText.setCharacterSize(45);
+		statsText.setString("Statistics:");
+			
+
 		highScoreText.setPosition(verticalLines[10].getPosition().x + 50, 0);
 		scoreText.setPosition(verticalLines[10].getPosition().x + 50, 90);
 		nextFigureText.setPosition(verticalLines[10].getPosition().x + 50, scoreText.getPosition().y + 200);
 		linesText.setPosition((APP_WIDTH - linesText.getGlobalBounds().width) / 2, 0);
+		statsText.setPosition((APP_WIDTH - 3 * linesText.getGlobalBounds().width) / 2 - 30, 40);
 
-		stats[Figure::I].first.Init(Figure::I, sf::Vector2f(12, 0), true, false);
-		stats[Figure::O].first.Init(Figure::I, sf::Vector2f(10, 0), true, false);
-		stats[Figure::Z].first.Init(Figure::I, sf::Vector2f(8, 0), true, false);
-		stats[Figure::S].first.Init(Figure::I, sf::Vector2f(6, 0), true, false);
-		stats[Figure::L].first.Init(Figure::I, sf::Vector2f(4, 0), true, false);
-		stats[Figure::J].first.Init(Figure::I, sf::Vector2f(2, 0), true, false);
-		stats[Figure::T].first.Init(Figure::I, sf::Vector2f(0, 0), true, false);
+		stats[Figure::I].first.Init(Figure::I, sf::Vector2f(-7.5, 1), true, false);
+		stats[Figure::O].first.Init(Figure::O, sf::Vector2f(-7.5, 3), true, false);
+		stats[Figure::Z].first.Init(Figure::Z, sf::Vector2f(-7.5, 6), true, false);
+		stats[Figure::S].first.Init(Figure::S, sf::Vector2f(-7.5, 9), true, false);
+		stats[Figure::L].first.Init(Figure::L, sf::Vector2f(-7.5, 12), true, false);
+		stats[Figure::J].first.Init(Figure::J, sf::Vector2f(-7.5, 15), true, false);
+		stats[Figure::T].first.Init(Figure::T, sf::Vector2f(-7.5, 18), true, false);
 
 		for (auto &fig : stats)
 		{
@@ -443,14 +449,33 @@ namespace hgw
 
 		for (int typeAsInt = 0; typeAsInt < 7; typeAsInt++)
 		{
-			std::string figClearedOfType = insertZeros(stats[static_cast<Figure::FigureType>(typeAsInt)].second, 3);
-			Figure fig = stats[static_cast<Figure::FigureType>(typeAsInt)].first;
+			Figure::FigureType type = static_cast<Figure::FigureType>(typeAsInt);
+			std::string figClearedOfType = insertZeros(stats[type].second, 3);
+			Figure fig = stats[type].first;
 
-			eachStatText[static_cast<Figure::FigureType>(typeAsInt)].setFont(_data->graphics.GetFont("font"));
-			eachStatText[static_cast<Figure::FigureType>(typeAsInt)].setCharacterSize(50);	
-			eachStatText[static_cast<Figure::FigureType>(typeAsInt)].setString(figClearedOfType);
+			eachStatText[type].setFont(_data->graphics.GetFont("font"));
+			eachStatText[type].setCharacterSize(50);	
+			eachStatText[type].setString(figClearedOfType);
 
-			eachStatText[static_cast<Figure::FigureType>(typeAsInt)].setPosition(fig.blocks[3].getPosition() + sf::Vector2f(50, 0));
+			float xPos = horizontalLines[0].getPosition().x - 83;
+
+			if (type == Figure::FigureType::I)
+			{
+				eachStatText[type].setPosition(xPos, fig.blocks[1].getPosition().y - 20);
+			}
+			else if (type == Figure::FigureType::L || type == Figure::FigureType::T)
+			{
+				eachStatText[type].setPosition(xPos, fig.blocks[3].getPosition().y);
+			}
+			else if (type == Figure::FigureType::J )
+			{
+				eachStatText[type].setPosition(xPos, fig.blocks[0].getPosition().y);
+			}
+			else
+			{
+				eachStatText[type].setPosition(xPos, fig.blocks[1].getPosition().y);
+			}
+			
 		}
 
 
@@ -670,6 +695,7 @@ namespace hgw
 		_data->window.draw(highScoreText);
 		_data->window.draw(nextFigureText);
 		_data->window.draw(linesText);
+		_data->window.draw(statsText);
 
 		_data->window.display();
 	}
