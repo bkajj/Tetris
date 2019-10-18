@@ -61,6 +61,7 @@ namespace hgw
 		void destroyFilledRows();
 
 		void updateHighScore(unsigned long newHS);
+		void updateStats(Figure::FigureType type);
 		unsigned long getHighScoreFromFile();
 		std::string insertZeros(int value, int digits);
 		

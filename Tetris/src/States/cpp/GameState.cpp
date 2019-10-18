@@ -478,7 +478,6 @@ namespace hgw
 			
 		}
 
-
 		dropClock.restart(); //start clock that moves blocks horizontally
 		moveClock.restart(); //start clock that moves blocks vertically
 
@@ -519,6 +518,9 @@ namespace hgw
 						{
 							grid[to_uns(currentFigure.gridCoords[i].x)][to_uns(currentFigure.gridCoords[i].y)] = std::make_pair(true, currentFigure.blocks[i]);
 						}
+
+						stats[currentFigure._type_].second++; //update statistics
+						eachStatText[currentFigure._type_].setString(insertZeros(stats[currentFigure._type_].second, 3));
 					}
 
 					destroyFilledRows(); //clear lines
@@ -584,6 +586,9 @@ namespace hgw
 					{
 						grid[to_uns(currentFigure.gridCoords[i].x)][to_uns(currentFigure.gridCoords[i].y)] = std::make_pair(true, currentFigure.blocks[i]);
 					}
+
+					stats[currentFigure._type_].second++; //update statistics
+					eachStatText[currentFigure._type_].setString(insertZeros(stats[currentFigure._type_].second, 3));
 				}
 		
 				destroyFilledRows(); //clear lines
