@@ -390,7 +390,7 @@ namespace hgw
 
 	void GameState::Init()
 	{
-		highScore = getHighScoreFromFile();
+		highScore = getGameDataFromFile(GameData::variableNames::highScore);
 
 		for (int i = 0; i < 11; i++) //set grid
 		{
@@ -750,7 +750,7 @@ namespace hgw
 
 			if (score > highScore)
 			{
-				updateHighScore(score);
+				updateGameData(GameData::variableNames::highScore, score, _data);
 				highScoreText.setString("Top:\n" + insertZeros(score, 6));
 			}
 
@@ -817,22 +817,35 @@ namespace hgw
 		nextFigure.Init(nextType, sf::Vector2f(12, 9), true, false);
 	}
 
-	void GameState::updateHighScore(unsigned long newHS)
+	void GameState::updateGameData(GameData::variableNames variableName, int variableValue, GameDataRef _data)
 	{
 		std::fstream newFile;
-		highScore = newHS;
 
-		newFile.open("tempData.dat", std::fstream::out | std::ios::binary);
-		dataFile.open("data.dat", std::fstream::out | std::ios::binary);
+		switch (variableName)
+		{
+		case hgw::GameData::highScore:
+			_data->saveVariables.highScore = variableValue;
+			break;
+
+		case hgw::GameData::fullGrid:
+			_data->saveVariables.fullGrid = variableValue;
+			break;
+
+		case hgw::GameData::originalColors:
+			_data->saveVariables.originalColors = variableValue;
+		}
+
+		newFile.open("tempData.dat", std::fstream::out);
+		dataFile.open("data.dat", std::fstream::out);
 
 		if (!dataFile.fail() && !newFile.fail())
 		{
-			newFile << "highscore " + std::to_string(highScore) << "\n";
+			newFile << variableName + " " + std::to_string(variableValue) << "\n";
 
 			std::string line;
 			while (std::getline(dataFile, line)) //copy all lines from data to newFile except highscore
 			{
-				if (line.find("highscore") == std::string::npos)
+				if (line.find(variableName) == std::string::npos)
 				{
 					newFile << line << "\n";
 				}
@@ -849,24 +862,40 @@ namespace hgw
 		newFile.close();		
 	}
 
-	unsigned long GameState::getHighScoreFromFile()
+	int GameState::getGameDataFromFile(GameData::variableNames variableName)
 	{
-		dataFile.open("data.dat", std::fstream::out | std::fstream::in | std::fstream::binary);
+		std::string toFind;
+		switch (variableName)
+		{
+		case hgw::GameData::highScore:
+			toFind = "highscore";
+			break;
+
+		case hgw::GameData::fullGrid:
+			toFind = "fullgrid";
+			break;
+
+		case hgw::GameData::originalColors:
+			toFind = "originalcolors";
+		}
+
+		dataFile.open("data.dat", std::fstream::out | std::fstream::in);
 
 		if (dataFile.good())
 		{
 			std::string line;
 			while (std::getline(dataFile, line))
 			{
-				if (line.find("highscore") != std::string::npos) //if this line contatins "highscore"
+				if (line.find(toFind) != std::string::npos) //if this line contatins "highscore"
 				{
-					std::string score = line.erase(0, 10); //10, cause "highscore " has 10 chars
+					std::string score = line.erase(0, toFind.size()); //10, cause "highscore " has 10 chars
 					dataFile.close();
-					return std::stoul(score);
+					return std::stoi(score);
 				}
 			}
 		}
 		dataFile.close();
+
 		return 0;
 	}
 
@@ -890,6 +919,8 @@ namespace hgw
 	Figure GameState::currentFigure;
 	Figure GameState::ghostFigure;
 	Figure GameState::nextFigure;
+
+	std::fstream GameState::dataFile;
 	/*
 	int GameState::rowsCleaned;
 	unsigned long GameState::score;

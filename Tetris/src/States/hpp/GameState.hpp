@@ -28,6 +28,7 @@ namespace hgw
 		void instaPlace();
 		void setColor(sf::Color color);
 		void setOffsetData();
+
 		FigureType randFigureType(FigureType notToRepeatType);
 		FigureType randFigureType();
 			
@@ -60,9 +61,10 @@ namespace hgw
 		std::vector<int> checkForRow();
 		void destroyFilledRows();
 
-		void updateHighScore(unsigned long newHS);
-		unsigned long getHighScoreFromFile();
 		std::string insertZeros(int value, int digits);
+
+		static void updateGameData(GameData::variableNames variableName, int variableValue, GameDataRef _data);
+		static int getGameDataFromFile(GameData::variableNames variableName);
 		
 		static std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> grid;
 		static Figure currentFigure, ghostFigure, nextFigure;
@@ -70,15 +72,16 @@ namespace hgw
 		int rowsCleaned;
 		unsigned long score;
 		unsigned long highScore;
-		std::fstream dataFile;
-
+		static std::fstream dataFile;
+	
 	private:
+		GameDataRef _data;
+
 		std::array<int, 30> level = { 48, 43, 38, 33, 28, 23, 18, 13, 8, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1 };
 		unsigned int currLvl = 0;
 		sf::Text scoreText, highScoreText, nextFigureText, linesText, statsText;
 		std::unordered_map<Figure::FigureType, std::pair<Figure, int>> stats;
 		std::unordered_map<Figure::FigureType, sf::Text> eachStatText;
-		GameDataRef _data;
 
 		sf::Clock dropClock, moveClock;
 		bool isDownKeyPressed = false;
@@ -89,4 +92,6 @@ namespace hgw
 
 	int random(int min, int max);
 	int negMod(int val);
+
+	
 }

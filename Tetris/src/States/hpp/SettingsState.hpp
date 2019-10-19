@@ -16,7 +16,8 @@ namespace hgw
 
 	private:
 		sf::Text returnText, originalColorText, drawFullGridText;
-
+		void setTextString(GameData::variableNames variableName);
+		
 		GameDataRef _data;
 	};
 }

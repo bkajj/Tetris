@@ -9,12 +9,23 @@
 
 namespace hgw
 {
+	struct saveVariables
+	{
+		int highScore;
+
+		bool fullGrid;
+		bool originalColors;
+	};
+
 	struct GameData
 	{
 		StateMachine machine;
 		sf::RenderWindow window;
 		GraphicsManager graphics;
 		InputManager input;
+
+		saveVariables saveVariables;
+		enum variableNames { highScore, fullGrid, originalColors };
 	};
 
 	typedef std::shared_ptr<GameData> GameDataRef;
