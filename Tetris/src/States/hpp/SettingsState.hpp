@@ -15,6 +15,8 @@ namespace hgw
 		void Draw(float dt);
 
 	private:
+		sf::Text returnText, originalColorText, drawFullGridText;
+
 		GameDataRef _data;
 	};
 }
