@@ -485,14 +485,29 @@ namespace hgw
 		Figure::FigureType nextType = nextFigure.randFigureType(figureType);
 
 		//used Init cause in this particular case constructor was causing bugs
-		currentFigure.Init(figureType, sf::Vector2f(3, 0), true, false); //create current figure
+		if (_data->saveVariables.originalColors)
+		{
+			currentFigure.Init(figureType, sf::Vector2f(3, 0), true, false); //create current figure
+		}
+		else
+		{
+			currentFigure.Init(figureType, sf::Vector2f(3, 0), false, false); //create current figure
+		}
 
 		ghostFigure.Init(figureType, sf::Vector2f(3, 0), true, true); //create ghost figure
+		
 		ghostFigure.setColor(sf::Color(currentFigure.figureColor.r, currentFigure.figureColor.g, //set ghosts figure color to more transparent
 									   currentFigure.figureColor.b, currentFigure.figureColor.a - 175));
 		ghostFigure.updateGhostCoords();
 
-		nextFigure.Init(nextType, sf::Vector2f(12, 9), true, false);
+		if (_data->saveVariables.originalColors)
+		{
+			nextFigure.Init(nextType, sf::Vector2f(12, 9), true, false);
+		}
+		else
+		{
+			nextFigure.Init(nextType, sf::Vector2f(12, 9), false, false);
+		}	
 	}
 
 	void GameState::HandleInput()
@@ -524,7 +539,7 @@ namespace hgw
 					}
 
 					destroyFilledRows(); //clear lines
-					setNextFigures(true); //create next figures
+					setNextFigures(_data->saveVariables.originalColors); //create next figures
 
 					for (int i = 0; i < 10; i++) //check for lose condition
 					{
@@ -592,7 +607,7 @@ namespace hgw
 				}
 		
 				destroyFilledRows(); //clear lines
-				setNextFigures(true); //create next figures
+				setNextFigures(_data->saveVariables.originalColors); //create next figures
 
 				//isDownKeyPressed is needed for stopping next figure from fast falling when holding down key
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
@@ -668,21 +683,26 @@ namespace hgw
 			}
 		}
 
-		//_data->window.draw(verticalLines[0]);
-		//_data->window.draw(verticalLines[10]);
-
-		//_data->window.draw(horizontalLines[0]);
-		//_data->window.draw(horizontalLines[20]);
-
-		for (int i = 0; i < 11; i++) //draw grid
+		if (_data->saveVariables.fullGrid)  //draw grid
 		{
-			_data->window.draw(verticalLines[i]);
+			for (int i = 0; i < 11; i++)
+			{
+				_data->window.draw(verticalLines[i]);
+			}
+			for (int i = 0; i < 21; i++)
+			{
+				_data->window.draw(horizontalLines[i]);
+			}
 		}
-		for (int i = 0; i < 21; i++)
+		else
 		{
-			_data->window.draw(horizontalLines[i]);
-		}
+			_data->window.draw(verticalLines[0]);
+			_data->window.draw(verticalLines[10]);
 
+			_data->window.draw(horizontalLines[0]);
+			_data->window.draw(horizontalLines[20]);
+		}
+		
 		for (auto &n : eachStatText)
 		{
 			_data->window.draw(n.second);
@@ -820,32 +840,36 @@ namespace hgw
 	void GameState::updateGameData(GameData::variableNames variableName, int variableValue, GameDataRef _data)
 	{
 		std::fstream newFile;
+		std::string variableName_str;
 
 		switch (variableName)
 		{
 		case hgw::GameData::highScore:
 			_data->saveVariables.highScore = variableValue;
+			variableName_str = "highscore";
 			break;
 
 		case hgw::GameData::fullGrid:
 			_data->saveVariables.fullGrid = variableValue;
+			variableName_str = "fullgrid";
 			break;
 
 		case hgw::GameData::originalColors:
+			variableName_str = "originalcolors";
 			_data->saveVariables.originalColors = variableValue;
 		}
 
 		newFile.open("tempData.dat", std::fstream::out);
-		dataFile.open("data.dat", std::fstream::out);
+		dataFile.open("data.dat", std::fstream::out | std::fstream::in);
 
 		if (!dataFile.fail() && !newFile.fail())
 		{
-			newFile << variableName + " " + std::to_string(variableValue) << "\n";
+			newFile << variableName_str + " " + std::to_string(variableValue) << "\n";
 
 			std::string line;
 			while (std::getline(dataFile, line)) //copy all lines from data to newFile except highscore
 			{
-				if (line.find(variableName) == std::string::npos)
+				if (line.find(variableName_str) == std::string::npos)
 				{
 					newFile << line << "\n";
 				}

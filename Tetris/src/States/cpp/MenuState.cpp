@@ -4,6 +4,8 @@
 #include "src/GameEngine/hpp/Game.hpp"
 #include "src/DEFINE.hpp"
 #include <iostream>
+#include <fstream>
+#include <string>
 
 namespace hgw
 {
@@ -37,6 +39,8 @@ namespace hgw
 		startText.setPosition(sf::Vector2f((APP_WIDTH - startText.getLocalBounds().width) / 2, tetrisText.getPosition().y + 350));
 		settingsText.setPosition(sf::Vector2f((APP_WIDTH - settingsText.getLocalBounds().width) / 2, startText.getPosition().y + 100));
 		exitText.setPosition(sf::Vector2f((APP_WIDTH - exitText.getLocalBounds().width) / 2, settingsText.getPosition().y + 100));
+
+		loadAllVariablesFromFile();
 	}
 
 	void MenuState::HandleInput()
@@ -84,5 +88,37 @@ namespace hgw
 		_data->window.draw(exitText);
 
 		_data->window.display();	
+	}
+
+	void MenuState::loadAllVariablesFromFile()
+	{
+		dataFile.open("data.dat", std::fstream::in);
+
+		if (dataFile.good())
+		{
+			std::string line;
+			while (std::getline(dataFile, line))
+			{
+				unsigned int spacePos = line.find(" ");
+
+				std::string varName = line.substr(0, spacePos);
+				std::string varValue = line.substr(spacePos, line.size() - spacePos);
+
+				if (varName == "highscore")
+				{
+					_data->saveVariables.highScore = std::stoi(varValue);
+				}
+				else if (varName == "fullgrid")
+				{
+					_data->saveVariables.fullGrid = std::stoi(varValue);
+				}
+				if (varName == "originalcolors")
+				{
+					_data->saveVariables.originalColors = std::stoi(varValue);
+				}
+			}
+		}
+
+		dataFile.close();
 	}
 }
