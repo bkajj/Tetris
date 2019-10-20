@@ -123,8 +123,7 @@ namespace hgw
 			setColor(sf::Color(random(0, 255), random(0, 255), random(0, 255), 255));
 		}
 
-
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++) //set block size and position on screen
 		{
 			blocks[i].setSize(sf::Vector2f(BLOCK_SIZE, BLOCK_SIZE));
 
@@ -208,7 +207,7 @@ namespace hgw
 
 				if (!canOffset)
 				{
-					Rotate(!clockwise, false); //if can't offset perform revert rotation
+					Rotate(!clockwise, false); //if can't offset, perform revert rotation
 				}
 			}	
 		}
@@ -225,7 +224,7 @@ namespace hgw
 
 	bool Figure::willBlockOverlapBlock(float offsetX, float offsetY)
 	{
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++) //test if there is already block on the grid
 		{
 			if (GameState::grid[to_uns(gridCoords[i].x + offsetX)][to_uns(gridCoords[i].y + offsetY)].first == true)
 			{
@@ -322,7 +321,7 @@ namespace hgw
 		sf::Vector2f offsetVal1, offsetVal2;
 		sf::Vector2f endOffset = sf::Vector2f(0, 0);
 
-		if (_type_ == FigureType::I)
+		if (_type_ == FigureType::I) //set proper offset data
 		{
 			currOffsetData = &I_offsetData;
 		}
@@ -390,9 +389,32 @@ namespace hgw
 
 	void GameState::Init()
 	{
-		highScore = getGameDataFromFile(GameData::variableNames::highScore);
+		_data->graphics.LoadFont("font", FONT_PATH);
+		sf::Font& font = _data->graphics.GetFont("font");
 
-		for (int i = 0; i < 11; i++) //set grid
+		scoreText.setFont(font);
+		scoreText.setCharacterSize(50);
+		scoreText.setLineSpacing(0.75f);
+		scoreText.setString("Score:\n000000");
+
+		highScoreText.setFont(font);
+		highScoreText.setCharacterSize(50);
+		highScoreText.setLineSpacing(0.75f);
+		highScoreText.setString("Top:\n" + insertZeros(_data->saveVariables.highScore, 6));
+
+		nextFigureText.setFont(font);
+		nextFigureText.setCharacterSize(50);
+		nextFigureText.setString("Next:");
+
+		linesText.setFont(font);
+		linesText.setCharacterSize(50);
+		linesText.setString("Lines: 000");
+
+		statsText.setFont(font);
+		statsText.setCharacterSize(45);
+		statsText.setString("Statistics:");
+			
+		for (int i = 0; i < 11; i++) //set grid on screen
 		{
 			verticalLines[i].setSize(sf::Vector2f(1, 600));
 			verticalLines[i].setPosition(sf::Vector2f(static_cast<float>(APP_WIDTH / 2 + i * 30 - 150), 100));
@@ -403,37 +425,13 @@ namespace hgw
 			horizontalLines[i].setPosition(verticalLines[0].getPosition().x, verticalLines[0].getPosition().y + i * 30);
 		}
 
-		_data->graphics.LoadFont("font", FONT_PATH);
-
-		scoreText.setFont(_data->graphics.GetFont("font"));
-		scoreText.setCharacterSize(50);
-		scoreText.setLineSpacing(0.75f);
-		scoreText.setString("Score:\n000000");
-
-		highScoreText.setFont(_data->graphics.GetFont("font"));
-		highScoreText.setCharacterSize(50);
-		highScoreText.setLineSpacing(0.75f);
-		highScoreText.setString("Top:\n" + insertZeros(highScore, 6));
-
-		nextFigureText.setFont(_data->graphics.GetFont("font"));
-		nextFigureText.setCharacterSize(50);
-		nextFigureText.setString("Next:");
-
-		linesText.setFont(_data->graphics.GetFont("font"));
-		linesText.setCharacterSize(50);
-		linesText.setString("Lines: 000");
-
-		statsText.setFont(_data->graphics.GetFont("font"));
-		statsText.setCharacterSize(45);
-		statsText.setString("Statistics:");
-			
-
 		highScoreText.setPosition(verticalLines[10].getPosition().x + 50, 0);
 		scoreText.setPosition(verticalLines[10].getPosition().x + 50, 90);
 		nextFigureText.setPosition(verticalLines[10].getPosition().x + 50, scoreText.getPosition().y + 200);
 		linesText.setPosition((APP_WIDTH - linesText.getGlobalBounds().width) / 2, 0);
 		statsText.setPosition((APP_WIDTH - 3 * linesText.getGlobalBounds().width) / 2 - 30, 40);
 
+		//set statistics figures
 		stats[Figure::I].first.Init(Figure::I, sf::Vector2f(-7.5, 1), true, false);
 		stats[Figure::O].first.Init(Figure::O, sf::Vector2f(-7.5, 3), true, false);
 		stats[Figure::Z].first.Init(Figure::Z, sf::Vector2f(-7.5, 6), true, false);
@@ -442,7 +440,7 @@ namespace hgw
 		stats[Figure::J].first.Init(Figure::J, sf::Vector2f(-7.5, 15), true, false);
 		stats[Figure::T].first.Init(Figure::T, sf::Vector2f(-7.5, 18), true, false);
 
-		for (auto &fig : stats)
+		for (auto &fig : stats) //reset statistics data
 		{
 			fig.second.second = 0;
 		}
@@ -450,13 +448,13 @@ namespace hgw
 		for (int typeAsInt = 0; typeAsInt < 7; typeAsInt++)
 		{
 			Figure::FigureType type = static_cast<Figure::FigureType>(typeAsInt);
-			std::string figClearedOfType = insertZeros(stats[type].second, 3);
 			Figure fig = stats[type].first;
 
-			eachStatText[type].setFont(_data->graphics.GetFont("font"));
+			eachStatText[type].setFont(font);
 			eachStatText[type].setCharacterSize(50);	
-			eachStatText[type].setString(figClearedOfType);
+			eachStatText[type].setString("000");
 
+			//set statistics figures position on screen
 			float xPos = horizontalLines[0].getPosition().x - 83;
 
 			if (type == Figure::FigureType::I)
@@ -475,9 +473,9 @@ namespace hgw
 			{
 				eachStatText[type].setPosition(xPos, fig.blocks[1].getPosition().y);
 			}
-			
 		}
 
+		//need 2 clocks for different moving speed
 		dropClock.restart(); //start clock that moves blocks horizontally
 		moveClock.restart(); //start clock that moves blocks vertically
 
@@ -487,26 +485,27 @@ namespace hgw
 		//used Init cause in this particular case constructor was causing bugs
 		if (_data->saveVariables.originalColors)
 		{
-			currentFigure.Init(figureType, sf::Vector2f(3, 0), true, false); //create current figure
+			currentFigure.Init(figureType, sf::Vector2f(3, 0), true, false); //create current figure with original colors
 		}
 		else
 		{
-			currentFigure.Init(figureType, sf::Vector2f(3, 0), false, false); //create current figure
+			currentFigure.Init(figureType, sf::Vector2f(3, 0), false, false); //create current figure with random colors
 		}
 
-		ghostFigure.Init(figureType, sf::Vector2f(3, 0), true, true); //create ghost figure
-		
-		ghostFigure.setColor(sf::Color(currentFigure.figureColor.r, currentFigure.figureColor.g, //set ghosts figure color to more transparent
+		ghostFigure.Init(figureType, sf::Vector2f(3, 0), true, true); //create ghost figurem
+
+		//set ghosts figure color to current figure color with additional transparency
+		ghostFigure.setColor(sf::Color(currentFigure.figureColor.r, currentFigure.figureColor.g, 
 									   currentFigure.figureColor.b, currentFigure.figureColor.a - 175));
 		ghostFigure.updateGhostCoords();
 
 		if (_data->saveVariables.originalColors)
 		{
-			nextFigure.Init(nextType, sf::Vector2f(12, 9), true, false);
+			nextFigure.Init(nextType, sf::Vector2f(12, 9), true, false); //set next figure with original colors
 		}
 		else
 		{
-			nextFigure.Init(nextType, sf::Vector2f(12, 9), false, false);
+			nextFigure.Init(nextType, sf::Vector2f(12, 9), false, false); //set next figure with random colors
 		}	
 	}
 
@@ -516,12 +515,11 @@ namespace hgw
 
 		while (_data->window.pollEvent(event))
 		{
-			if (sf::Event::Closed == event.type)
+			if (event.type == sf::Event::Closed)
 			{
 				_data->window.close();
 			}
-
-			if (event.type == sf::Event::KeyPressed)
+			else if (event.type == sf::Event::KeyPressed)
 			{
 				if (event.key.code == sf::Keyboard::Space)
 				{
@@ -535,11 +533,11 @@ namespace hgw
 						}
 
 						stats[currentFigure._type_].second++; //update statistics
-						eachStatText[currentFigure._type_].setString(insertZeros(stats[currentFigure._type_].second, 3));
-					}
+						eachStatText[currentFigure._type_].setString(insertZeros(stats[currentFigure._type_].second, 3)); //update statistics text
 
-					destroyFilledRows(); //clear lines
-					setNextFigures(_data->saveVariables.originalColors); //create next figures
+						destroyFilledRows(); //clear lines
+						setNextFigures(_data->saveVariables.originalColors); //create next figures
+					}
 
 					for (int i = 0; i < 10; i++) //check for lose condition
 					{
@@ -568,10 +566,8 @@ namespace hgw
 					currentFigure.Rotate(false, true);
 					ghostFigure.updateGhostCoords();
 				}			
-				
 			}
-
-			if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Down) //down key release
+			else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Down) //down key release
 			{
 				isDownKeyPressed = false;
 			}
@@ -580,22 +576,22 @@ namespace hgw
 
 	void GameState::Update(float dt)
 	{
-		int speed;
-		if (currLvl < 30)
+		int dropSpeed;
+		if (currLvl < 30) //calculate drop speed based on current level
 		{
-			speed = level[currLvl];
+			dropSpeed = level[currLvl];
 		}
 		else
 		{
-			speed = 1;
+			dropSpeed = 1;
 		}
 		
-		if ((dropClock.getElapsedTime() >= sf::seconds(speed * dt) || 
-			(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !isDownKeyPressed))) //Figure falling + fast fall
+		if ((dropClock.getElapsedTime() >= sf::seconds(dropSpeed * dt) || //if need to move figure down
+			(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !isDownKeyPressed)))
 		{
-			if (currentFigure.willGridExceed_Y(1) || currentFigure.willBlockOverlapBlock(0, 1)) //if figure stopped
+			if (currentFigure.willGridExceed_Y(1) || currentFigure.willBlockOverlapBlock(0, 1)) //if can't move
 			{
-				if (currentFigure.areCoordsGood())
+				if (currentFigure.areCoordsGood()) //maybe can put all to this and else is game loss!!!!!!!!!!
 				{
 					for (int i = 0; i < 4; i++) //add to grid
 					{
@@ -603,11 +599,11 @@ namespace hgw
 					}
 
 					stats[currentFigure._type_].second++; //update statistics
-					eachStatText[currentFigure._type_].setString(insertZeros(stats[currentFigure._type_].second, 3));
-				}
-		
-				destroyFilledRows(); //clear lines
-				setNextFigures(_data->saveVariables.originalColors); //create next figures
+					eachStatText[currentFigure._type_].setString(insertZeros(stats[currentFigure._type_].second, 3)); //update statistics text
+
+					destroyFilledRows(); //clear lines
+					setNextFigures(_data->saveVariables.originalColors); //create next figures
+				}		
 
 				//isDownKeyPressed is needed for stopping next figure from fast falling when holding down key
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
@@ -636,7 +632,7 @@ namespace hgw
 					}
 				}
 			}
-			else
+			else //if can move - move
 			{
 				currentFigure.moveFigure(sf::Vector2f(0, 1));
 			}
@@ -665,14 +661,14 @@ namespace hgw
 	{
 		_data->window.clear();
 
-		for (int i = 0; i < 4; i++) //draw current figure and ghost figure
+		for (int i = 0; i < 4; i++) //draw current figure, ghost figure and next figure
 		{
 			_data->window.draw(currentFigure.blocks[i]);
 			_data->window.draw(ghostFigure.blocks[i]);
 			_data->window.draw(nextFigure.blocks[i]);
 		}
 
-		for (int i = 0; i < 10; i++) //draw solid blocks
+		for (int i = 0; i < 10; i++) //draw blocks on grid
 		{
 			for (int j = 0; j < 20; j++)
 			{
@@ -683,9 +679,9 @@ namespace hgw
 			}
 		}
 
-		if (_data->saveVariables.fullGrid)  //draw grid
+		if (_data->saveVariables.fullGrid) //draw full grid
 		{
-			for (int i = 0; i < 11; i++)
+			for (int i = 0; i < 11; i++) 
 			{
 				_data->window.draw(verticalLines[i]);
 			}
@@ -694,7 +690,7 @@ namespace hgw
 				_data->window.draw(horizontalLines[i]);
 			}
 		}
-		else
+		else //draw only grid borders
 		{
 			_data->window.draw(verticalLines[0]);
 			_data->window.draw(verticalLines[10]);
@@ -703,12 +699,13 @@ namespace hgw
 			_data->window.draw(horizontalLines[20]);
 		}
 		
-		for (auto &n : eachStatText)
+		
+		for (auto &n : eachStatText) // draw statictic counter texts
 		{
 			_data->window.draw(n.second);
 		}
 
-		for (auto &n : stats)
+		for (auto &n : stats) //draw statistic figures
 		{
 			for (int i = 0; i < 4; i++)
 			{
@@ -748,9 +745,9 @@ namespace hgw
 				}
 			}
 
-			rowsCleaned += rowsLost;
+			totalRowsCleaned += rowsLost;
 
-			switch (rowsLost)
+			switch (rowsLost) //update score
 			{
 			case 1:
 				score += 40 * (currLvl + 1);
@@ -768,18 +765,18 @@ namespace hgw
 			//GameState::rowsCleanedtext.setString("Score: " + score);// causes nice bug
 			GameState::scoreText.setString("Score:\n" + insertZeros(score, 6));
 
-			if (score > highScore)
+			if (score > _data->saveVariables.highScore) //if current score is higher than highscore
 			{
-				updateGameData(GameData::variableNames::highScore, score, _data);
-				highScoreText.setString("Top:\n" + insertZeros(score, 6));
+				updateGameData(GameData::variableNames::highScore, score, _data); //set highscore to current score
+				highScoreText.setString("Top:\n" + insertZeros(score, 6)); //update highscore text
 			}
 
-			if (rowsCleaned % 10 == 0) //increase level if needed
+			if (totalRowsCleaned % 10 == 0) //increase level if needed
 			{
 				currLvl++;
 			}
 
-			linesText.setString("Lines: " + insertZeros(rowsCleaned, 3));
+			linesText.setString("Lines: " + insertZeros(totalRowsCleaned, 3)); //update lines counter text
 		}		
 	}
 
@@ -824,7 +821,7 @@ namespace hgw
 		return val % 4;
 	}
 
-	void GameState::setNextFigures(bool classicColor) //create and set next figures (ghost and current)
+	void GameState::setNextFigures(bool classicColor) //create and set next figures (ghost, current and next next)
 	{
 		currentFigure.Init(nextFigure._type_, sf::Vector2f(3, 0), classicColor, false);
 
@@ -840,9 +837,9 @@ namespace hgw
 	void GameState::updateGameData(GameData::variableNames variableName, int variableValue, GameDataRef _data)
 	{
 		std::fstream newFile;
-		std::string variableName_str;
+		std::string variableName_str; //variable name to search in file
 
-		switch (variableName)
+		switch (variableName) //set proper variable name
 		{
 		case hgw::GameData::highScore:
 			_data->saveVariables.highScore = variableValue;
@@ -859,15 +856,15 @@ namespace hgw
 			_data->saveVariables.originalColors = variableValue;
 		}
 
-		newFile.open("tempData.dat", std::fstream::out);
-		dataFile.open("data.dat", std::fstream::out | std::fstream::in);
+		newFile.open("tempData.dat", std::fstream::out); //create temp file to save new data
+		dataFile.open("data.dat", std::fstream::out | std::fstream::in); //open current data file
 
-		if (!dataFile.fail() && !newFile.fail())
+		if (dataFile.good() && newFile.good()) //not fail
 		{
-			newFile << variableName_str + " " + std::to_string(variableValue) << "\n";
+			newFile << variableName_str + " " + std::to_string(variableValue) << "\n"; //write updated variable to new file
 
 			std::string line;
-			while (std::getline(dataFile, line)) //copy all lines from data to newFile except highscore
+			while (std::getline(dataFile, line)) //copy all lines from current data file to new file except updated variable
 			{
 				if (line.find(variableName_str) == std::string::npos)
 				{
@@ -878,8 +875,8 @@ namespace hgw
 			dataFile.close();
 			newFile.close();
 
-			std::experimental::filesystem::remove("data.dat"); //remove data file
-			std::experimental::filesystem::rename("tempData.dat", "data.dat"); //rename tempData file to data
+			std::experimental::filesystem::remove("data.dat"); //remove current data file
+			std::experimental::filesystem::rename("tempData.dat", "data.dat"); //rename temp data file to current data file
 		}
 
 		dataFile.close();
@@ -888,20 +885,8 @@ namespace hgw
 
 	int GameState::getGameDataFromFile(GameData::variableNames variableName)
 	{
-		std::string toFind;
-		switch (variableName)
-		{
-		case hgw::GameData::highScore:
-			toFind = "highscore";
-			break;
-
-		case hgw::GameData::fullGrid:
-			toFind = "fullgrid";
-			break;
-
-		case hgw::GameData::originalColors:
-			toFind = "originalcolors";
-		}
+		std::string toFind; //data to find in file
+		toFind = varNameAsStr(variableName); //convert enum type 'GameData::variableNames' to proper string
 
 		dataFile.open("data.dat", std::fstream::out | std::fstream::in);
 
@@ -910,11 +895,12 @@ namespace hgw
 			std::string line;
 			while (std::getline(dataFile, line))
 			{
-				if (line.find(toFind) != std::string::npos) //if this line contatins "highscore"
+				if (line.find(toFind) != std::string::npos) //if this line contatins variable we want to find
 				{
-					std::string score = line.erase(0, toFind.size()); //10, cause "highscore " has 10 chars
+					std::string score = line.erase(0, toFind.size()); //convert file line to value
+					//eg. highscore 20 -> 20
 					dataFile.close();
-					return std::stoi(score);
+					return std::stoi(score); //return score as int
 				}
 			}
 		}
@@ -923,13 +909,42 @@ namespace hgw
 		return 0;
 	}
 
-	std::string GameState::insertZeros(int value, int digits)
+	std::string GameState::insertZeros(int value, int digits) //insert zeros to number string (eg. insertZeros(5, 3) -> 005)
 	{
 		std::string scoreString = std::to_string(value);
 		int zerosToInsert = digits - scoreString.size();
 		scoreString.insert(0, zerosToInsert, '0');
 
 		return scoreString;
+	}
+
+	std::string GameState::varNameAsStr(GameData::variableNames varName) //convert enum type 'GameData::variableNames' to proper string
+	{
+		switch (varName) 
+		{
+		case GameData::highScore:
+			return "highscore";
+		case GameData::fullGrid:
+			return "fullgrid";
+		case GameData::originalColors:;
+			return "originalcolors";
+		}
+	}
+
+	GameData::variableNames GameState::asVarName(std::string varNameAsStr) //convert string to proper enum type 'GameData::variableNames' variable
+	{
+		if (varNameAsStr == "highscore")
+		{
+			return GameData::highScore;
+		}
+		else if (varNameAsStr == "fullgrid")
+		{
+			return GameData::fullGrid;
+		}
+		else if (varNameAsStr == "originalcolors")
+		{
+			return GameData::originalColors;
+		}
 	}
 
 #pragma endregion
@@ -945,10 +960,4 @@ namespace hgw
 	Figure GameState::nextFigure;
 
 	std::fstream GameState::dataFile;
-	/*
-	int GameState::rowsCleaned;
-	unsigned long GameState::score;
-	unsigned long GameState::highScore;
-	sf::Text GameState::scoreText;
-	sf::Text GameState::highScoreText;*/
 }

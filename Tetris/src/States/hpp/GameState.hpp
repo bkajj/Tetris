@@ -68,10 +68,11 @@ namespace hgw
 		
 		static std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> grid;
 		static Figure currentFigure, ghostFigure, nextFigure;
+		static std::string varNameAsStr(GameData::variableNames varName);
+		static GameData::variableNames asVarName(std::string varNameAsStr);
 
-		int rowsCleaned;
-		unsigned long score;
-		unsigned long highScore;
+		int totalRowsCleaned;
+		int score;
 		static std::fstream dataFile;
 	
 	private:
