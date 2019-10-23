@@ -11,7 +11,7 @@ namespace hgw
 		GraphicsManager() {};
 		~GraphicsManager() {};
 
-		void LoadTexture(std::string name, std::string filename);
+		void LoadTexture(std::string name, std::string filename, bool setSmooth = true);
 		sf::Texture &GetTexture(std::string name);
 
 		void LoadFont(std::string name, std::string filename);

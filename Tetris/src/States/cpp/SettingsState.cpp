@@ -2,6 +2,7 @@
 #include "src/States/hpp/MenuState.hpp"
 #include "src/States/hpp/GameState.hpp"
 #include "src/GameEngine/hpp/Game.hpp"
+#include "src/GameEngine/hpp/Components.hpp"
 #include "src/DEFINE.hpp"
 #include <iostream>
 
@@ -14,14 +15,30 @@ namespace hgw
 
 	void SettingsState::Init()
 	{
-		bool state;
 		_data->graphics.LoadFont("font", FONT_PATH);
 
 		returnText.setFont(_data->graphics.GetFont("font"));
 		returnText.setCharacterSize(50);
 		returnText.setString("Return");
 
-		//ADD FUNCTION TO LOAD ALL VARIABLES FROM FILE AND SET GAME VARIABLES
+		_data->graphics.LoadTexture("sound off", SOUND_OFF_FILEPATH);
+		_data->graphics.LoadTexture("sound on", SOUND_ON_FILEPATH);
+		_data->graphics.LoadTexture("music off", MUSIC_OFF_FILEPATH);
+		_data->graphics.LoadTexture("music on", MUSIC_ON_FILEPATH);
+
+		soundBar.Init(_data);
+		musicBar.Init(_data);
+
+		soundOff.setTexture(_data->graphics.GetTexture("sound off"));
+		soundOn.setTexture(_data->graphics.GetTexture("sound on"));
+
+		musicOff.setTexture(_data->graphics.GetTexture("music off"));
+		musicOn.setTexture(_data->graphics.GetTexture("music on"));
+
+		soundOff.setScale(0.7, 0.7);
+		soundOn.setScale(0.7, 0.7);
+		musicOff.setScale(0.7, 0.7);
+		musicOn.setScale(0.7, 0.7);
 
 		originalColorText.setFont(_data->graphics.GetFont("font"));
 		originalColorText.setCharacterSize(50);
@@ -32,8 +49,17 @@ namespace hgw
 		setTextString(GameData::variableNames::fullGrid);
 		
 		returnText.setPosition((APP_WIDTH - returnText.getGlobalBounds().width) / 2, 800);
-		originalColorText.setPosition((APP_WIDTH - originalColorText.getGlobalBounds().width) / 2, 100);
-		drawFullGridText.setPosition((APP_WIDTH - drawFullGridText.getGlobalBounds().width) / 2, 160);
+		originalColorText.setPosition((APP_WIDTH - originalColorText.getGlobalBounds().width) / 2, 180);
+		drawFullGridText.setPosition((APP_WIDTH - drawFullGridText.getGlobalBounds().width) / 2, 230);
+
+		soundOff.setPosition((APP_WIDTH - soundOff.getGlobalBounds().width) / 5 + 70, 100);
+		soundOn.setPosition((APP_WIDTH - soundOn.getGlobalBounds().width) / 5 + 70, 100);
+		
+		musicOff.setPosition(soundOff.getPosition().x + drawFullGridText.getGlobalBounds().width - 170, 50);
+		musicOn.setPosition(soundOff.getPosition().x + drawFullGridText.getGlobalBounds().width - 170, 50);
+
+		musicBar.Attach(musicOff, sf::Vector2f(0, -musicOn.getGlobalBounds().height - 10), musicVolume);
+		soundBar.Attach(soundOff, sf::Vector2f(0, -soundOn.getGlobalBounds().height - 10), soundVolume);
 	}
 
 	void SettingsState::HandleInput()
@@ -80,6 +106,16 @@ namespace hgw
 		_data->window.draw(returnText);
 		_data->window.draw(originalColorText);
 		_data->window.draw(drawFullGridText);
+
+		_data->window.draw(soundOff);
+		_data->window.draw(soundOn);
+		_data->window.draw(musicOff);
+		_data->window.draw(musicOn);
+
+		_data->window.draw(musicBar._bar);
+		_data->window.draw(musicBar._point);
+		_data->window.draw(soundBar._bar);
+		_data->window.draw(soundBar._point);
 
 		_data->window.display();
 	}

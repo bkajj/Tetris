@@ -1,28 +1,26 @@
 #include "src/GameEngine/hpp/Components.hpp"
+#include "src/DEFINE.hpp"
 #include <iostream>
-
-//definitions here, not in DEFINE.hpp
-#define VOLUME_BAR_FILEPATH ""
-#define VOLUME_POINT_FILEPATH ""
 
 namespace hgw
 {
 	namespace cmp
 	{
-		VolumeBar::VolumeBar(GameDataRef data) : _data(data)
+		VolumeBar::VolumeBar()
 		{
-			Init();
+			
 		}
 
-		void VolumeBar::Init()
+		void VolumeBar::Init(GameDataRef data)
 		{
-			this->_data->graphics.LoadTexture("Bar", VOLUME_BAR_FILEPATH);
-			this->_data->graphics.LoadTexture("Point", VOLUME_POINT_FILEPATH);
+			this->_data = data;
+			_data->graphics.LoadTexture("bar", VOLUME_BAR_FILEPATH);
+			_data->graphics.LoadTexture("point", VOLUME_POINT_FILEPATH);
 
-			this->_bar.setTexture(this->_data->graphics.GetTexture("Bar"));
-			this->_point.setTexture(this->_data->graphics.GetTexture("Point"));
+			_bar.setTexture(this->_data->graphics.GetTexture("bar"));
+			_point.setTexture(this->_data->graphics.GetTexture("point"));
 
-			this->_point.setOrigin(this->_point.getGlobalBounds().width / 2, this->_point.getGlobalBounds().height / 2);
+			_point.setOrigin(this->_point.getGlobalBounds().width / 2, this->_point.getGlobalBounds().height / 2);
 		}
 
 		void VolumeBar::Attach(sf::Sprite sprite, sf::Vector2f posDifference, float volume)

@@ -10,12 +10,12 @@ namespace hgw
 		class VolumeBar
 		{
 		public:
-			VolumeBar(GameDataRef data);
+			VolumeBar();
 
 			sf::Sprite _bar;
 			sf::Sprite _point;
 
-			void Init();
+			void Init(GameDataRef data);
 
 			void Attach(sf::Sprite sprite, sf::Vector2f posDifference, float volume);
 			void MovePoint();

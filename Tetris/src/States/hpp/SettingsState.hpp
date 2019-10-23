@@ -1,6 +1,7 @@
 #pragma once
 #include "src/GameEngine/hpp/State.hpp"
 #include "src/GameEngine/hpp/Game.hpp"
+#include "src/GameEngine/hpp/Components.hpp"
 
 namespace hgw
 {
@@ -16,6 +17,11 @@ namespace hgw
 
 	private:
 		sf::Text returnText, originalColorText, drawFullGridText;
+		float soundVolume = 100.0, musicVolume = 100.0;
+		sf::Sprite soundOff, soundOn;
+		sf::Sprite musicOff, musicOn;
+		cmp::VolumeBar soundBar, musicBar;
+		
 		void setTextString(GameData::variableNames variableName);
 		
 		GameDataRef _data;

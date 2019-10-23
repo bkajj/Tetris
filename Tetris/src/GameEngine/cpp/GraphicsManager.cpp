@@ -2,12 +2,13 @@
 
 namespace hgw
 {
-	void GraphicsManager::LoadTexture(std::string name, std::string filename)
+	void GraphicsManager::LoadTexture(std::string name, std::string filename, bool setSmooth)
 	{
 		sf::Texture tex;
 
 		if (tex.loadFromFile(filename))
 		{
+			tex.setSmooth(setSmooth); //true by default
 			this->_textures[name] = tex;
 		}
 	}

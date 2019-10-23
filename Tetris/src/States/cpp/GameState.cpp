@@ -1,6 +1,7 @@
 #include "src/States/hpp/GameState.hpp"
 #include "src/GameEngine/hpp/Game.hpp"
 #include "src/States/hpp/GameOverState.hpp"
+#include "src/GameEngine/hpp/Components.hpp"
 #include "src/DEFINE.hpp"
 #include <iostream>
 #include <chrono>

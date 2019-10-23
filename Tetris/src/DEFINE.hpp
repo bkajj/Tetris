@@ -17,6 +17,15 @@
 #define EMPTY_GRID_PLACE std::pair<bool, sf::RectangleShape>(false, sf::RectangleShape())
 #define FILLED_GRID_PLACE std::pair<bool, sf::RectangleShape>(true, sf::RectangleShape(sf::Vector2f(BLOCK_SIZE, BLOCK_SIZE)))
 
+#define VOLUME_BAR_FILEPATH "res/gfx/Volume Bar.png"
+#define VOLUME_POINT_FILEPATH "res/gfx/Volume Point.png"
+
+#define SOUND_OFF_FILEPATH "res/gfx/Sound Off.png"
+#define SOUND_ON_FILEPATH "res/gfx/Sound On.png"
+
+#define MUSIC_OFF_FILEPATH "res/gfx/Music On.png"
+#define MUSIC_ON_FILEPATH "res/gfx/Music On.png"
+
 #define CLEAR1_SOUND_PATH "res/audio/sounds/clear1.wav"
 #define CLEAR2_SOUND_PATH "res/audio/sounds/clear2.wav"
 #define CLEAR3_SOUND_PATH "res/audio/sounds/clear3.wav"
