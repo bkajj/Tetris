@@ -22,4 +22,6 @@
 #define CLEAR3_SOUND_PATH "res/audio/sounds/clear3.wav"
 #define CLEAR4_SOUND_PATH "res/audio/sounds/clear4.wav"
 
+#define GAME_MUSIC_PATH "res/audio/music/gameMusic.wav"
+
 #define to_uns(x) static_cast<unsigned>(x)

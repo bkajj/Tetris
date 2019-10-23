@@ -399,6 +399,8 @@ namespace hgw
 		clear3.setBuffer(_data->sounds.GetSoundBuffer("clear3"));
 		clear4.setBuffer(_data->sounds.GetSoundBuffer("clear4"));
 
+		_data->music.Play(gameMusic, GAME_MUSIC_PATH, 100.0, true);
+
 		_data->graphics.LoadFont("font", FONT_PATH);
 		sf::Font& font = _data->graphics.GetFont("font");
 
@@ -561,7 +563,7 @@ namespace hgw
 									grid[i][j] = std::make_pair(false, sf::RectangleShape());
 								}
 							}
-
+							_data->music.Stop(gameMusic);
 							_data->machine.AddState(StateRef(new GameOverState(_data)));
 						}
 					}
@@ -637,7 +639,7 @@ namespace hgw
 								grid[i][j] = std::make_pair(false, sf::RectangleShape());
 							}
 						}
-
+						_data->music.Stop(gameMusic);
 						_data->machine.AddState(StateRef(new GameOverState(_data)));
 					}
 				}

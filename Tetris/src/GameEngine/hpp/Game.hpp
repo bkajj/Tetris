@@ -7,6 +7,7 @@
 #include "GraphicsManager.hpp"
 #include "InputManager.hpp"
 #include "SoundManager.hpp"
+#include "MusicManager.hpp"
 
 namespace hgw
 {
@@ -25,6 +26,7 @@ namespace hgw
 		GraphicsManager graphics;
 		InputManager input;
 		SoundManager sounds;
+		MusicManager music;
 
 		saveVariables saveVariables;
 		enum variableNames { highScore, fullGrid, originalColors };
