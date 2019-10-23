@@ -5,29 +5,16 @@
 
 namespace hgw
 {
-	struct SoundData
-	{
-		SoundData(std::string soundFilePath);
-
-		sf::Sound sound;
-		sf::SoundBuffer buffer;
-
-		static float globalSoundVolume;
-		static bool globalMute;
-
-		bool isLoaded = false;
-	};
-
 	class SoundManager
 	{
 	public:
 		SoundManager() {};
 		~SoundManager() {};
 
-		void Play(SoundData sd);
-		void Play(SoundData sd, float tempVolumeToPlay);
+		void LoadSoundBuffer(std::string name, std::string filename);
+		sf::SoundBuffer &GetSoundBuffer(std::string name);
 
-		//init sd here
-		//SoundData StartGame(FILENAME)...
+	private:
+		std::map<std::string, sf::SoundBuffer> _soundBuffers;
 	};
 }

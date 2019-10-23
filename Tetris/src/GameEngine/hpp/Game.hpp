@@ -6,6 +6,7 @@
 #include "StateMachine.hpp"
 #include "GraphicsManager.hpp"
 #include "InputManager.hpp"
+#include "SoundManager.hpp"
 
 namespace hgw
 {
@@ -23,6 +24,7 @@ namespace hgw
 		sf::RenderWindow window;
 		GraphicsManager graphics;
 		InputManager input;
+		SoundManager sounds;
 
 		saveVariables saveVariables;
 		enum variableNames { highScore, fullGrid, originalColors };

@@ -389,6 +389,16 @@ namespace hgw
 
 	void GameState::Init()
 	{
+		_data->sounds.LoadSoundBuffer("clear1", CLEAR1_SOUND_PATH);
+		_data->sounds.LoadSoundBuffer("clear2", CLEAR2_SOUND_PATH);
+		_data->sounds.LoadSoundBuffer("clear3", CLEAR3_SOUND_PATH);
+		_data->sounds.LoadSoundBuffer("clear4", CLEAR4_SOUND_PATH);
+
+		clear1.setBuffer(_data->sounds.GetSoundBuffer("clear1"));
+		clear2.setBuffer(_data->sounds.GetSoundBuffer("clear2"));
+		clear3.setBuffer(_data->sounds.GetSoundBuffer("clear3"));
+		clear4.setBuffer(_data->sounds.GetSoundBuffer("clear4"));
+
 		_data->graphics.LoadFont("font", FONT_PATH);
 		sf::Font& font = _data->graphics.GetFont("font");
 
@@ -534,10 +544,10 @@ namespace hgw
 
 						stats[currentFigure._type_].second++; //update statistics
 						eachStatText[currentFigure._type_].setString(insertZeros(stats[currentFigure._type_].second, 3)); //update statistics text
-
-						destroyFilledRows(); //clear lines
-						setNextFigures(_data->saveVariables.originalColors); //create next figures
 					}
+
+					destroyFilledRows(); //clear lines
+					setNextFigures(_data->saveVariables.originalColors); //create next figures
 
 					for (int i = 0; i < 10; i++) //check for lose condition
 					{
@@ -600,10 +610,10 @@ namespace hgw
 
 					stats[currentFigure._type_].second++; //update statistics
 					eachStatText[currentFigure._type_].setString(insertZeros(stats[currentFigure._type_].second, 3)); //update statistics text
-
-					destroyFilledRows(); //clear lines
-					setNextFigures(_data->saveVariables.originalColors); //create next figures
 				}		
+
+				destroyFilledRows(); //clear lines
+				setNextFigures(_data->saveVariables.originalColors); //create next figures
 
 				//isDownKeyPressed is needed for stopping next figure from fast falling when holding down key
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
@@ -747,19 +757,23 @@ namespace hgw
 
 			totalRowsCleaned += rowsLost;
 
-			switch (rowsLost) //update score
+			switch (rowsLost) //update score and play proper sound
 			{
 			case 1:
 				score += 40 * (currLvl + 1);
+				clear1.play();
 				break;
 			case 2:
 				score += 100 * (currLvl + 1);
+				clear2.play();
 				break;
 			case 3:
 				score += 300 * (currLvl + 1);
+				clear3.play();
 				break;
 			case 4:
 				score += 1200 * (currLvl + 1);
+				clear4.play();
 			}
 
 			//GameState::rowsCleanedtext.setString("Score: " + score);// causes nice bug

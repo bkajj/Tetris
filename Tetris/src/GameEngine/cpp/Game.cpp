@@ -7,7 +7,9 @@ namespace hgw
 	{
 		_data->window.create(sf::VideoMode(width, height), title,
 			sf::Style::Close | sf::Style::Titlebar);
+
 		_data->window.setKeyRepeatEnabled(false);
+
 		_data->machine.AddState(StateRef(new MenuState(_data)));
 		this->Run();
 	}
