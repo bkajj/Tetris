@@ -16,4 +16,10 @@ namespace hgw
 	{
 		return _soundBuffers.at(name);
 	}
+
+	void SoundManager::Play(sf::Sound &sound)
+	{
+		sound.setVolume(globalVolume);
+		sound.play();
+	}
 }

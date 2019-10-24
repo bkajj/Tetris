@@ -400,7 +400,7 @@ namespace hgw
 		clear3.setBuffer(_data->sounds.GetSoundBuffer("clear3"));
 		clear4.setBuffer(_data->sounds.GetSoundBuffer("clear4"));
 
-		_data->music.Play(gameMusic, GAME_MUSIC_PATH, 100.0, true);
+		_data->music.Play(gameMusic, GAME_MUSIC_PATH, true);
 
 		_data->graphics.LoadFont("font", FONT_PATH);
 		sf::Font& font = _data->graphics.GetFont("font");
@@ -764,19 +764,19 @@ namespace hgw
 			{
 			case 1:
 				score += 40 * (currLvl + 1);
-				clear1.play();
+				_data->sounds.Play(clear1);
 				break;
 			case 2:
 				score += 100 * (currLvl + 1);
-				clear2.play();
+				_data->sounds.Play(clear2);
 				break;
 			case 3:
 				score += 300 * (currLvl + 1);
-				clear3.play();
+				_data->sounds.Play(clear3);
 				break;
 			case 4:
 				score += 1200 * (currLvl + 1);
-				clear4.play();
+				_data->sounds.Play(clear4);
 			}
 
 			//GameState::rowsCleanedtext.setString("Score: " + score);// causes nice bug

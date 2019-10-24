@@ -17,10 +17,11 @@ namespace hgw
 
 	private:
 		sf::Text returnText, originalColorText, drawFullGridText;
-		float soundVolume = 100.0, musicVolume = 100.0;
+
 		sf::Sprite soundOff, soundOn;
 		sf::Sprite musicOff, musicOn;
 		cmp::VolumeBar soundBar, musicBar;
+		bool musicPointPressed = false, soundPointPressed = false;
 		
 		void setTextString(GameData::variableNames variableName);
 		

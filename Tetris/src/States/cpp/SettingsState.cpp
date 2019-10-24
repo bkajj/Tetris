@@ -52,14 +52,14 @@ namespace hgw
 		originalColorText.setPosition((APP_WIDTH - originalColorText.getGlobalBounds().width) / 2, 180);
 		drawFullGridText.setPosition((APP_WIDTH - drawFullGridText.getGlobalBounds().width) / 2, 230);
 
-		soundOff.setPosition((APP_WIDTH - soundOff.getGlobalBounds().width) / 5 + 70, 100);
-		soundOn.setPosition((APP_WIDTH - soundOn.getGlobalBounds().width) / 5 + 70, 100);
+		soundOff.setPosition((APP_WIDTH - soundOff.getGlobalBounds().width) / 5 + 70, 50);
+		soundOn.setPosition((APP_WIDTH - soundOn.getGlobalBounds().width) / 5 + 70, 50);
 		
 		musicOff.setPosition(soundOff.getPosition().x + drawFullGridText.getGlobalBounds().width - 170, 50);
 		musicOn.setPosition(soundOff.getPosition().x + drawFullGridText.getGlobalBounds().width - 170, 50);
 
-		musicBar.Attach(musicOff, sf::Vector2f(0, -musicOn.getGlobalBounds().height - 10), musicVolume);
-		soundBar.Attach(soundOff, sf::Vector2f(0, -soundOn.getGlobalBounds().height - 10), soundVolume);
+		musicBar.Attach(musicOff, sf::Vector2f(0, -musicOn.getGlobalBounds().height - 10), _data->music.globalVolume);
+		soundBar.Attach(soundOff, sf::Vector2f(0, -soundOn.getGlobalBounds().height - 10), _data->sounds.globalVolume);
 	}
 
 	void SettingsState::HandleInput()
@@ -72,31 +72,48 @@ namespace hgw
 			{
 				_data->window.close();
 			}
-
-			if (_data->input.IsTextClicked(returnText, sf::Mouse::Left, event.type, _data->window))
+			else if (_data->input.IsTextClicked(returnText, sf::Mouse::Left, event.type, _data->window))
 			{
 				_data->machine.AddState(StateRef(new MenuState(_data)));
 			}
-
-			if (_data->input.IsTextClicked(drawFullGridText, sf::Mouse::Left, event.type, _data->window))
+			else if (_data->input.IsTextClicked(drawFullGridText, sf::Mouse::Left, event.type, _data->window))
 			{
 				GameState::updateGameData(GameData::variableNames::fullGrid, !_data->saveVariables.fullGrid, _data);
 
 				setTextString(GameData::variableNames::fullGrid);
 			}
-
-			if (_data->input.IsTextClicked(originalColorText, sf::Mouse::Left, event.type, _data->window))
+			else if (_data->input.IsTextClicked(originalColorText, sf::Mouse::Left, event.type, _data->window))
 			{
 				GameState::updateGameData(GameData::variableNames::originalColors, !_data->saveVariables.originalColors, _data);
 
 				setTextString(GameData::variableNames::originalColors);
+			}
+			else if (_data->input.IsSpriteReleased(soundBar._bar, sf::Mouse::Left, event.type, _data->window))
+			{
+				soundPointPressed = false;
+				std::cout << "SOUND BAR RELEASED" << std::endl;
+			}
+			else if (_data->input.IsSpriteHeld(musicBar._bar, sf::Mouse::Left, _data->window))
+			{
+				musicBar.MovePoint();
+				_data->music.globalVolume = musicBar.GetVolume();
+			}
+			else if (_data->input.IsSpriteClicked(soundBar._bar, sf::Mouse::Left, event.type, _data->window))
+			{
+				soundPointPressed = true;
 			}
 		}
 	}
 
 	void SettingsState::Update(float dt)
 	{
-
+		if (soundPointPressed)
+		{
+			soundBar.MovePoint();
+			_data->sounds.globalVolume = soundBar.GetVolume();
+		}
+		//std::cout << "SOUND: " << _data->sounds.globalVolume << std::endl;
+		//std::cout << "MUSIC: " << _data->music.globalVolume << std::endl;
 	}
 
 	void SettingsState::Draw(float dt)
@@ -107,10 +124,24 @@ namespace hgw
 		_data->window.draw(originalColorText);
 		_data->window.draw(drawFullGridText);
 
-		_data->window.draw(soundOff);
-		_data->window.draw(soundOn);
-		_data->window.draw(musicOff);
-		_data->window.draw(musicOn);
+		if (_data->sounds.globalVolume <= 0)
+		{
+			_data->window.draw(soundOff);
+			
+		}
+		else
+		{
+			_data->window.draw(soundOn);
+		}
+
+		if (_data->music.globalVolume <= 0)
+		{
+			_data->window.draw(musicOff);
+		}
+		else
+		{
+			_data->window.draw(musicOn);
+		}
 
 		_data->window.draw(musicBar._bar);
 		_data->window.draw(musicBar._point);

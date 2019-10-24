@@ -58,6 +58,22 @@ namespace hgw
 		return false;
 	}
 
+	bool InputManager::IsSpriteReleased(sf::Sprite object, sf::Mouse::Button button,
+		sf::Event::EventType eventType, sf::RenderWindow &window)
+	{
+		if (eventType == sf::Event::EventType::MouseButtonReleased)
+		{
+			sf::IntRect tempRect(object.getPosition().x, object.getPosition().y,
+				object.getGlobalBounds().width, object.getGlobalBounds().height);
+
+			if (tempRect.contains(sf::Mouse::getPosition(window)))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	bool InputManager::IsTextClicked(sf::Text text, sf::Mouse::Button button, sf::Event::EventType eventType, sf::RenderWindow &window)
 	{
 		if (eventType == sf::Event::EventType::MouseButtonPressed)

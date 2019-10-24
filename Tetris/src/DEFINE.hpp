@@ -23,7 +23,7 @@
 #define SOUND_OFF_FILEPATH "res/gfx/Sound Off.png"
 #define SOUND_ON_FILEPATH "res/gfx/Sound On.png"
 
-#define MUSIC_OFF_FILEPATH "res/gfx/Music On.png"
+#define MUSIC_OFF_FILEPATH "res/gfx/Music Off.png"
 #define MUSIC_ON_FILEPATH "res/gfx/Music On.png"
 
 #define CLEAR1_SOUND_PATH "res/audio/sounds/clear1.wav"

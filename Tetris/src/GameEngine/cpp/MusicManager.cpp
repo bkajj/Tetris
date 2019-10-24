@@ -1,13 +1,13 @@
-#include "src/GameEngine/hpp/MusicManager.hpp"
+	#include "src/GameEngine/hpp/MusicManager.hpp"
 #include <iostream>
 
 namespace hgw
 {
-	void MusicManager::Play(sf::Music &music, std::string filepath, float volume = 100.0f, bool loop = true)
+	void MusicManager::Play(sf::Music &music, std::string filepath, bool loop = true)
 	{
 		if (music.openFromFile(filepath))
 		{
-			music.setVolume(volume);
+			music.setVolume(globalVolume);
 			music.setLoop(loop);
 			music.play();
 		}
