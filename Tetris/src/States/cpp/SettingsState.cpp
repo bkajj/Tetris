@@ -88,19 +88,19 @@ namespace hgw
 
 				setTextString(GameData::variableNames::originalColors);
 			}
-			else if (_data->input.IsSpriteReleased(soundBar._bar, sf::Mouse::Left, event.type, _data->window))
+			else if (sf::Event::MouseButtonReleased == event.type && event.mouseButton.button == sf::Mouse::Left)
 			{
 				soundPointPressed = false;
+				musicPointPressed = false;
 				std::cout << "SOUND BAR RELEASED" << std::endl;
-			}
-			else if (_data->input.IsSpriteHeld(musicBar._bar, sf::Mouse::Left, _data->window))
-			{
-				musicBar.MovePoint();
-				_data->music.globalVolume = musicBar.GetVolume();
 			}
 			else if (_data->input.IsSpriteClicked(soundBar._bar, sf::Mouse::Left, event.type, _data->window))
 			{
 				soundPointPressed = true;
+			}
+			else if (_data->input.IsSpriteClicked(musicBar._bar, sf::Mouse::Left, event.type, _data->window))
+			{
+				musicPointPressed = true;
 			}
 		}
 	}
@@ -111,6 +111,11 @@ namespace hgw
 		{
 			soundBar.MovePoint();
 			_data->sounds.globalVolume = soundBar.GetVolume();
+		}
+		else if (musicPointPressed)
+		{
+			musicBar.MovePoint();
+			_data->music.globalVolume = musicBar.GetVolume();
 		}
 		//std::cout << "SOUND: " << _data->sounds.globalVolume << std::endl;
 		//std::cout << "MUSIC: " << _data->music.globalVolume << std::endl;
