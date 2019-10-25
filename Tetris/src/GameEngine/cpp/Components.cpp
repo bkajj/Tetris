@@ -53,9 +53,15 @@ namespace hgw
 			float barpoint = this->_bar.getPosition().x;
 			float pointPos = sf::Mouse::getPosition(this->_data->window).x - barpoint;
 
-			if (std::round(pointPos) / barSize * 100 > 0)
+			float volume = std::round(pointPos) / barSize * 100;
+
+			if (volume > 100)
 			{
-				return std::round(pointPos) / barSize * 100;
+				return 100;
+			}
+			else if (volume > 0)
+			{
+				return volume;
 			}
 			else
 			{

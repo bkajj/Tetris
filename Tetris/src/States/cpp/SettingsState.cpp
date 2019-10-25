@@ -117,8 +117,8 @@ namespace hgw
 			musicBar.MovePoint();
 			_data->music.globalVolume = musicBar.GetVolume();
 		}
-		//std::cout << "SOUND: " << _data->sounds.globalVolume << std::endl;
-		//std::cout << "MUSIC: " << _data->music.globalVolume << std::endl;
+		std::cout << "SOUND: " << _data->sounds.globalVolume << std::endl;
+		std::cout << "MUSIC: " << _data->music.globalVolume << std::endl;
 	}
 
 	void SettingsState::Draw(float dt)
@@ -132,7 +132,6 @@ namespace hgw
 		if (_data->sounds.globalVolume <= 0)
 		{
 			_data->window.draw(soundOff);
-			
 		}
 		else
 		{
