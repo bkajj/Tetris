@@ -426,6 +426,10 @@ namespace hgw
 		statsText.setFont(font);
 		statsText.setCharacterSize(45);
 		statsText.setString("Statistics:");
+
+		levelText.setFont(font);
+		levelText.setCharacterSize(50);
+		levelText.setString("Level:\n  00");
 			
 		for (int i = 0; i < 11; i++) //set grid on screen
 		{
@@ -443,6 +447,7 @@ namespace hgw
 		nextFigureText.setPosition(verticalLines[10].getPosition().x + 50, scoreText.getPosition().y + 200);
 		linesText.setPosition((APP_WIDTH - linesText.getGlobalBounds().width) / 2, 0);
 		statsText.setPosition((APP_WIDTH - 3 * linesText.getGlobalBounds().width) / 2 - 30, 40);
+		levelText.setPosition(nextFigureText.getPosition() + sf::Vector2f(0, 160));
 
 		//set statistics figures
 		stats[Figure::I].first.Init(Figure::I, sf::Vector2f(-7.5, 1), true, false);
@@ -731,6 +736,7 @@ namespace hgw
 		_data->window.draw(nextFigureText);
 		_data->window.draw(linesText);
 		_data->window.draw(statsText);
+		_data->window.draw(levelText);
 
 		_data->window.display();
 	}
@@ -791,6 +797,7 @@ namespace hgw
 			if (totalRowsCleaned % 10 == 0) //increase level if needed
 			{
 				currLvl++;
+				levelText.setString("Level:\n  " + insertZeros(currLvl, 2));
 			}
 
 			linesText.setString("Lines: " + insertZeros(totalRowsCleaned, 3)); //update lines counter text
