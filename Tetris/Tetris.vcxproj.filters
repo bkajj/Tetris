@@ -13,12 +13,12 @@
     <ClCompile Include="src\States\cpp\GameState.cpp" />
     <ClCompile Include="src\States\cpp\SettingsState.cpp" />
     <ClCompile Include="src\States\cpp\GameOverState.cpp" />
+    <ClCompile Include="src\GameEngine\cpp\DataManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GameEngine\hpp\Components.hpp" />
     <ClInclude Include="src\GameEngine\hpp\Game.hpp" />
     <ClInclude Include="src\GameEngine\hpp\GraphicsManager.hpp" />
-    <ClInclude Include="src\GameEngine\hpp\InputManager.hpp" />
     <ClInclude Include="src\GameEngine\hpp\MusicManager.hpp" />
     <ClInclude Include="src\GameEngine\hpp\SoundManager.hpp" />
     <ClInclude Include="src\GameEngine\hpp\State.hpp" />
@@ -28,6 +28,8 @@
     <ClInclude Include="src\States\hpp\GameState.hpp" />
     <ClInclude Include="src\States\hpp\SettingsState.hpp" />
     <ClInclude Include="src\States\hpp\GameOverState.hpp" />
+    <ClInclude Include="src\GameEngine\hpp\InputManager.hpp" />
+    <ClInclude Include="src\GameEngine\hpp\DataManager.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="openal32.dll" />

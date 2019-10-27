@@ -84,7 +84,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);P:\VisualC++\Libs\SFML-2.5.1\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>P:\VisualC++\Libs\boost_1_70_0\libs;P:\VisualC++\Libs\boost_1_70_0;P:\VisualC++\Libs\boost_1_70_0;$(ProjectDir);P:\VisualC++\Libs\SFML-2.5.1\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>P:\VisualC++\Libs\SFML-2.5.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -113,7 +113,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);P:\VisualC++\Libs\SFML-2.5.1\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>P:\VisualC++\Libs\boost_1_70_0\libs;P:\VisualC++\Libs\boost_1_70_0;$(ProjectDir);P:\VisualC++\Libs\SFML-2.5.1\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -124,6 +124,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\GameEngine\cpp\Components.cpp" />
+    <ClCompile Include="src\GameEngine\cpp\DataManager.cpp" />
     <ClCompile Include="src\GameEngine\cpp\Game.cpp" />
     <ClCompile Include="src\GameEngine\cpp\GraphicsManager.cpp" />
     <ClCompile Include="src\GameEngine\cpp\InputManager.cpp" />
@@ -141,6 +142,7 @@
   <ItemGroup>
     <ClInclude Include="src\DEFINE.hpp" />
     <ClInclude Include="src\GameEngine\hpp\Components.hpp" />
+    <ClInclude Include="src\GameEngine\hpp\DataManager.hpp" />
     <ClInclude Include="src\GameEngine\hpp\Game.hpp" />
     <ClInclude Include="src\GameEngine\hpp\GraphicsManager.hpp" />
     <ClInclude Include="src\GameEngine\hpp\InputManager.hpp" />

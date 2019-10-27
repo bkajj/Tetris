@@ -16,6 +16,10 @@ namespace hgw
 
 	void MenuState::Init()
 	{
+		_data->gameData.gameData = SaveGameData(1, true, false, 0.5f, 0.8f);
+		_data->gameData.serializeSave();
+
+
 		_data->graphics.LoadFont("font", FONT_PATH);
 
 		tetrisText.setFont(_data->graphics.GetFont("font"));
