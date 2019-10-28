@@ -4,6 +4,7 @@
 #include "boost/archive/binary_oarchive.hpp"
 #include "boost/serialization/binary_object.hpp"
 #include "boost/serialization/serialization.hpp"
+#include "boost/serialization/binary_object.hpp"
 
 #include <iostream>
 
@@ -12,7 +13,7 @@ namespace hgw
 	namespace ar = boost::archive;
 	using boost::serialization::make_binary_object;
 
-	SaveGameData::SaveGameData(int highscore, bool fullGrid, bool originalColors, float soundVolume, float musicVolume)
+	SaveGameData::SaveGameData(int highScore, bool fullGrid, bool originalColors, float soundVolume, float musicVolume)
 	{
 		this->highScore = highScore;
 
@@ -26,13 +27,12 @@ namespace hgw
 
 	void DataManager::serializeSave()
 	{
-		gameDataFile.open("data111.dat", std::fstream::binary | std::fstream::out);
+		gameDataFile.open("data111.dat", std::fstream::out);
 
 		if (gameDataFile.good())
 		{
-			ar::binary_oarchive oarchive{ gameDataFile, boost::archive::no_header };
-
-			oarchive << make_binary_object(&gameData, sizeof(gameData));
+			ar::binary_oarchive oarchive{ gameDataFile, ar::no_header };
+			oarchive << gameData;
 		}
 		else
 		{
@@ -44,12 +44,11 @@ namespace hgw
 
 	void DataManager::serializeLoad()
 	{
-		gameDataFile.open("data111.dat", std::fstream::binary | std::fstream::in);
+		gameDataFile.open("data111.dat", std::fstream::in);
 
 		if (gameDataFile.good())
 		{
-			ar::binary_iarchive iarchive{ gameDataFile, boost::archive::no_header };
-
+			ar::binary_iarchive iarchive{ gameDataFile, ar::no_header};
 			iarchive >> gameData;
 		}
 		else

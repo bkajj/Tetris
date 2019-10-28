@@ -16,8 +16,15 @@ namespace hgw
 
 	void MenuState::Init()
 	{
-		_data->gameData.gameData = SaveGameData(1, true, false, 0.5f, 0.8f);
-		_data->gameData.serializeSave();
+		//_data->gameData.gameData = SaveGameData(1, true, true, 0.5f, 0.8f);
+		//_data->gameData.serializeSave();
+		_data->gameData.serializeLoad();
+		
+		std::cout << "HS: " << _data->gameData.gameData.highScore << std::endl;
+		std::cout << "FG: " << _data->gameData.gameData.fullGrid << std::endl;
+		std::cout << "OC: " << _data->gameData.gameData.originalColors << std::endl;
+		std::cout << "SV: " << _data->gameData.gameData.soundVolume << std::endl;
+		std::cout << "MV: " << _data->gameData.gameData.musicVolume << std::endl;
 
 
 		_data->graphics.LoadFont("font", FONT_PATH);
