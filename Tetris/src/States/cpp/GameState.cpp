@@ -1,6 +1,7 @@
 #include "src/States/hpp/GameState.hpp"
 #include "src/GameEngine/hpp/Game.hpp"
 #include "src/States/hpp/GameOverState.hpp"
+#include "src/States/hpp/SettingsState.hpp"
 #include "src/GameEngine/hpp/Components.hpp"
 #include "src/DEFINE.hpp"
 #include <iostream>
@@ -390,17 +391,8 @@ namespace hgw
 
 	void GameState::Init()
 	{
-		_data->sounds.LoadSoundBuffer("clear1", CLEAR1_SOUND_PATH);
-		_data->sounds.LoadSoundBuffer("clear2", CLEAR2_SOUND_PATH);
-		_data->sounds.LoadSoundBuffer("clear3", CLEAR3_SOUND_PATH);
-		_data->sounds.LoadSoundBuffer("clear4", CLEAR4_SOUND_PATH);
 
-		clear1.setBuffer(_data->sounds.GetSoundBuffer("clear1"));
-		clear2.setBuffer(_data->sounds.GetSoundBuffer("clear2"));
-		clear3.setBuffer(_data->sounds.GetSoundBuffer("clear3"));
-		clear4.setBuffer(_data->sounds.GetSoundBuffer("clear4"));
-
-		_data->music.Play(gameMusic, GAME_MUSIC_PATH, true);
+		_data->music.Play("gameMusic");
 
 		_data->graphics.LoadFont("font", FONT_PATH);
 		sf::Font& font = _data->graphics.GetFont("font");
@@ -413,7 +405,7 @@ namespace hgw
 		highScoreText.setFont(font);
 		highScoreText.setCharacterSize(50);
 		highScoreText.setLineSpacing(0.75f);
-		highScoreText.setString("Top:\n" + insertZeros(_data->saveVariables.highScore, 6));
+		highScoreText.setString("Top:\n" + insertZeros(_data->gameData.gameData.highScore, 6));
 
 		nextFigureText.setFont(font);
 		nextFigureText.setCharacterSize(50);
@@ -501,7 +493,7 @@ namespace hgw
 		Figure::FigureType nextType = nextFigure.randFigureType(figureType);
 
 		//used Init cause in this particular case constructor was causing bugs
-		if (_data->saveVariables.originalColors)
+		if (_data->gameData.gameData.originalColors)
 		{
 			currentFigure.Init(figureType, sf::Vector2f(3, 0), true, false); //create current figure with original colors
 		}
@@ -517,7 +509,7 @@ namespace hgw
 									   currentFigure.figureColor.b, currentFigure.figureColor.a - 175));
 		ghostFigure.updateGhostCoords();
 
-		if (_data->saveVariables.originalColors)
+		if (_data->gameData.gameData.originalColors)
 		{
 			nextFigure.Init(nextType, sf::Vector2f(12, 9), true, false); //set next figure with original colors
 		}
@@ -555,7 +547,7 @@ namespace hgw
 					}
 
 					destroyFilledRows(); //clear lines
-					setNextFigures(_data->saveVariables.originalColors); //create next figures
+					setNextFigures(_data->gameData.gameData.originalColors); //create next figures
 
 					for (int i = 0; i < 10; i++) //check for lose condition
 					{
@@ -569,7 +561,7 @@ namespace hgw
 									grid[i][j] = std::make_pair(false, sf::RectangleShape());
 								}
 							}
-							_data->music.Stop(gameMusic);
+							_data->music.Stop("gameMusic");
 							_data->machine.AddState(StateRef(new GameOverState(_data)));
 						}
 					}
@@ -583,7 +575,11 @@ namespace hgw
 				{
 					currentFigure.Rotate(false, true);
 					ghostFigure.updateGhostCoords();
-				}			
+				}	
+				else if (event.key.code == sf::Keyboard::P) //game pause
+				{
+					_data->machine.AddState(StateRef(new SettingsState(_data)), false);
+				}
 			}
 			else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Down) //down key release
 			{
@@ -621,7 +617,7 @@ namespace hgw
 				}		
 
 				destroyFilledRows(); //clear lines
-				setNextFigures(_data->saveVariables.originalColors); //create next figures
+				setNextFigures(_data->gameData.gameData.originalColors); //create next figures
 
 				//isDownKeyPressed is needed for stopping next figure from fast falling when holding down key
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
@@ -645,7 +641,7 @@ namespace hgw
 								grid[i][j] = std::make_pair(false, sf::RectangleShape());
 							}
 						}
-						_data->music.Stop(gameMusic);
+						_data->music.Stop("gameMusic");
 						_data->machine.AddState(StateRef(new GameOverState(_data)));
 					}
 				}
@@ -697,7 +693,7 @@ namespace hgw
 			}
 		}
 
-		if (_data->saveVariables.fullGrid) //draw full grid
+		if (_data->gameData.gameData.fullGrid) //draw full grid
 		{
 			for (int i = 0; i < 11; i++) 
 			{
@@ -770,27 +766,27 @@ namespace hgw
 			{
 			case 1:
 				score += 40 * (currLvl + 1);
-				_data->sounds.Play(clear1);
+				_data->sounds.Play("clear1");
 				break;
 			case 2:
 				score += 100 * (currLvl + 1);
-				_data->sounds.Play(clear2);
+				_data->sounds.Play("clear2");
 				break;
 			case 3:
 				score += 300 * (currLvl + 1);
-				_data->sounds.Play(clear3);
+				_data->sounds.Play("clear3");
 				break;
 			case 4:
 				score += 1200 * (currLvl + 1);
-				_data->sounds.Play(clear4);
+				_data->sounds.Play("clear4");
 			}
 
 			//GameState::rowsCleanedtext.setString("Score: " + score);// causes nice bug
 			GameState::scoreText.setString("Score:\n" + insertZeros(score, 6));
 
-			if (score > _data->saveVariables.highScore) //if current score is higher than highscore
+			if (score > _data->gameData.gameData.highScore) //if current score is higher than highscore
 			{
-				updateGameData(GameData::variableNames::highScore, score, _data); //set highscore to current score
+				_data->gameData.gameData.highScore = score;
 				highScoreText.setString("Top:\n" + insertZeros(score, 6)); //update highscore text
 			}
 
@@ -858,81 +854,6 @@ namespace hgw
 		nextFigure.Init(nextType, sf::Vector2f(12, 9), true, false);
 	}
 
-	void GameState::updateGameData(GameData::variableNames variableName, int variableValue, GameDataRef _data)
-	{
-		std::fstream newFile;
-		std::string variableName_str; //variable name to search in file
-
-		switch (variableName) //set proper variable name
-		{
-		case hgw::GameData::highScore:
-			_data->saveVariables.highScore = variableValue;
-			variableName_str = "highscore";
-			break;
-
-		case hgw::GameData::fullGrid:
-			_data->saveVariables.fullGrid = variableValue;
-			variableName_str = "fullgrid";
-			break;
-
-		case hgw::GameData::originalColors:
-			variableName_str = "originalcolors";
-			_data->saveVariables.originalColors = variableValue;
-		}
-
-		newFile.open("tempData.dat", std::fstream::out); //create temp file to save new data
-		dataFile.open("data.dat", std::fstream::out | std::fstream::in); //open current data file
-
-		if (dataFile.good() && newFile.good()) //not fail
-		{
-			newFile << variableName_str + " " + std::to_string(variableValue) << "\n"; //write updated variable to new file
-
-			std::string line;
-			while (std::getline(dataFile, line)) //copy all lines from current data file to new file except updated variable
-			{
-				if (line.find(variableName_str) == std::string::npos)
-				{
-					newFile << line << "\n";
-				}
-			}
-
-			dataFile.close();
-			newFile.close();
-
-			std::experimental::filesystem::remove("data.dat"); //remove current data file
-			std::experimental::filesystem::rename("tempData.dat", "data.dat"); //rename temp data file to current data file
-		}
-
-		dataFile.close();
-		newFile.close();		
-	}
-
-	int GameState::getGameDataFromFile(GameData::variableNames variableName)
-	{
-		std::string toFind; //data to find in file
-		toFind = varNameAsStr(variableName); //convert enum type 'GameData::variableNames' to proper string
-
-		dataFile.open("data.dat", std::fstream::out | std::fstream::in);
-
-		if (dataFile.good())
-		{
-			std::string line;
-			while (std::getline(dataFile, line))
-			{
-				if (line.find(toFind) != std::string::npos) //if this line contatins variable we want to find
-				{
-					std::string score = line.erase(0, toFind.size()); //convert file line to value
-					//eg. highscore 20 -> 20
-					dataFile.close();
-					return std::stoi(score); //return score as int
-				}
-			}
-		}
-		dataFile.close();
-
-		return 0;
-	}
-
 	std::string GameState::insertZeros(int value, int digits) //insert zeros to number string (eg. insertZeros(5, 3) -> 005)
 	{
 		std::string scoreString = std::to_string(value);
@@ -940,35 +861,6 @@ namespace hgw
 		scoreString.insert(0, zerosToInsert, '0');
 
 		return scoreString;
-	}
-
-	std::string GameState::varNameAsStr(GameData::variableNames varName) //convert enum type 'GameData::variableNames' to proper string
-	{
-		switch (varName) 
-		{
-		case GameData::highScore:
-			return "highscore";
-		case GameData::fullGrid:
-			return "fullgrid";
-		case GameData::originalColors:;
-			return "originalcolors";
-		}
-	}
-
-	GameData::variableNames GameState::asVarName(std::string varNameAsStr) //convert string to proper enum type 'GameData::variableNames' variable
-	{
-		if (varNameAsStr == "highscore")
-		{
-			return GameData::highScore;
-		}
-		else if (varNameAsStr == "fullgrid")
-		{
-			return GameData::fullGrid;
-		}
-		else if (varNameAsStr == "originalcolors")
-		{
-			return GameData::originalColors;
-		}
 	}
 
 #pragma endregion

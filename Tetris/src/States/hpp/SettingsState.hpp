@@ -23,8 +23,6 @@ namespace hgw
 		cmp::VolumeBar soundBar, musicBar;
 		bool musicPointPressed = false, soundPointPressed = false;
 		
-		void setTextString(GameData::variableNames variableName);
-		
 		GameDataRef _data;
 	};
 }

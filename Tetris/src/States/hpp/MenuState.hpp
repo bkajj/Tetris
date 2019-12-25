@@ -16,15 +16,14 @@ namespace hgw
 		void Draw(float dt);
 	
 	private:
-		void loadAllVariablesFromFile();
-
 		GameDataRef _data;
+
+		sf::Sound clear1, clear2, clear3, clear4;
+		sf::Music gameMusic, menuMusic;
 
 		sf::Text tetrisText;
 		sf::Text startText;
 		sf::Text settingsText;
 		sf::Text exitText;
-
-		std::fstream dataFile;
 	};
 }

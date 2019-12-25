@@ -42,11 +42,25 @@ namespace hgw
 
 		originalColorText.setFont(_data->graphics.GetFont("font"));
 		originalColorText.setCharacterSize(50);
-		setTextString(GameData::variableNames::originalColors);
+		if (_data->gameData.gameData.originalColors)
+		{
+			originalColorText.setString("Original Colors: ON");
+		}
+		else
+		{
+			originalColorText.setString("Original Colors: OFF");
+		}
 
 		drawFullGridText.setFont(_data->graphics.GetFont("font"));
 		drawFullGridText.setCharacterSize(50);
-		setTextString(GameData::variableNames::fullGrid);
+		if (_data->gameData.gameData.fullGrid)
+		{
+			drawFullGridText.setString("Draw Full Grid: ON");
+		}
+		else
+		{
+			drawFullGridText.setString("Draw Full Grid: OFF");
+		}
 		
 		returnText.setPosition((APP_WIDTH - returnText.getGlobalBounds().width) / 2, 800);
 		originalColorText.setPosition((APP_WIDTH - originalColorText.getGlobalBounds().width) / 2, 180);
@@ -58,8 +72,8 @@ namespace hgw
 		musicOff.setPosition(soundOff.getPosition().x + drawFullGridText.getGlobalBounds().width - 170, 50);
 		musicOn.setPosition(soundOff.getPosition().x + drawFullGridText.getGlobalBounds().width - 170, 50);
 
-		musicBar.Attach(musicOff, sf::Vector2f(0, -musicOn.getGlobalBounds().height - 10), _data->music.globalVolume);
-		soundBar.Attach(soundOff, sf::Vector2f(0, -soundOn.getGlobalBounds().height - 10), _data->sounds.globalVolume);
+		musicBar.Attach(musicOff, sf::Vector2f(0, -musicOn.getGlobalBounds().height - 10), _data->music.getGlobalVolume());
+		soundBar.Attach(soundOff, sf::Vector2f(0, -soundOn.getGlobalBounds().height - 10), _data->sounds.getGlobalVolume());
 	}
 
 	void SettingsState::HandleInput()
@@ -74,24 +88,41 @@ namespace hgw
 			}
 			else if (_data->input.IsTextClicked(returnText, sf::Mouse::Left, event.type, _data->window))
 			{
-				_data->machine.AddState(StateRef(new MenuState(_data)));
+				_data->machine.RemoveState();
 			}
 			else if (_data->input.IsTextClicked(drawFullGridText, sf::Mouse::Left, event.type, _data->window))
 			{
-				GameState::updateGameData(GameData::variableNames::fullGrid, !_data->saveVariables.fullGrid, _data);
+				_data->gameData.gameData.fullGrid = !_data->gameData.gameData.fullGrid;
+				_data->gameData.serializeSave();
 
-				setTextString(GameData::variableNames::fullGrid);
+				if (_data->gameData.gameData.fullGrid)
+				{
+					drawFullGridText.setString("Draw Full Grid: ON");
+				}
+				else
+				{
+					drawFullGridText.setString("Draw Full Grid: OFF");
+				}		
 			}
 			else if (_data->input.IsTextClicked(originalColorText, sf::Mouse::Left, event.type, _data->window))
 			{
-				GameState::updateGameData(GameData::variableNames::originalColors, !_data->saveVariables.originalColors, _data);
+				_data->gameData.gameData.originalColors = !_data->gameData.gameData.originalColors;
+				_data->gameData.serializeSave();
 
-				setTextString(GameData::variableNames::originalColors);
+				if (_data->gameData.gameData.originalColors)
+				{
+					originalColorText.setString("Original Colors: ON");
+				}
+				else
+				{
+					originalColorText.setString("Original Colors: OFF");
+				}			
 			}
 			else if (sf::Event::MouseButtonReleased == event.type && event.mouseButton.button == sf::Mouse::Left)
 			{
 				soundPointPressed = false;
 				musicPointPressed = false;
+
 				std::cout << "SOUND BAR RELEASED" << std::endl;
 			}
 			else if (_data->input.IsSpriteClicked(soundBar._bar, sf::Mouse::Left, event.type, _data->window))
@@ -110,15 +141,21 @@ namespace hgw
 		if (soundPointPressed)
 		{
 			soundBar.MovePoint();
-			_data->sounds.globalVolume = soundBar.GetVolume();
+			_data->sounds.setGlobalVolume(soundBar.GetVolume());
+			_data->gameData.gameData.soundVolume = soundBar.GetVolume();
+			_data->gameData.serializeSave();
+			_data->sounds.setAllSoundsToGlobalVolume();
 		}
 		else if (musicPointPressed)
 		{
 			musicBar.MovePoint();
-			_data->music.globalVolume = musicBar.GetVolume();
+			_data->music.setGlobalVolume(musicBar.GetVolume());
+			_data->gameData.gameData.musicVolume = musicBar.GetVolume();
+			_data->gameData.serializeSave();
+			_data->music.setAllSongsToGlobalVolume();
 		}
-		std::cout << "SOUND: " << _data->sounds.globalVolume << std::endl;
-		std::cout << "MUSIC: " << _data->music.globalVolume << std::endl;
+		std::cout << "SOUND: " << _data->sounds.getGlobalVolume() << std::endl;
+		std::cout << "MUSIC: " << _data->music.getGlobalVolume() << std::endl;
 	}
 
 	void SettingsState::Draw(float dt)
@@ -129,7 +166,7 @@ namespace hgw
 		_data->window.draw(originalColorText);
 		_data->window.draw(drawFullGridText);
 
-		if (_data->sounds.globalVolume <= 0)
+		if (_data->sounds.getGlobalVolume() <= 0)
 		{
 			_data->window.draw(soundOff);
 		}
@@ -138,7 +175,7 @@ namespace hgw
 			_data->window.draw(soundOn);
 		}
 
-		if (_data->music.globalVolume <= 0)
+		if (_data->music.getGlobalVolume() <= 0)
 		{
 			_data->window.draw(musicOff);
 		}
@@ -153,33 +190,5 @@ namespace hgw
 		_data->window.draw(soundBar._point);
 
 		_data->window.display();
-	}
-
-	void SettingsState::setTextString(GameData::variableNames variableName)
-	{
-		switch (variableName)
-		{
-		case hgw::GameData::fullGrid:
-			if (_data->saveVariables.fullGrid)
-			{
-				drawFullGridText.setString("Draw Full Grid: ON");
-			}
-			else
-			{
-				drawFullGridText.setString("Draw Full Grid: OFF");
-			}
-			break;
-
-		case hgw::GameData::originalColors:
-
-			if (_data->saveVariables.originalColors)
-			{
-				originalColorText.setString("Original Colors: ON");
-			}
-			else
-			{
-				originalColorText.setString("Original Colors: OFF");
-			}
-		}
 	}
 }

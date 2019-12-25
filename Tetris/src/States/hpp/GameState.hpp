@@ -62,14 +62,9 @@ namespace hgw
 		void destroyFilledRows();
 
 		std::string insertZeros(int value, int digits);
-
-		static void updateGameData(GameData::variableNames variableName, int variableValue, GameDataRef _data);
-		static int getGameDataFromFile(GameData::variableNames variableName);
 		
 		static std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> grid;
 		static Figure currentFigure, ghostFigure, nextFigure;
-		static std::string varNameAsStr(GameData::variableNames varName);
-		static GameData::variableNames asVarName(std::string varNameAsStr);
 
 		int totalRowsCleaned;
 		int score;
@@ -85,6 +80,7 @@ namespace hgw
 		sf::Text scoreText, highScoreText, nextFigureText, linesText, statsText, levelText;
 		std::unordered_map<Figure::FigureType, std::pair<Figure, int>> stats;
 		std::unordered_map<Figure::FigureType, sf::Text> eachStatText;
+
 
 		sf::Clock dropClock, moveClock;
 		bool isDownKeyPressed = false;

@@ -12,14 +12,6 @@
 
 namespace hgw
 {
-	struct saveVariables
-	{
-		int highScore;
-
-		bool fullGrid;
-		bool originalColors;
-	};
-
 	struct GameData
 	{
 		StateMachine machine;
@@ -29,9 +21,6 @@ namespace hgw
 		SoundManager sounds;
 		MusicManager music;
 		DataManager gameData;
-
-		saveVariables saveVariables;
-		enum variableNames { highScore, fullGrid, originalColors };
 	};
 
 	typedef std::shared_ptr<GameData> GameDataRef;

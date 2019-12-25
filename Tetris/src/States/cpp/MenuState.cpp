@@ -16,16 +16,26 @@ namespace hgw
 
 	void MenuState::Init()
 	{
-		//_data->gameData.gameData = SaveGameData(1, true, true, 0.5f, 0.8f);
-		//_data->gameData.serializeSave();
 		_data->gameData.serializeLoad();
 		
+		_data->music.setGlobalVolume(_data->gameData.gameData.musicVolume);
+		_data->sounds.setGlobalVolume(_data->gameData.gameData.soundVolume);
+
+		_data->sounds.AddSound("clear1", CLEAR1_SOUND_PATH);
+		_data->sounds.AddSound("clear2", CLEAR2_SOUND_PATH);
+		_data->sounds.AddSound("clear3", CLEAR3_SOUND_PATH);
+		_data->sounds.AddSound("clear4", CLEAR4_SOUND_PATH);
+
+		_data->music.AddSong("gameMusic", GAME_MUSIC_PATH, true);
+		_data->music.AddSong("menuMusic", MENU_MUSIC_PATH, true);
+
+		_data->music.Play("menuMusic");
+
 		std::cout << "HS: " << _data->gameData.gameData.highScore << std::endl;
 		std::cout << "FG: " << _data->gameData.gameData.fullGrid << std::endl;
 		std::cout << "OC: " << _data->gameData.gameData.originalColors << std::endl;
 		std::cout << "SV: " << _data->gameData.gameData.soundVolume << std::endl;
 		std::cout << "MV: " << _data->gameData.gameData.musicVolume << std::endl;
-
 
 		_data->graphics.LoadFont("font", FONT_PATH);
 
@@ -50,8 +60,6 @@ namespace hgw
 		startText.setPosition(sf::Vector2f((APP_WIDTH - startText.getLocalBounds().width) / 2, tetrisText.getPosition().y + 350));
 		settingsText.setPosition(sf::Vector2f((APP_WIDTH - settingsText.getLocalBounds().width) / 2, startText.getPosition().y + 100));
 		exitText.setPosition(sf::Vector2f((APP_WIDTH - exitText.getLocalBounds().width) / 2, settingsText.getPosition().y + 100));
-
-		loadAllVariablesFromFile();
 	}
 
 	void MenuState::HandleInput()
@@ -67,12 +75,13 @@ namespace hgw
 
 			if (_data->input.IsTextClicked(startText, sf::Mouse::Button::Left, event.type, _data->window))
 			{
+				_data->music.Pause("menuMusic");
 				_data->machine.AddState(StateRef(new GameState(_data)));
 			}
 
 			if (_data->input.IsTextClicked(settingsText, sf::Mouse::Button::Left, event.type, _data->window))
 			{
-				_data->machine.AddState(StateRef(new SettingsState(_data)));
+				_data->machine.AddState(StateRef(new SettingsState(_data)), false);
 			}
 
 			if (_data->input.IsTextClicked(exitText, sf::Mouse::Button::Left, event.type, _data->window))
@@ -99,37 +108,5 @@ namespace hgw
 		_data->window.draw(exitText);
 
 		_data->window.display();	
-	}
-
-	void MenuState::loadAllVariablesFromFile()
-	{
-		dataFile.open("data.dat", std::fstream::in);
-
-		if (dataFile.good())
-		{
-			std::string line;
-			while (std::getline(dataFile, line))
-			{
-				unsigned int spacePos = line.find(" ");
-
-				std::string varName = line.substr(0, spacePos);
-				std::string varValue = line.substr(spacePos, line.size() - spacePos);
-
-				if (varName == "highscore")
-				{
-					_data->saveVariables.highScore = std::stoi(varValue);
-				}
-				else if (varName == "fullgrid")
-				{
-					_data->saveVariables.fullGrid = std::stoi(varValue);
-				}
-				if (varName == "originalcolors")
-				{
-					_data->saveVariables.originalColors = std::stoi(varValue);
-				}
-			}
-		}
-
-		dataFile.close();
 	}
 }

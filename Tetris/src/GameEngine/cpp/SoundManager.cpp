@@ -17,9 +17,34 @@ namespace hgw
 		return _soundBuffers.at(name);
 	}
 
-	void SoundManager::Play(sf::Sound &sound)
+	void SoundManager::Play(std::string keyName)
 	{
-		sound.setVolume(globalVolume);
-		sound.play();
+		_sounds[keyName].setVolume(globalVolume);
+		_sounds[keyName].play();
+	}
+
+	void SoundManager::AddSound(std::string keyName, std::string filepath)
+	{
+		LoadSoundBuffer(keyName, filepath);
+		_sounds[keyName].setBuffer(GetSoundBuffer(keyName));
+		_sounds[keyName].setVolume(globalVolume);
+	}
+
+	void SoundManager::setGlobalVolume(float volume)
+	{
+		globalVolume = volume;
+	}
+
+	float SoundManager::getGlobalVolume()
+	{
+		return globalVolume;
+	}
+
+	void SoundManager::setAllSoundsToGlobalVolume()
+	{
+		for (auto &s : _sounds)
+		{
+			s.second.setVolume(globalVolume);
+		}
 	}
 }

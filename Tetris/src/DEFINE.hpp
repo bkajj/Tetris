@@ -32,5 +32,6 @@
 #define CLEAR4_SOUND_PATH "res/audio/sounds/clear4.wav"
 
 #define GAME_MUSIC_PATH "res/audio/music/gameMusic.wav"
+#define MENU_MUSIC_PATH "res/audio/music/menuMusic.wav"
 
 #define to_uns(x) static_cast<unsigned>(x)
