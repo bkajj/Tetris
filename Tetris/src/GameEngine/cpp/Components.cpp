@@ -33,7 +33,7 @@ namespace hgw
 
 		void VolumeBar::MovePoint()
 		{
-			sf::Vector2f pointPos(sf::Mouse::getPosition(this->_data->window).x , _point.getPosition().y);
+			sf::Vector2f pointPos(to_float(sf::Mouse::getPosition(this->_data->window).x) , _point.getPosition().y);
 
 			if (sf::Mouse::getPosition(this->_data->window).x > _bar.getPosition().x + _bar.getGlobalBounds().width)
 			{

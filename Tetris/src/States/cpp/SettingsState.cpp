@@ -35,10 +35,10 @@ namespace hgw
 		musicOff.setTexture(_data->graphics.GetTexture("music off"));
 		musicOn.setTexture(_data->graphics.GetTexture("music on"));
 
-		soundOff.setScale(0.7, 0.7);
-		soundOn.setScale(0.7, 0.7);
-		musicOff.setScale(0.7, 0.7);
-		musicOn.setScale(0.7, 0.7);
+		soundOff.setScale(0.7f, 0.7f);
+		soundOn.setScale(0.7f, 0.7f);
+		musicOff.setScale(0.7f, 0.7f);
+		musicOn.setScale(0.7f, 0.7f);
 
 		originalColorText.setFont(_data->graphics.GetFont("font"));
 		originalColorText.setCharacterSize(50);

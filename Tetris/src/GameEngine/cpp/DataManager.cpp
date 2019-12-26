@@ -7,6 +7,7 @@
 #include "boost/serialization/binary_object.hpp"
 
 #include <iostream>
+#include <filesystem>
 
 namespace hgw
 {
@@ -15,6 +16,7 @@ namespace hgw
 
 	SaveGameData::SaveGameData(int highScore, bool fullGrid, bool originalColors, float soundVolume, float musicVolume)
 	{
+		
 		this->highScore = highScore;
 
 		this->fullGrid = fullGrid;
@@ -27,12 +29,16 @@ namespace hgw
 
 	void DataManager::serializeSave()
 	{
-		gameDataFile.open("data111.dat", std::fstream::out);
+		gameDataFile.open("data.dat", std::fstream::out);
 
 		if (gameDataFile.good())
 		{
 			ar::binary_oarchive oarchive{ gameDataFile, ar::no_header };
 			oarchive << gameData;
+		}
+		else if(!std::filesystem::exists("data.dat"))
+		{
+			std::cout << "File doesn't exists" << std::endl;
 		}
 		else
 		{
@@ -44,12 +50,16 @@ namespace hgw
 
 	void DataManager::serializeLoad()
 	{
-		gameDataFile.open("data111.dat", std::fstream::in);
+		gameDataFile.open("data.dat", std::fstream::in);
 
 		if (gameDataFile.good())
 		{
 			ar::binary_iarchive iarchive{ gameDataFile, ar::no_header};
 			iarchive >> gameData;
+		}
+		else if (!std::filesystem::exists("data.dat"))
+		{
+			std::cout << "File doesn't exists" << std::endl;
 		}
 		else
 		{

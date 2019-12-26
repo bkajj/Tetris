@@ -13,6 +13,8 @@ namespace hgw
 
 	void GameOverState::Init()
 	{
+		_data->music.Play("gameOver");
+
 		_data->graphics.LoadFont("font", FONT_PATH);
 
 		gameOverText.setFont(_data->graphics.GetFont("font"));
@@ -52,11 +54,12 @@ namespace hgw
 			}
 			else if (_data->input.IsTextClicked(restartText, sf::Mouse::Left, event.type, _data->window))
 			{
+				_data->music.Stop("gameOver");
 				_data->machine.AddState(StateRef(new GameState(_data)));
 			}
 			else if (_data->input.IsTextClicked(settingsText, sf::Mouse::Left, event.type, _data->window))
 			{
-				_data->machine.AddState(StateRef(new SettingsState(_data)));
+				_data->machine.AddState(StateRef(new SettingsState(_data)), false);
 			}
 			else if (_data->input.IsTextClicked(exitText, sf::Mouse::Left, event.type, _data->window))
 			{

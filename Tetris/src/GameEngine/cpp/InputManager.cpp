@@ -1,4 +1,5 @@
 #include "src/GameEngine/hpp/InputManager.hpp"
+#include "src/DEFINE.hpp"
 
 namespace hgw
 {
@@ -7,10 +8,10 @@ namespace hgw
 	{
 		if (sf::Mouse::isButtonPressed(button))
 		{
-			sf::IntRect tempRect(object.getPosition().x, object.getPosition().y,
+			sf::FloatRect tempRect(object.getPosition().x, object.getPosition().y,
 				object.getGlobalBounds().width, object.getGlobalBounds().height);
 
-			if (tempRect.contains(sf::Mouse::getPosition(window)))
+			if (tempRect.contains(sf::Vector2f(sf::Mouse::getPosition(window))))
 			{
 				return true;
 			}
@@ -34,11 +35,11 @@ namespace hgw
 	{
 		if (eventType == sf::Event::EventType::MouseButtonPressed)
 		{
-			sf::IntRect tempRect(object.getPosition().x, object.getPosition().y, 
+			sf::FloatRect tempRect(object.getPosition().x, object.getPosition().y, 
 				object.getGlobalBounds().width,	object.getGlobalBounds().height);
 
 			if (sf::Mouse::isButtonPressed(button) && 
-				tempRect.contains(sf::Mouse::getPosition(window)))
+				tempRect.contains(sf::Vector2f(sf::Mouse::getPosition(window))))
 			{
 				return true;
 			}
@@ -63,10 +64,10 @@ namespace hgw
 	{
 		if (eventType == sf::Event::EventType::MouseButtonReleased)
 		{
-			sf::IntRect tempRect(object.getPosition().x, object.getPosition().y,
+			sf::FloatRect tempRect(object.getPosition().x, object.getPosition().y,
 				object.getGlobalBounds().width, object.getGlobalBounds().height);
 
-			if (tempRect.contains(sf::Mouse::getPosition(window)))
+			if (tempRect.contains(sf::Vector2f(sf::Mouse::getPosition(window))))
 			{
 				return true;
 			}
@@ -78,14 +79,14 @@ namespace hgw
 	{
 		if (eventType == sf::Event::EventType::MouseButtonPressed)
 		{
-			sf::IntRect tempRect;
+			sf::FloatRect tempRect;
 			tempRect.height = text.getGlobalBounds().height + 10;
 			tempRect.width = text.getGlobalBounds().width;
 			tempRect.top = text.getPosition().y + text.getGlobalBounds().height / 2;
 			tempRect.left = text.getPosition().x + 5;
 
 			if (sf::Mouse::isButtonPressed(button) &&
-				tempRect.contains(sf::Mouse::getPosition(window)))
+				tempRect.contains(sf::Vector2f(sf::Mouse::getPosition(window))))
 			{
 				return true;
 			}

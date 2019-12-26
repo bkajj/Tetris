@@ -28,6 +28,7 @@ namespace hgw
 
 		_data->music.AddSong("gameMusic", GAME_MUSIC_PATH, true);
 		_data->music.AddSong("menuMusic", MENU_MUSIC_PATH, true);
+		_data->music.AddSong("gameOver", GAME_OVER_MUSIC_PATH, true);
 
 		_data->music.Play("menuMusic");
 

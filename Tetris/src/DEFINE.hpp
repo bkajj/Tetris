@@ -33,5 +33,8 @@
 
 #define GAME_MUSIC_PATH "res/audio/music/gameMusic.wav"
 #define MENU_MUSIC_PATH "res/audio/music/menuMusic.wav"
+#define GAME_OVER_MUSIC_PATH "res/audio/music/gameOver.wav"
 
 #define to_uns(x) static_cast<unsigned>(x)
+#define to_float(x) static_cast<float>(x)
+//#define to_type<class T, x> static_cast<T>(x)

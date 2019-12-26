@@ -857,7 +857,7 @@ namespace hgw
 	std::string GameState::insertZeros(int value, int digits) //insert zeros to number string (eg. insertZeros(5, 3) -> 005)
 	{
 		std::string scoreString = std::to_string(value);
-		int zerosToInsert = digits - scoreString.size();
+		int zerosToInsert = digits - to_uns(scoreString.size());
 		scoreString.insert(0, zerosToInsert, '0');
 
 		return scoreString;
