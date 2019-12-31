@@ -22,7 +22,8 @@ namespace hgw
 		sf::Music gameMusic, menuMusic;
 
 		sf::Text tetrisText;
-		sf::Text startText;
+		sf::Text singlePlayerText;
+		sf::Text multiPlayerText;
 		sf::Text settingsText;
 		sf::Text exitText;
 	};

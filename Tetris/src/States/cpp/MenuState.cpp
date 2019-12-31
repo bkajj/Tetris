@@ -41,15 +41,19 @@ namespace hgw
 		_data->graphics.LoadFont("font", FONT_PATH);
 
 		tetrisText.setFont(_data->graphics.GetFont("font"));
-		startText.setFont(_data->graphics.GetFont("font"));
+		singlePlayerText.setFont(_data->graphics.GetFont("font"));
+		multiPlayerText.setFont(_data->graphics.GetFont("font"));
 		settingsText.setFont(_data->graphics.GetFont("font"));
 		exitText.setFont(_data->graphics.GetFont("font"));
 
 		tetrisText.setString("TETRIS");
 		tetrisText.setCharacterSize(200);
 
-		startText.setString("START");
-		startText.setCharacterSize(100);
+		singlePlayerText.setString("SINGLEPLAYER");
+		singlePlayerText.setCharacterSize(100);
+
+		multiPlayerText.setString("MULTIPLAYER");
+		multiPlayerText.setCharacterSize(100);
 
 		settingsText.setString("SETTINGS");
 		settingsText.setCharacterSize(100);
@@ -58,8 +62,9 @@ namespace hgw
 		exitText.setCharacterSize(100);
 
 		tetrisText.setPosition(sf::Vector2f((APP_WIDTH - tetrisText.getLocalBounds().width) / 2 - 15, 30));
-		startText.setPosition(sf::Vector2f((APP_WIDTH - startText.getLocalBounds().width) / 2, tetrisText.getPosition().y + 350));
-		settingsText.setPosition(sf::Vector2f((APP_WIDTH - settingsText.getLocalBounds().width) / 2, startText.getPosition().y + 100));
+		singlePlayerText.setPosition(sf::Vector2f((APP_WIDTH - singlePlayerText.getLocalBounds().width) / 2, tetrisText.getPosition().y + 300));
+		multiPlayerText.setPosition(sf::Vector2f((APP_WIDTH - multiPlayerText.getLocalBounds().width) / 2, singlePlayerText.getPosition().y + 100));
+		settingsText.setPosition(sf::Vector2f((APP_WIDTH - settingsText.getLocalBounds().width) / 2, multiPlayerText.getPosition().y + 100));
 		exitText.setPosition(sf::Vector2f((APP_WIDTH - exitText.getLocalBounds().width) / 2, settingsText.getPosition().y + 100));
 	}
 
@@ -73,19 +78,21 @@ namespace hgw
 			{
 				_data->window.close();
 			}
-
-			if (_data->input.IsTextClicked(startText, sf::Mouse::Button::Left, event.type, _data->window))
+			else if (_data->input.IsTextClicked(singlePlayerText, sf::Mouse::Button::Left, event.type, _data->window))
 			{
 				_data->music.Pause("menuMusic");
-				_data->machine.AddState(StateRef(new GameState(_data)));
+				_data->machine.AddState(StateRef(new GameState(_data, false)));
 			}
-
-			if (_data->input.IsTextClicked(settingsText, sf::Mouse::Button::Left, event.type, _data->window))
+			else if (_data->input.IsTextClicked(multiPlayerText, sf::Mouse::Button::Left, event.type, _data->window))
+			{
+				_data->music.Pause("menuMusic");
+				_data->machine.AddState(StateRef(new GameState(_data, true)));
+			}
+			else if (_data->input.IsTextClicked(settingsText, sf::Mouse::Button::Left, event.type, _data->window))
 			{
 				_data->machine.AddState(StateRef(new SettingsState(_data)), false);
 			}
-
-			if (_data->input.IsTextClicked(exitText, sf::Mouse::Button::Left, event.type, _data->window))
+			else if (_data->input.IsTextClicked(exitText, sf::Mouse::Button::Left, event.type, _data->window))
 			{
 				_data->window.close();
 			}
@@ -104,7 +111,8 @@ namespace hgw
 		_data->window.clear();
 
 		_data->window.draw(tetrisText);
-		_data->window.draw(startText);
+		_data->window.draw(singlePlayerText);
+		_data->window.draw(multiPlayerText);
 		_data->window.draw(settingsText);
 		_data->window.draw(exitText);
 

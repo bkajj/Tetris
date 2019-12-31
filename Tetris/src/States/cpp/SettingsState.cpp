@@ -8,18 +8,40 @@
 
 namespace hgw
 {
-	SettingsState::SettingsState(GameDataRef _data)
+	SettingsState::SettingsState(GameDataRef _data, bool additionalBackOption)
 	{
 		this->_data = _data;
+		this->additionalBackOption = additionalBackOption;
 	}
 
 	void SettingsState::Init()
 	{
 		_data->graphics.LoadFont("font", FONT_PATH);
 
-		returnText.setFont(_data->graphics.GetFont("font"));
-		returnText.setCharacterSize(50);
-		returnText.setString("Return");
+		if (additionalBackOption)
+		{
+			returnText.setFont(_data->graphics.GetFont("font"));
+			additionalReturnText.setFont(_data->graphics.GetFont("font"));
+
+			returnText.setCharacterSize(50);
+			returnText.setString("Back to game");
+
+			additionalReturnText.setCharacterSize(50);
+			additionalReturnText.setString("Back to main menu");
+
+			returnText.setPosition((APP_WIDTH - returnText.getGlobalBounds().width) / 2, 750);
+			additionalReturnText.setPosition((APP_WIDTH - additionalReturnText.getGlobalBounds().width) / 2, returnText.getPosition().y + 50);
+		}	
+		else
+		{
+			returnText.setFont(_data->graphics.GetFont("font"));
+			additionalReturnText.setFont(_data->graphics.GetFont("font"));
+
+			returnText.setCharacterSize(50);
+			returnText.setString("Back to main menu");
+
+			returnText.setPosition((APP_WIDTH - returnText.getGlobalBounds().width) / 2, 775);
+		}
 
 		_data->graphics.LoadTexture("sound off", SOUND_OFF_FILEPATH);
 		_data->graphics.LoadTexture("sound on", SOUND_ON_FILEPATH);
@@ -61,8 +83,7 @@ namespace hgw
 		{
 			drawFullGridText.setString("Draw Full Grid: OFF");
 		}
-		
-		returnText.setPosition((APP_WIDTH - returnText.getGlobalBounds().width) / 2, 800);
+			
 		originalColorText.setPosition((APP_WIDTH - originalColorText.getGlobalBounds().width) / 2, 180);
 		drawFullGridText.setPosition((APP_WIDTH - drawFullGridText.getGlobalBounds().width) / 2, 230);
 
@@ -89,6 +110,14 @@ namespace hgw
 			else if (_data->input.IsTextClicked(returnText, sf::Mouse::Left, event.type, _data->window))
 			{
 				_data->machine.RemoveState();
+			}
+			else if (_data->input.IsTextClicked(additionalReturnText, sf::Mouse::Left, event.type, _data->window))
+			{
+				if (additionalBackOption)
+				{
+					_data->machine.RemoveState();
+					_data->machine.AddState(StateRef(new MenuState(_data)));
+				}
 			}
 			else if (_data->input.IsTextClicked(drawFullGridText, sf::Mouse::Left, event.type, _data->window))
 			{
@@ -162,9 +191,14 @@ namespace hgw
 	{
 		_data->window.clear();
 
-		_data->window.draw(returnText);
 		_data->window.draw(originalColorText);
 		_data->window.draw(drawFullGridText);
+		_data->window.draw(returnText);
+
+		if (additionalBackOption)
+		{	
+			_data->window.draw(additionalReturnText);
+		}
 
 		if (_data->sounds.getGlobalVolume() <= 0)
 		{

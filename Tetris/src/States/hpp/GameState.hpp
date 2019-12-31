@@ -50,7 +50,7 @@ namespace hgw
 	class GameState : public State
 	{
 	public:
-		GameState(GameDataRef _data);
+		GameState(GameDataRef _data, bool multiplayer = false);
 		void Init();
 
 		void HandleInput();
@@ -72,6 +72,7 @@ namespace hgw
 	
 	private:
 		GameDataRef _data;
+		bool multiplayer;
 		sf::Sound clear1, clear2, clear3, clear4;
 		sf::Music gameMusic;
 
@@ -80,7 +81,6 @@ namespace hgw
 		sf::Text scoreText, highScoreText, nextFigureText, linesText, statsText, levelText;
 		std::unordered_map<Figure::FigureType, std::pair<Figure, int>> stats;
 		std::unordered_map<Figure::FigureType, sf::Text> eachStatText;
-
 
 		sf::Clock dropClock, moveClock;
 		bool isDownKeyPressed = false;

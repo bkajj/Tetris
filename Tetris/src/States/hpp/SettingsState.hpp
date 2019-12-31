@@ -8,7 +8,7 @@ namespace hgw
 	class SettingsState : public State
 	{
 	public:
-		SettingsState(GameDataRef _data);
+		SettingsState(GameDataRef _data, bool additionalBackOption = false);
 		void Init();
 
 		void HandleInput();
@@ -16,7 +16,9 @@ namespace hgw
 		void Draw(float dt);
 
 	private:
-		sf::Text returnText, originalColorText, drawFullGridText;
+		bool additionalBackOption;
+		sf::Text returnText, additionalReturnText;
+		sf::Text originalColorText, drawFullGridText;
 
 		sf::Sprite soundOff, soundOn;
 		sf::Sprite musicOff, musicOn;

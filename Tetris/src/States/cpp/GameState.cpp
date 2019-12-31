@@ -1,8 +1,9 @@
 #include "src/States/hpp/GameState.hpp"
-#include "src/GameEngine/hpp/Game.hpp"
+#include "src/States/hpp/MenuState.hpp"
 #include "src/States/hpp/GameOverState.hpp"
 #include "src/States/hpp/SettingsState.hpp"
 #include "src/GameEngine/hpp/Components.hpp"
+#include "src/GameEngine/hpp/Game.hpp"
 #include "src/DEFINE.hpp"
 #include <iostream>
 #include <chrono>
@@ -384,9 +385,10 @@ namespace hgw
 #pragma endregion
 
 #pragma region GameState
-	GameState::GameState(GameDataRef data)
+	GameState::GameState(GameDataRef data, bool multiplayer)
 	{
 		_data = data;
+		this->multiplayer = multiplayer;
 	}
 
 	void GameState::Init()
@@ -432,6 +434,14 @@ namespace hgw
 		{
 			horizontalLines[i].setSize(sf::Vector2f(300, 1));
 			horizontalLines[i].setPosition(verticalLines[0].getPosition().x, verticalLines[0].getPosition().y + i * 30);
+		}
+
+		for (int i = 0; i < 10; i++) //clear grid
+		{
+			for (int j = 0; j < 20; j++)
+			{
+				grid[i][j] = std::make_pair(false, sf::RectangleShape());
+			}
 		}
 
 		highScoreText.setPosition(verticalLines[10].getPosition().x + 50, 0);
@@ -553,14 +563,6 @@ namespace hgw
 					{
 						if (grid[i][0].first == true)
 						{
-							//clear grid, cause it's static
-							for (int i = 0; i < 10; i++)
-							{
-								for (int j = 0; j < 20; j++)
-								{
-									grid[i][j] = std::make_pair(false, sf::RectangleShape());
-								}
-							}
 							_data->music.Stop("gameMusic");
 							_data->machine.AddState(StateRef(new GameOverState(_data)));
 						}
@@ -578,7 +580,7 @@ namespace hgw
 				}	
 				else if (event.key.code == sf::Keyboard::P) //game pause
 				{
-					_data->machine.AddState(StateRef(new SettingsState(_data)), false);
+					_data->machine.AddState(StateRef(new SettingsState(_data, true)), false);
 				}
 			}
 			else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Down) //down key release
@@ -633,14 +635,6 @@ namespace hgw
 				{
 					if (grid[i][0].first == true)
 					{
-						//clear grid
-						for (int i = 0; i < 10; i++)
-						{
-							for (int j = 0; j < 20; j++)
-							{
-								grid[i][j] = std::make_pair(false, sf::RectangleShape());
-							}
-						}
 						_data->music.Stop("gameMusic");
 						_data->machine.AddState(StateRef(new GameOverState(_data)));
 					}
