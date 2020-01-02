@@ -393,7 +393,6 @@ namespace hgw
 
 	void GameState::Init()
 	{
-
 		_data->music.Play("gameMusic");
 
 		_data->graphics.LoadFont("font", FONT_PATH);
@@ -527,6 +526,30 @@ namespace hgw
 		{
 			nextFigure.Init(nextType, sf::Vector2f(12, 9), false, false); //set next figure with random colors
 		}	
+
+
+
+		if (multiplayer)
+		{
+			for (int i = 0; i < 11; i++) //set enemy grid on screen
+			{
+				enemy_verticalLines[i].setSize(sf::Vector2f(1, 300));
+				enemy_verticalLines[i].setPosition(scoreText.getPosition().x + i * 15, 570);
+			}
+			for (int i = 0; i < 21; i++)
+			{
+				enemy_horizontalLines[i].setSize(sf::Vector2f(150, 1));
+				enemy_horizontalLines[i].setPosition(enemy_verticalLines[0].getPosition().x, enemy_verticalLines[0].getPosition().y + i * 15);
+			}
+
+			for (int i = 0; i < 10; i++) //clear enemy grid
+			{
+				for (int j = 0; j < 20; j++)
+				{
+					enemy_grid[i][j] = std::make_pair(false, sf::RectangleShape());
+				}
+			}
+		}
 	}
 
 	void GameState::HandleInput()
@@ -697,6 +720,18 @@ namespace hgw
 			{
 				_data->window.draw(horizontalLines[i]);
 			}
+
+			if (multiplayer)
+			{
+				for (int i = 0; i < 11; i++)
+				{
+					_data->window.draw(enemy_verticalLines[i]);
+				}
+				for (int i = 0; i < 21; i++)
+				{
+					_data->window.draw(enemy_horizontalLines[i]);
+				}
+			}
 		}
 		else //draw only grid borders
 		{
@@ -705,6 +740,16 @@ namespace hgw
 
 			_data->window.draw(horizontalLines[0]);
 			_data->window.draw(horizontalLines[20]);
+
+			if (multiplayer)
+			{
+				_data->window.draw(enemy_verticalLines[0]);
+				_data->window.draw(enemy_verticalLines[10]);
+
+				_data->window.draw(enemy_horizontalLines[0]);
+				_data->window.draw(enemy_horizontalLines[20]);
+
+			}
 		}
 		
 		
@@ -864,10 +909,11 @@ namespace hgw
 	std::map<std::pair<int, int>, sf::Vector2f> Figure::JLSTZ_offsetData;
 
 	std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> GameState::grid;
+	std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> GameState::enemy_grid;
 
-	Figure GameState::currentFigure;
-	Figure GameState::ghostFigure;
-	Figure GameState::nextFigure;
+	Figure GameState::currentFigure, GameState::enemy_currentFigure;
+	Figure GameState::ghostFigure, GameState::enemy_ghostFigure;
+	Figure GameState::nextFigure, GameState::enemy_nextFigure;
 
 	std::fstream GameState::dataFile;
 }

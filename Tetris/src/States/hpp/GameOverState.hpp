@@ -7,7 +7,7 @@ namespace hgw
 	class GameOverState : public State
 	{
 	public:
-		GameOverState(GameDataRef _data);
+		GameOverState(GameDataRef _data, bool multiplayerMatch = false);
 		void Init();
 
 		void HandleInput();
@@ -16,7 +16,8 @@ namespace hgw
 
 	private:
 		GameDataRef _data;
+		bool multiplayerMatch;
 
-		sf::Text gameOverText, restartText, settingsText, exitText;
+		sf::Text gameOverText, restartText, mainMenuText, exitText;
 	};
 }

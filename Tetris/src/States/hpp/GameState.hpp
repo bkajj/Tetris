@@ -64,7 +64,9 @@ namespace hgw
 		std::string insertZeros(int value, int digits);
 		
 		static std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> grid;
+		static std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> enemy_grid;
 		static Figure currentFigure, ghostFigure, nextFigure;
+		static Figure enemy_currentFigure, enemy_ghostFigure, enemy_nextFigure;
 
 		int totalRowsCleaned;
 		int score;
@@ -85,8 +87,8 @@ namespace hgw
 		sf::Clock dropClock, moveClock;
 		bool isDownKeyPressed = false;
 
-		std::array<sf::RectangleShape, 11> verticalLines;
-		std::array<sf::RectangleShape, 21> horizontalLines;
+		std::array<sf::RectangleShape, 11> verticalLines, enemy_verticalLines;
+		std::array<sf::RectangleShape, 21> horizontalLines, enemy_horizontalLines;
 	};
 
 	int random(int min, int max);

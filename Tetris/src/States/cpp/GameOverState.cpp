@@ -6,9 +6,10 @@
 
 namespace hgw
 {
-	GameOverState::GameOverState(GameDataRef _data)
+	GameOverState::GameOverState(GameDataRef _data, bool multiplayerMatch)
 	{
 		this->_data = _data;
+		this->multiplayerMatch = multiplayerMatch;
 	}
 
 	void GameOverState::Init()
@@ -19,17 +20,17 @@ namespace hgw
 
 		gameOverText.setFont(_data->graphics.GetFont("font"));
 		restartText.setFont(_data->graphics.GetFont("font"));
-		settingsText.setFont(_data->graphics.GetFont("font"));
+		mainMenuText.setFont(_data->graphics.GetFont("font"));
 		exitText.setFont(_data->graphics.GetFont("font"));
 
 		gameOverText.setString("GAME OVER");
 		gameOverText.setCharacterSize(160);
 
-		restartText.setString("START");
+		restartText.setString("START OVER");
 		restartText.setCharacterSize(100);
 
-		settingsText.setString("SETTINGS");
-		settingsText.setCharacterSize(100);
+		mainMenuText.setString("MAIN MENU");
+		mainMenuText.setCharacterSize(100);
 
 		exitText.setString("EXIT");
 		exitText.setCharacterSize(100);
@@ -38,8 +39,8 @@ namespace hgw
 								 (APP_HEIGHT - gameOverText.getGlobalBounds().height) / 10);
 
 		restartText.setPosition((APP_WIDTH - restartText.getGlobalBounds().width) / 2, gameOverText.getPosition().y + 250);
-		settingsText.setPosition((APP_WIDTH - settingsText.getGlobalBounds().width) / 2, restartText.getPosition().y + 100);
-		exitText.setPosition((APP_WIDTH - exitText.getGlobalBounds().width) / 2, settingsText.getPosition().y + 100);
+		mainMenuText.setPosition((APP_WIDTH - mainMenuText.getGlobalBounds().width) / 2, restartText.getPosition().y + 100);
+		exitText.setPosition((APP_WIDTH - exitText.getGlobalBounds().width) / 2, mainMenuText.getPosition().y + 100);
 	}
 
 	void GameOverState::HandleInput()
@@ -57,9 +58,10 @@ namespace hgw
 				_data->music.Stop("gameOver");
 				_data->machine.AddState(StateRef(new GameState(_data)));
 			}
-			else if (_data->input.IsTextClicked(settingsText, sf::Mouse::Left, event.type, _data->window))
+			else if (_data->input.IsTextClicked(mainMenuText, sf::Mouse::Left, event.type, _data->window))
 			{
-				_data->machine.AddState(StateRef(new SettingsState(_data)), false);
+				_data->music.Stop("gameOver");
+				_data->machine.AddState(StateRef(new MenuState(_data)));
 			}
 			else if (_data->input.IsTextClicked(exitText, sf::Mouse::Left, event.type, _data->window))
 			{
@@ -79,7 +81,7 @@ namespace hgw
 
 		_data->window.draw(gameOverText);
 		_data->window.draw(restartText);
-		_data->window.draw(settingsText);
+		_data->window.draw(mainMenuText);
 		_data->window.draw(exitText);
 
 		_data->window.display();

@@ -1,6 +1,7 @@
 #include "src/States/hpp/MenuState.hpp"
 #include "src/States/hpp/SettingsState.hpp"
 #include "src/States/hpp/GameState.hpp"
+#include "src/States/hpp/ConnectState.hpp"
 #include "src/GameEngine/hpp/Game.hpp"
 #include "src/DEFINE.hpp"
 #include <iostream>
@@ -85,8 +86,7 @@ namespace hgw
 			}
 			else if (_data->input.IsTextClicked(multiPlayerText, sf::Mouse::Button::Left, event.type, _data->window))
 			{
-				_data->music.Pause("menuMusic");
-				_data->machine.AddState(StateRef(new GameState(_data, true)));
+				_data->machine.AddState(StateRef(new ConnectState(_data)));
 			}
 			else if (_data->input.IsTextClicked(settingsText, sf::Mouse::Button::Left, event.type, _data->window))
 			{
