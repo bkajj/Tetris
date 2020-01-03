@@ -58,8 +58,10 @@ namespace hgw
 			{
 				isCreatingGame = true;
 				_data->network.addClient("enemy");
+				sf::TcpSocket a;
 				//createGameThread = std::thread{ &ConnectState::waitForConnection, this }; //add thread to wait for connection in there
-				//createGameThread = std::thread{ &NetworkManager::listen, _data->network};
+				createGameThread = std::thread{ [&]() {&NetworkManager::listen; } , static_cast<unsigned short>(5300), std::ref(a) };
+				//createGameThread = std::thread{ &NetworkManager::listen, 5300, a };
 				waitingClock.restart();
 			}
 			else if (_data->input.IsTextClicked(joinGameText, sf::Mouse::Left, event.type, _data->window)) //join game text
@@ -80,7 +82,6 @@ namespace hgw
 						ipToConnectTo = sf::IpAddress(strigToIP(ipDigitsEntered));
 						ipToConnectTo = sf::IpAddress("127.0.0.1"); //temp connection with localhost
 						_data->network.addTcpSocket("socket", "127.0.0.1", 53000);
-						_data->network.getTcpSocket("socket")->connect("127.0.0.1", 53000); //idkkk
 					}
 					else if (ipDigitsEntered.size() < 9) //adding ip digit
 					{
