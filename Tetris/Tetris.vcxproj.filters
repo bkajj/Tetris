@@ -15,6 +15,7 @@
     <ClCompile Include="src\States\cpp\GameOverState.cpp" />
     <ClCompile Include="src\GameEngine\cpp\DataManager.cpp" />
     <ClCompile Include="src\States\cpp\ConnectState.cpp" />
+    <ClCompile Include="src\GameEngine\cpp\NetworkManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GameEngine\hpp\Components.hpp" />
@@ -32,6 +33,7 @@
     <ClInclude Include="src\GameEngine\hpp\InputManager.hpp" />
     <ClInclude Include="src\GameEngine\hpp\DataManager.hpp" />
     <ClInclude Include="src\States\hpp\ConnectState.hpp" />
+    <ClInclude Include="src\GameEngine\hpp\NetworkManager.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="openal32.dll" />

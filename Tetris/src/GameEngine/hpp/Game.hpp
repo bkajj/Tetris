@@ -9,6 +9,7 @@
 #include "SoundManager.hpp"
 #include "MusicManager.hpp"
 #include "DataManager.hpp"
+#include "NetworkManager.hpp"
 
 namespace hgw
 {
@@ -20,6 +21,7 @@ namespace hgw
 		InputManager input;
 		SoundManager sounds;
 		MusicManager music;
+		NetworkManager network;
 		DataManager gameData;
 	};
 

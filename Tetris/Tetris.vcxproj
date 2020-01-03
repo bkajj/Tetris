@@ -136,6 +136,7 @@
     <ClCompile Include="src\GameEngine\cpp\GraphicsManager.cpp" />
     <ClCompile Include="src\GameEngine\cpp\InputManager.cpp" />
     <ClCompile Include="src\GameEngine\cpp\MusicManager.cpp" />
+    <ClCompile Include="src\GameEngine\cpp\NetworkManager.cpp" />
     <ClCompile Include="src\GameEngine\cpp\SoundManager.cpp" />
     <ClCompile Include="src\GameEngine\cpp\StateMachine.cpp" />
     <ClCompile Include="src\Main.cpp">
@@ -155,6 +156,7 @@
     <ClInclude Include="src\GameEngine\hpp\GraphicsManager.hpp" />
     <ClInclude Include="src\GameEngine\hpp\InputManager.hpp" />
     <ClInclude Include="src\GameEngine\hpp\MusicManager.hpp" />
+    <ClInclude Include="src\GameEngine\hpp\NetworkManager.hpp" />
     <ClInclude Include="src\GameEngine\hpp\SoundManager.hpp" />
     <ClInclude Include="src\GameEngine\hpp\State.hpp" />
     <ClInclude Include="src\GameEngine\hpp\StateMachine.hpp" />
