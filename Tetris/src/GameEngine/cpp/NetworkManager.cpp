@@ -1,10 +1,10 @@
 #include "src/GameEngine/hpp/NetworkManager.hpp"
-#include <string>
+
 namespace hgw
 {
 	void NetworkManager::addClient(std::string key)
 	{
-		//_tcpClients.emplace(key, sf::TcpSocket{});
+		_tcpClients[key] = std::make_unique<sf::TcpSocket>();
 	}
 
 	sf::TcpSocket& NetworkManager::getTcpClient(std::string name)
@@ -20,7 +20,7 @@ namespace hgw
 	sf::UdpSocket& NetworkManager::getUdpSocket(std::string name)
 	{
 		return *_udpSockets[name];
-	}	
+	}
 
 	void NetworkManager::addTcpSocket(std::string key, sf::IpAddress ip, unsigned short port, sf::Time timeout)
 	{
@@ -68,11 +68,11 @@ namespace hgw
 		udpSocket.receive(packet, ip, port);
 	}
 
-	void NetworkManager::listen(unsigned short port, sf::TcpSocket &client)
+	void NetworkManager::listenForConnection(unsigned short port, sf::TcpSocket &client)
 	{
 		if (_tcpServer.listen(port) != sf::Socket::Done)
 		{
-			std::cout << "[server] Error Ocurred while listening to " << port << std::endl;
+			std::cout << "[server] Error Ocurred while listening to " << _tcpServer.getLocalPort() << std::endl;
 		}
 
 		if (_tcpServer.accept(client) != sf::Socket::Done)

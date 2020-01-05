@@ -29,12 +29,13 @@ namespace hgw
 		void recievePacket(sf::Packet &packet, sf::TcpSocket &tcpSocket);
 		void recievePacket(sf::Packet &packet, sf::UdpSocket &udpSocket, sf::IpAddress ip, unsigned short port);
 
-		void listen(unsigned short port, sf::TcpSocket &client);
+		void listenForConnection(unsigned short port, sf::TcpSocket &client);
+
+		sf::TcpListener _tcpServer;
 	private:
 		std::map<std::string, std::unique_ptr<sf::TcpSocket>> _tcpSockets;
 		std::map<std::string, std::unique_ptr<sf::UdpSocket>> _udpSockets;
-
-		sf::TcpListener _tcpServer;
 		std::map<std::string, std::unique_ptr<sf::TcpSocket>> _tcpClients;
+		
 	};
 }

@@ -33,7 +33,9 @@ namespace hgw
 		sf::IpAddress ipToConnectTo;
 
 		sf::Text createGameText, joinGameText;
-		sf::Text localIPText;
+		sf::Text localIPText, localPortText;
+		unsigned short localport = 0;
+
 
 		sf::Text toConnectText, waitingForConnectionText;
 	};

@@ -28,20 +28,25 @@ namespace hgw
 		localIPText.setFont(font);
 		localIPText.setCharacterSize(50);
 
+		localPortText.setString("Your Port: _____");
+		localPortText.setFont(font);
+		localPortText.setCharacterSize(50);
+
 		toConnectText.setString("IP TO CONNECT TO:\n   _.___.___.__");
 		toConnectText.setFont(font);
 		toConnectText.setCharacterSize(50);
 
-		waitingForConnectionText.setString(" WAITING FOR\nCONNECTION");
+		waitingForConnectionText.setString("WAITING FOR CONNECTION");
 		waitingForConnectionText.setFont(font);
 		waitingForConnectionText.setCharacterSize(50);
 
 		createGameText.setPosition((APP_WIDTH - createGameText.getGlobalBounds().width) / 2, 300);
 		joinGameText.setPosition((APP_WIDTH - joinGameText.getGlobalBounds().width) / 2, createGameText.getPosition().y + 100);
 		localIPText.setPosition((APP_WIDTH - localIPText.getGlobalBounds().width) / 2, 150);
+		localPortText.setPosition((APP_WIDTH - localPortText.getGlobalBounds().width) / 2, localIPText.getPosition().y + 70);
 
-		toConnectText.setPosition((APP_WIDTH - toConnectText.getGlobalBounds().width) / 2, 225);
-		waitingForConnectionText.setPosition((APP_WIDTH - waitingForConnectionText.getGlobalBounds().width) / 2, 225);
+		toConnectText.setPosition((APP_WIDTH - toConnectText.getGlobalBounds().width) / 2, 300);
+		waitingForConnectionText.setPosition((APP_WIDTH - waitingForConnectionText.getGlobalBounds().width) / 2, localPortText.getPosition().y + 70);
 	}
 
 	void ConnectState::HandleInput()
@@ -58,10 +63,11 @@ namespace hgw
 			{
 				isCreatingGame = true;
 				_data->network.addClient("enemy");
-				sf::TcpSocket a;
-				//createGameThread = std::thread{ &ConnectState::waitForConnection, this }; //add thread to wait for connection in there
-				createGameThread = std::thread{ [&]() {&NetworkManager::listen; } , static_cast<unsigned short>(5300), std::ref(a) };
-				//createGameThread = std::thread{ &NetworkManager::listen, 5300, a };
+				createGameThread = std::thread{ &NetworkManager::listenForConnection, &_data->network, sf::Socket::AnyPort, std::ref(_data->network.getTcpClient("enemy")) };
+				std::this_thread::sleep_for(std::chrono::milliseconds(1)); //listenForConnetction must be called first in order to get localport
+				localport = _data->network._tcpServer.getLocalPort();
+				localPortText.setString("Your Port: " + std::to_string(localport));
+
 				waitingClock.restart();
 			}
 			else if (_data->input.IsTextClicked(joinGameText, sf::Mouse::Left, event.type, _data->window)) //join game text
@@ -80,8 +86,9 @@ namespace hgw
 					else if (event.key.code == sf::Keyboard::Enter || event.key.code == sf::Keyboard::Return) //joining game
 					{
 						ipToConnectTo = sf::IpAddress(strigToIP(ipDigitsEntered));
-						ipToConnectTo = sf::IpAddress("127.0.0.1"); //temp connection with localhost
-						_data->network.addTcpSocket("socket", "127.0.0.1", 53000);
+						_data->network.addTcpSocket("socket", ipToConnectTo, 53000);
+						//ipToConnectTo = sf::IpAddress("127.0.0.1"); //temp connection with localhost
+						//_data->network.addTcpSocket("socket", "127.0.0.1", 53000);
 					}
 					else if (ipDigitsEntered.size() < 9) //adding ip digit
 					{
@@ -138,9 +145,9 @@ namespace hgw
 						case sf::Keyboard::Numpad9:
 							keyPressed = '9';
 							break;
-						}
+						}		
 
-						if (keyPressed != 'Q')
+						if (keyPressed != 'Q') //if key was pressed
 						{
 							ipDigitsEntered += keyPressed;
 							toConnectText.setString("IP TO CONNECT TO:\n   " + strigToIP(ipDigitsEntered));
@@ -178,7 +185,7 @@ namespace hgw
 				}
 			}
 
-			waitingForConnectionText.setString(" WAITING FOR\nCONNECTION" + waitingDots);
+			waitingForConnectionText.setString("WAITING FOR CONNECTION" + waitingDots);
 
 			waitingClock.restart();
 		}
@@ -192,11 +199,12 @@ namespace hgw
 		{
 			_data->window.draw(createGameText);
 			_data->window.draw(joinGameText);
-			_data->window.draw(localIPText);
 		}
 		else if (isCreatingGame)
 		{
 			_data->window.draw(waitingForConnectionText);
+			_data->window.draw(localIPText);
+			_data->window.draw(localPortText);
 		}
 		else if (isJoiningGame)
 		{
