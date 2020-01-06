@@ -90,6 +90,14 @@ namespace hgw
 			{
 				return true;
 			}
+
+			/*sf::FloatRect tempRect{ text.getPosition().x, text.getPosition().y, text.getGlobalBounds().width, text.getGlobalBounds().height };
+			
+			if (sf::Mouse::isButtonPressed(button) &&
+				tempRect.contains(sf::Vector2f(sf::Mouse::getPosition(window))))
+			{
+				return true;
+			}*/
 		}
 		return false;
 	}

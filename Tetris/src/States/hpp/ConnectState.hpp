@@ -17,26 +17,28 @@ namespace hgw
 		void Draw(float dt);
 
 		std::string strigToIP(std::string str);
-		void waitForConnection();
+		std::string stringToPort(std::string str);
+		char getPressedDigit(sf::Event event);
 
 	private:
 		GameDataRef _data;
 
+		sf::Text createGameText, joinGameText; //join or create choice
 		bool isJoiningGame = false, isCreatingGame = false;
-		std::string ipDigitsEntered = "";
+
+		sf::Text localIPText, localPortText; //create game
 		std::thread createGameThread;
+		sf::Text waitingForConnectionText;
 		sf::Clock waitingClock;
 		std::string waitingDots = "";
 		bool dotsGoingForward = true;
-		sf::TcpSocket socket, client;
-		sf::TcpListener server;
-		sf::IpAddress ipToConnectTo;
-
-		sf::Text createGameText, joinGameText;
-		sf::Text localIPText, localPortText;
 		unsigned short localport = 0;
+		sf::TcpSocket client;
 
-
-		sf::Text toConnectText, waitingForConnectionText;
+		sf::Text ipConnect, portConnect; //join game
+		sf::IpAddress ipToConnectTo;
+		bool isTypingIp = false, isTypingPort = false;
+		std::string ipDigitsEntered = "", portDigitsEntered = "";
+		sf::TcpSocket socket;
 	};
 }
