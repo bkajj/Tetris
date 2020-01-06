@@ -79,12 +79,12 @@ namespace hgw
 			{
 				isJoiningGame = true;		
 			}
-			else if (_data->input.IsTextClicked(ipConnect, sf::Mouse::Left, event.type, _data->window) && isJoiningGame) //ip to connect to text
+			else if (_data->input.IsTextClicked(ipConnect, sf::Mouse::Left, event.type, _data->window, sf::Vector2i(1, 2)) && isJoiningGame) //ip to connect to text
 			{
 				isTypingIp = true;
 				isTypingPort = false;
 			}
-			else if (_data->input.IsTextClicked(portConnect, sf::Mouse::Left, event.type, _data->window) && isJoiningGame) //port to connect to text
+			else if (_data->input.IsTextClicked(portConnect, sf::Mouse::Left, event.type, _data->window, sf::Vector2i(1, 2)) && isJoiningGame) //port to connect to text
 			{
 				isTypingIp = false;
 				isTypingPort = true;
