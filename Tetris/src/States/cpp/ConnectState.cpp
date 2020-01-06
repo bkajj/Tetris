@@ -32,13 +32,13 @@ namespace hgw
 		localPortText.setFont(font);
 		localPortText.setCharacterSize(50);
 
-		ipConnect.setString("IP TO CONNECT TO:\n   _.___.___.__");
-		ipConnect.setFont(font);
-		ipConnect.setCharacterSize(50);
+		ipConnectText.setString("IP TO CONNECT TO:\n   _.___.___.__");
+		ipConnectText.setFont(font);
+		ipConnectText.setCharacterSize(50);
 
-		portConnect.setString("PORT TO CONNECT TO:\n	   _____");
-		portConnect.setFont(font);
-		portConnect.setCharacterSize(50);
+		portConnectText.setString("PORT TO CONNECT TO:\n	   _____");
+		portConnectText.setFont(font);
+		portConnectText.setCharacterSize(50);
 
 		waitingForConnectionText.setString("WAITING FOR CONNECTION");
 		waitingForConnectionText.setFont(font);
@@ -49,8 +49,8 @@ namespace hgw
 		localIPText.setPosition((APP_WIDTH - localIPText.getGlobalBounds().width) / 2, 150);
 		localPortText.setPosition((APP_WIDTH - localPortText.getGlobalBounds().width) / 2, localIPText.getPosition().y + 70);
 
-		ipConnect.setPosition((APP_WIDTH - ipConnect.getGlobalBounds().width) / 2, 200);
-		portConnect.setPosition((APP_WIDTH - portConnect.getGlobalBounds().width) / 2, ipConnect.getPosition().y + 150);
+		ipConnectText.setPosition((APP_WIDTH - ipConnectText.getGlobalBounds().width) / 2, 200);
+		portConnectText.setPosition((APP_WIDTH - portConnectText.getGlobalBounds().width) / 2, ipConnectText.getPosition().y + 150);
 		waitingForConnectionText.setPosition((APP_WIDTH - waitingForConnectionText.getGlobalBounds().width) / 2, localPortText.getPosition().y + 70);
 	}
 
@@ -64,112 +64,130 @@ namespace hgw
 			{
 				_data->window.close();
 			}
-			else if (_data->input.IsTextClicked(createGameText, sf::Mouse::Left, event.type, _data->window)) //create game text
+			if (!isCreatingGame && !isJoiningGame)
 			{
-				isCreatingGame = true;
-				_data->network.addClient("enemy");
-				createGameThread = std::thread{ &NetworkManager::listenForConnection, &_data->network, sf::Socket::AnyPort, std::ref(_data->network.getTcpClient("enemy")) };
-				std::this_thread::sleep_for(std::chrono::milliseconds(1)); //listenForConnetction must be called first in order to get localport
-				localport = _data->network._tcpServer.getLocalPort();
-				localPortText.setString("Your Port: " + std::to_string(localport));
+				if (_data->input.IsTextClicked(createGameText, sf::Mouse::Left, event.type, _data->window)) //create game text
+				{
+					isCreatingGame = true;
 
-				waitingClock.restart();
-			}
-			else if (_data->input.IsTextClicked(joinGameText, sf::Mouse::Left, event.type, _data->window)) //join game text
-			{
-				isJoiningGame = true;		
-			}
-			else if (_data->input.IsTextClicked(ipConnect, sf::Mouse::Left, event.type, _data->window, sf::Vector2i(1, 2)) && isJoiningGame) //ip to connect to text
-			{
-				isTypingIp = true;
-				isTypingPort = false;
-			}
-			else if (_data->input.IsTextClicked(portConnect, sf::Mouse::Left, event.type, _data->window, sf::Vector2i(1, 2)) && isJoiningGame) //port to connect to text
-			{
-				isTypingIp = false;
-				isTypingPort = true;
-			}
-			else if (event.type == sf::Event::KeyPressed && isJoiningGame)
-			{
-				char digitPressed = getPressedDigit(event);
-				
-				if (isTypingIp)
+					_data->network.addClient("enemy");
+					//start listening from other thread, cause sf::TcpListener::listen() blocks thread from which is called
+					connectionThread = std::thread{ &NetworkManager::listenForConnection, &_data->network, sf::Socket::AnyPort, std::ref(_data->network.getTcpClient("enemy")) };
+					std::this_thread::sleep_for(std::chrono::milliseconds(1)); //listenForConnetction must be called first in order to get localport
+					localport = _data->network._tcpServer.getLocalPort();
+					localPortText.setString("Your Port: " + std::to_string(localport));
+
+					waitingClock.restart();
+				}
+				else if (_data->input.IsTextClicked(joinGameText, sf::Mouse::Left, event.type, _data->window)) //join game text
 				{
-					if ((event.key.code == sf::Keyboard::BackSpace || event.key.code == sf::Keyboard::Backspace) && ipDigitsEntered.size() > 0) //removing ip digit
+					isJoiningGame = true;
+				}
+			}
+			else if (isJoiningGame) //join game clicked
+			{
+				if (_data->input.IsTextClicked(ipConnectText, sf::Mouse::Left, event.type, _data->window, sf::Vector2i(1, 2))) //ip to connect to text
+				{
+					isTypingIp = true;
+					isTypingPort = false;
+				}
+				else if (_data->input.IsTextClicked(portConnectText, sf::Mouse::Left, event.type, _data->window, sf::Vector2i(1, 2))) //port to connect to text
+				{
+					isTypingIp = false;
+					isTypingPort = true;
+				}
+				if (event.type == sf::Event::KeyPressed)
+				{
+					char digitPressed = getPressedDigit(event);
+
+					if (isTypingIp)
 					{
-						ipDigitsEntered.erase(ipDigitsEntered.end() - 1);
-						ipConnect.setString("IP TO CONNECT TO:\n   " + strigToIP(ipDigitsEntered));
+						if ((event.key.code == sf::Keyboard::BackSpace || event.key.code == sf::Keyboard::Backspace) && ipDigitsEntered.size() > 0) //removing ip digit
+						{
+							isIpFullyEnterd = false;
+							ipDigitsEntered.erase(ipDigitsEntered.end() - 1);
+							ipConnectText.setString("IP TO CONNECT TO:\n   " + strigToIP(ipDigitsEntered));
+						}
+						else if (ipDigitsEntered.size() < 9 && digitPressed != 'X') //adding ip digit
+						{
+							isIpFullyEnterd = false;
+							ipDigitsEntered += digitPressed;
+							ipConnectText.setString("IP TO CONNECT TO:\n   " + strigToIP(ipDigitsEntered));
+						}
+						else if (ipDigitsEntered.size() == 9)
+						{
+							isIpFullyEnterd = true;
+						}
 					}
-					else if (ipDigitsEntered.size() < 9 && digitPressed != 'X') //adding ip digit
+
+					if (isTypingPort)
 					{
-						ipDigitsEntered += digitPressed;
-						ipConnect.setString("IP TO CONNECT TO:\n   " + strigToIP(ipDigitsEntered));
+						if ((event.key.code == sf::Keyboard::BackSpace || event.key.code == sf::Keyboard::Backspace) && portDigitsEntered.size() > 0) //removing ip digit
+						{
+							isPortFullyEnterd = false;
+							portDigitsEntered.erase(portDigitsEntered.end() - 1);
+							portConnectText.setString("PORT TO CONNECT TO:\n       " + stringToPort(portDigitsEntered));
+						}
+						else if (portDigitsEntered.size() < 5 && digitPressed != 'X') //adding ip digit
+						{
+							isPortFullyEnterd = false;
+							portDigitsEntered += digitPressed;
+							portConnectText.setString("PORT TO CONNECT TO:\n       " + stringToPort(portDigitsEntered));
+						}
+						else if (portDigitsEntered.size() == 5)
+						{
+							isPortFullyEnterd = true;
+						}
+					}
+
+					if ((event.key.code == sf::Keyboard::Enter || event.key.code == sf::Keyboard::Return) && isIpFullyEnterd && isPortFullyEnterd) //joining game
+					{
+						/*ipToConnectTo = sf::IpAddress(strigToIP(ipDigitsEntered));
+						portToConnectTo = std::stoi(portDigitsEntered);
+						_data->network.addTcpSocket("socket", ipToConnectTo, portToConnectTo);
+						*/
+						portToConnectTo = std::stoi(portDigitsEntered);
+						ipToConnectTo = sf::IpAddress("127.0.0.1"); //temp connection with localhost
+						_data->network.addTcpSocket("socket", "127.0.0.1", portToConnectTo);
 					}
 				}
-				
-				if(isTypingPort)
-				{
-					if ((event.key.code == sf::Keyboard::BackSpace || event.key.code == sf::Keyboard::Backspace) && portDigitsEntered.size() > 0) //removing ip digit
-					{
-						portDigitsEntered.erase(portDigitsEntered.end() - 1);
-						portConnect.setString("PORT TO CONNECT TO:\n       " + stringToPort(portDigitsEntered));
-					}
-					else if (portDigitsEntered.size() < 5 && digitPressed != 'X') //adding ip digit
-					{
-						portDigitsEntered += digitPressed;
-						portConnect.setString("PORT TO CONNECT TO:\n       " + stringToPort(portDigitsEntered));
-					}
-				}
-				
-				if (event.key.code == sf::Keyboard::Enter || event.key.code == sf::Keyboard::Return) //joining game
-				{
-					ipToConnectTo = sf::IpAddress(strigToIP(ipDigitsEntered));
-					_data->network.addTcpSocket("socket", ipToConnectTo, 53000);
-					//ipToConnectTo = sf::IpAddress("127.0.0.1"); //temp connection with localhost
-					//_data->network.addTcpSocket("socket", "127.0.0.1", 53000);
-				}
-				
-			}		
+			}
 		}
 	}
 
 	void ConnectState::Update(float dt)
 	{
-		if (waitingClock.getElapsedTime().asMilliseconds() >= 1000) //dots animation
+		if (isCreatingGame)
 		{
-			if (dotsGoingForward) //adding dots
+			if (waitingClock.getElapsedTime().asMilliseconds() >= 1000) //dots animation
 			{
-				if (waitingDots.size() < 3)
+				if (dotsGoingForward) //adding dots
 				{
-					waitingDots += ".";
+					if (waitingDots.size() < 3)
+					{
+						waitingDots += ".";
+					}
+					else
+					{
+						dotsGoingForward = false;
+					}
 				}
-				else
+				else //removing dots
 				{
-					dotsGoingForward = false;
+					if (waitingDots.size() > 0)
+					{
+						waitingDots.erase(waitingDots.end() - 1);
+					}
+					else
+					{
+						dotsGoingForward = true;
+					}
 				}
-			}
-			else //removing dots
-			{
-				if (waitingDots.size() > 0)
-				{
-					waitingDots.erase(waitingDots.end() - 1);
-				}
-				else
-				{
-					dotsGoingForward = true;
-				}
-			}
 
-			waitingForConnectionText.setString("WAITING FOR CONNECTION" + waitingDots);
-
-			waitingClock.restart();
+				waitingForConnectionText.setString("WAITING FOR CONNECTION" + waitingDots);
+				waitingClock.restart();
+			}
 		}
-
-		std::cout << "PORT X: " << portConnect.getPosition().x << ",  Y: " << portConnect.getPosition().y << std::endl;
-		std::cout << "PORT HEIGHt: " << portConnect.getGlobalBounds().height << std::endl;
-		std::cout << "MOUSE X: " << sf::Mouse::getPosition(_data->window).x << ",  Y: " << sf::Mouse::getPosition(_data->window).y << std::endl;
-
-		
 	}
 
 	void ConnectState::Draw(float dt)
@@ -189,8 +207,8 @@ namespace hgw
 		}
 		else if (isJoiningGame)
 		{
-			_data->window.draw(portConnect);
-			_data->window.draw(ipConnect);
+			_data->window.draw(portConnectText);
+			_data->window.draw(ipConnectText);
 		}
 		
 		_data->window.display();

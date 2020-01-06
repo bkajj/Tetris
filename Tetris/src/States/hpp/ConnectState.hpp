@@ -27,7 +27,7 @@ namespace hgw
 		bool isJoiningGame = false, isCreatingGame = false;
 
 		sf::Text localIPText, localPortText; //create game
-		std::thread createGameThread;
+		std::thread connectionThread;
 		sf::Text waitingForConnectionText;
 		sf::Clock waitingClock;
 		std::string waitingDots = "";
@@ -35,9 +35,11 @@ namespace hgw
 		unsigned short localport = 0;
 		sf::TcpSocket client;
 
-		sf::Text ipConnect, portConnect; //join game
+		sf::Text ipConnectText, portConnectText; //join game
 		sf::IpAddress ipToConnectTo;
+		unsigned short portToConnectTo;
 		bool isTypingIp = false, isTypingPort = false;
+		bool isIpFullyEnterd = false, isPortFullyEnterd = false;
 		std::string ipDigitsEntered = "", portDigitsEntered = "";
 		sf::TcpSocket socket;
 	};
