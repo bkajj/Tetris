@@ -22,30 +22,30 @@ namespace hgw
 		return *_udpSockets[name];
 	}
 
-	void NetworkManager::addTcpSocket(std::string key, sf::IpAddress ip, unsigned short port, sf::Time timeout)
+	bool NetworkManager::addTcpSocket(std::string key, sf::IpAddress ip, unsigned short port, sf::Time timeout)
 	{
 		_tcpSockets[key] = std::make_unique<sf::TcpSocket>();
 		if (_tcpSockets[key]->connect(ip, port, timeout) != sf::Socket::Done)
 		{
 			std::cout << "[tcp socket] connection error" << std::endl;
+			return false;
 		}
-		else
-		{
-			std::cout << "[tcp socket] connected successfully" << std::endl;
-		}
+
+		std::cout << "[tcp socket] connected successfully" << std::endl;
+		return true;
 	}
 
-	void NetworkManager::addUdpSocket(std::string key, unsigned short port)
+	bool NetworkManager::addUdpSocket(std::string key, unsigned short port)
 	{
 		_udpSockets[key] = std::make_unique<sf::UdpSocket>();
 		if (_udpSockets[key]->bind(port) != sf::Socket::Done)
 		{
 			std::cout << "[udp socket] binding error" << std::endl;
+			return false;
 		}
-		else
-		{
-			std::cout << "[tcp socket] binded successfully" << std::endl;
-		}
+
+		std::cout << "[tcp socket] binded successfully" << std::endl;
+		return true;
 	}
 
 	void NetworkManager::sendPacket(sf::Packet &packet, sf::TcpSocket &tcpSocket)
@@ -67,21 +67,22 @@ namespace hgw
 	{
 		udpSocket.receive(packet, ip, port);
 	}
-
-	void NetworkManager::listenForConnection(unsigned short port, sf::TcpSocket &client)
+	
+	bool NetworkManager::listenForConnection(unsigned short port, sf::TcpSocket &client)
 	{
 		if (_tcpServer.listen(port) != sf::Socket::Done)
 		{
 			std::cout << "[server] Error Ocurred while listening to " << _tcpServer.getLocalPort() << std::endl;
+			return false;
 		}
 
 		if (_tcpServer.accept(client) != sf::Socket::Done)
 		{
 			std::cout << "[server] Error Ocurred while connecting to client" << std::endl;
+			return false;
 		}
-		else
-		{
-			std::cout << "[server] Connection accepted successfully" << std::endl;
-		}	
+
+		std::cout << "[server] Connection accepted successfully" << std::endl;
+		return true;
 	}
 }

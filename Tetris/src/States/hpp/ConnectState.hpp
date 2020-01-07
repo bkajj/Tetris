@@ -3,6 +3,7 @@
 #include "src/GameEngine/hpp/Game.hpp"
 #include <SFML/Network.hpp>
 #include <thread>
+#include <future>
 
 namespace hgw
 {
@@ -34,6 +35,7 @@ namespace hgw
 		bool dotsGoingForward = true;
 		unsigned short localport = 0;
 		sf::TcpSocket client;
+		std::future<bool> gameCreated;
 
 		sf::Text ipConnectText, portConnectText; //join game
 		sf::IpAddress ipToConnectTo;

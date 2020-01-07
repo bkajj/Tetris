@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <memory>
+#include <future>
 
 namespace hgw
 {
@@ -20,8 +21,8 @@ namespace hgw
 		sf::UdpSocket& getUdpSocket(std::string name);
 		sf::TcpSocket& getTcpSocket(std::string name);	
 
-		void addTcpSocket(std::string key, sf::IpAddress ip, unsigned short port, sf::Time timeout = sf::Time::Zero);
-		void addUdpSocket(std::string key, unsigned short port);
+		bool addTcpSocket(std::string key, sf::IpAddress ip, unsigned short port, sf::Time timeout = sf::Time::Zero);
+		bool addUdpSocket(std::string key, unsigned short port);
 		
 		void sendPacket(sf::Packet &packet, sf::TcpSocket &tcpSocket);
 		void sendPacket(sf::Packet &packet, sf::UdpSocket &udpSocket, sf::IpAddress ip, unsigned short port);
@@ -29,7 +30,7 @@ namespace hgw
 		void recievePacket(sf::Packet &packet, sf::TcpSocket &tcpSocket);
 		void recievePacket(sf::Packet &packet, sf::UdpSocket &udpSocket, sf::IpAddress ip, unsigned short port);
 
-		void listenForConnection(unsigned short port, sf::TcpSocket &client);
+		bool listenForConnection(unsigned short port, sf::TcpSocket &client);
 
 		sf::TcpListener _tcpServer;
 	private:

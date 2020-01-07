@@ -1,4 +1,5 @@
 #include "src/States/hpp/ConnectState.hpp"
+#include "src/States/hpp/GameState.hpp"
 #include "src/DEFINE.hpp"
 #include <iostream>
 #include <SFML/Network.hpp>
@@ -72,8 +73,9 @@ namespace hgw
 
 					_data->network.addClient("enemy");
 					//start listening from other thread, cause sf::TcpListener::listen() blocks thread from which is called
-					connectionThread = std::thread{ &NetworkManager::listenForConnection, &_data->network, sf::Socket::AnyPort, std::ref(_data->network.getTcpClient("enemy")) };
+					gameCreated = std::async( &NetworkManager::listenForConnection, &_data->network, sf::Socket::AnyPort, std::ref(_data->network.getTcpClient("enemy")));
 					std::this_thread::sleep_for(std::chrono::milliseconds(1)); //listenForConnetction must be called first in order to get localport
+
 					localport = _data->network._tcpServer.getLocalPort();
 					localPortText.setString("Your Port: " + std::to_string(localport));
 
@@ -148,7 +150,11 @@ namespace hgw
 						*/
 						portToConnectTo = std::stoi(portDigitsEntered);
 						ipToConnectTo = sf::IpAddress("127.0.0.1"); //temp connection with localhost
-						_data->network.addTcpSocket("socket", "127.0.0.1", portToConnectTo);
+
+						if (_data->network.addTcpSocket("socket", "127.0.0.1", portToConnectTo))
+						{
+							_data->machine.AddState(StateRef(new GameState(_data, true)));
+						}
 					}
 				}
 			}
@@ -187,6 +193,11 @@ namespace hgw
 				waitingForConnectionText.setString("WAITING FOR CONNECTION" + waitingDots);
 				waitingClock.restart();
 			}
+		}
+
+		if (gameCreated.valid() && gameCreated.wait_for(std::chrono::microseconds(1)) == std::future_status::ready && gameCreated.get())
+		{
+			_data->machine.AddState(StateRef(new GameState(_data, true)));
 		}
 	}
 
