@@ -8,6 +8,7 @@
 #define APP_WIDTH 800
 
 #define BLOCK_SIZE 30
+#define ENEMY_BLOCK_SIZE 15
 
 #define GRID_START_POS_X 250
 #define GRID_START_POS_Y 100

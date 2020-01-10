@@ -32,6 +32,10 @@ namespace hgw
 
 		bool listenForConnection(unsigned short port, sf::TcpSocket &client);
 
+		size_t getTcpSocketsSize();
+		size_t getUdpSocketsSize();
+		size_t getTcpClientsSize();
+
 		sf::TcpListener _tcpServer;
 	private:
 		std::map<std::string, std::unique_ptr<sf::TcpSocket>> _tcpSockets;

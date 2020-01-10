@@ -11,6 +11,35 @@
 #include <map>
 #include <filesystem>
 
+sf::Packet&operator<<(sf::Packet& packet, std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10>& grid)
+{
+	for (int i = 0; i < 10; i++)
+	{
+		for (int j = 0; j < 20; j++)
+		{
+			packet << grid[i][j].first << grid[i][j].second.getFillColor().r << grid[i][j].second.getFillColor().g;
+			packet << grid[i][j].second.getFillColor().b << grid[i][j].second.getFillColor().a;
+		}
+	}
+
+	return packet;
+}
+
+sf::Packet&operator>>(sf::Packet& packet, std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10>& grid)
+{
+	for (int i = 0; i < 10; i++)
+	{
+		for (int j = 0; j < 20; j++)
+		{
+			sf::Color col;
+			packet >> grid[i][j].first >> col.r >> col.g >> col.b >> col.a;
+			grid[i][j].second.setFillColor(col);
+		}
+	}
+
+	return packet;
+}
+
 namespace hgw
 {
 #pragma region Figure
@@ -527,8 +556,6 @@ namespace hgw
 			nextFigure.Init(nextType, sf::Vector2f(12, 9), false, false); //set next figure with random colors
 		}	
 
-
-
 		if (multiplayer)
 		{
 			for (int i = 0; i < 11; i++) //set enemy grid on screen
@@ -686,6 +713,47 @@ namespace hgw
 
 			moveClock.restart();
 		}
+
+		if (multiplayer)
+		{
+			sf::Packet gridPacket;
+			gridPacket;
+
+			if (_data->network.getTcpClientsSize() == 0)
+			{
+				gridPacket << grid;
+				_data->network.sendPacket(gridPacket, _data->network.getTcpSocket("enemy"));
+
+				_data->network.recievePacket(gridPacket, _data->network.getTcpSocket("enemy"));
+				gridPacket >> enemy_grid;
+
+				for (int i = 0; i < 10; i++)
+				{
+					for (int j = 0; j < 20; j++)
+					{
+						enemy_grid[i][j].second.setPosition(enemy_verticalLines[0].getPosition().x + i * ENEMY_BLOCK_SIZE,
+															enemy_verticalLines[0].getPosition().y + j * ENEMY_BLOCK_SIZE);
+					}
+				}
+			}
+			else
+			{
+				gridPacket << grid;
+				_data->network.sendPacket(gridPacket, _data->network.getTcpClient("enemy"));
+
+				_data->network.recievePacket(gridPacket, _data->network.getTcpClient("enemy"));
+				gridPacket >> enemy_grid;
+
+				for (int i = 0; i < 10; i++)
+				{
+					for (int j = 0; j < 20; j++)
+					{
+						enemy_grid[i][j].second.setPosition(enemy_verticalLines[0].getPosition().x + i * ENEMY_BLOCK_SIZE,
+							enemy_verticalLines[0].getPosition().y + j * ENEMY_BLOCK_SIZE);
+					}
+				}
+			}
+		}
 	}
 
 	void GameState::Draw(float dt)
@@ -706,6 +774,11 @@ namespace hgw
 				if (grid[i][j].first == true) //if block is on grid
 				{
 					_data->window.draw(grid[i][j].second);
+					if (multiplayer)
+					{
+						_data->window.draw(enemy_grid[i][j].second);
+
+					}
 				}
 			}
 		}
@@ -748,7 +821,6 @@ namespace hgw
 
 				_data->window.draw(enemy_horizontalLines[0]);
 				_data->window.draw(enemy_horizontalLines[20]);
-
 			}
 		}
 		

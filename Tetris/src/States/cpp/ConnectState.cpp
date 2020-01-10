@@ -151,7 +151,7 @@ namespace hgw
 						portToConnectTo = std::stoi(portDigitsEntered);
 						ipToConnectTo = sf::IpAddress("127.0.0.1"); //temp connection with localhost
 
-						if (_data->network.addTcpSocket("socket", "127.0.0.1", portToConnectTo))
+						if (_data->network.addTcpSocket("enemy", "127.0.0.1", portToConnectTo))
 						{
 							_data->machine.AddState(StateRef(new GameState(_data, true)));
 						}

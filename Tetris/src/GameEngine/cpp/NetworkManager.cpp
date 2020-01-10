@@ -85,4 +85,19 @@ namespace hgw
 		std::cout << "[server] Connection accepted successfully" << std::endl;
 		return true;
 	}
+
+	size_t NetworkManager::getTcpClientsSize()
+	{
+		return _tcpClients.size();
+	}
+
+	size_t NetworkManager::getTcpSocketsSize()
+	{
+		return _tcpSockets.size();
+	}
+
+	size_t NetworkManager::getUdpSocketsSize()
+	{
+		return _udpSockets.size();
+	}
 }
