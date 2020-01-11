@@ -144,12 +144,12 @@ namespace hgw
 
 					if ((event.key.code == sf::Keyboard::Enter || event.key.code == sf::Keyboard::Return) && isIpFullyEnterd && isPortFullyEnterd) //joining game
 					{
-						/*ipToConnectTo = sf::IpAddress(strigToIP(ipDigitsEntered));
+						ipToConnectTo = sf::IpAddress(strigToIP(ipDigitsEntered));
 						portToConnectTo = std::stoi(portDigitsEntered);
 						_data->network.addTcpSocket("socket", ipToConnectTo, portToConnectTo);
-						*/
-						portToConnectTo = std::stoi(portDigitsEntered);
-						ipToConnectTo = sf::IpAddress("127.0.0.1"); //temp connection with localhost
+						
+						//portToConnectTo = std::stoi(portDigitsEntered);
+						//ipToConnectTo = sf::IpAddress("127.0.0.1"); //temp connection with localhost
 
 						if (_data->network.addTcpSocket("enemy", "127.0.0.1", portToConnectTo))
 						{

@@ -17,8 +17,12 @@ sf::Packet&operator<<(sf::Packet& packet, std::array<std::array<std::pair<bool, 
 	{
 		for (int j = 0; j < 20; j++)
 		{
-			packet << grid[i][j].first << grid[i][j].second.getFillColor().r << grid[i][j].second.getFillColor().g;
-			packet << grid[i][j].second.getFillColor().b << grid[i][j].second.getFillColor().a;
+			sf::Uint8 a = 12, b = 255;
+			packet << grid[i][j].first;
+			packet << grid[i][j].second.getFillColor().r;
+			packet << grid[i][j].second.getFillColor().g;
+			packet << grid[i][j].second.getFillColor().b;
+			packet << grid[i][j].second.getFillColor().a;
 		}
 	}
 
@@ -32,7 +36,11 @@ sf::Packet&operator>>(sf::Packet& packet, std::array<std::array<std::pair<bool, 
 		for (int j = 0; j < 20; j++)
 		{
 			sf::Color col;
-			packet >> grid[i][j].first >> col.r >> col.g >> col.b >> col.a;
+			packet >> grid[i][j].first;
+			packet >> col.r;
+			packet >> col.g;
+			packet >> col.b;
+			packet >> col.a;
 			grid[i][j].second.setFillColor(col);
 		}
 	}
@@ -717,12 +725,13 @@ namespace hgw
 		if (multiplayer)
 		{
 			sf::Packet gridPacket;
-			gridPacket;
 
 			if (_data->network.getTcpClientsSize() == 0)
 			{
 				gridPacket << grid;
 				_data->network.sendPacket(gridPacket, _data->network.getTcpSocket("enemy"));
+
+				gridPacket.clear();
 
 				_data->network.recievePacket(gridPacket, _data->network.getTcpSocket("enemy"));
 				gridPacket >> enemy_grid;
@@ -733,6 +742,7 @@ namespace hgw
 					{
 						enemy_grid[i][j].second.setPosition(enemy_verticalLines[0].getPosition().x + i * ENEMY_BLOCK_SIZE,
 															enemy_verticalLines[0].getPosition().y + j * ENEMY_BLOCK_SIZE);
+						enemy_grid[i][j].second.setSize(sf::Vector2f(ENEMY_BLOCK_SIZE, ENEMY_BLOCK_SIZE));
 					}
 				}
 			}
@@ -740,6 +750,8 @@ namespace hgw
 			{
 				gridPacket << grid;
 				_data->network.sendPacket(gridPacket, _data->network.getTcpClient("enemy"));
+
+				gridPacket.clear();
 
 				_data->network.recievePacket(gridPacket, _data->network.getTcpClient("enemy"));
 				gridPacket >> enemy_grid;
@@ -750,6 +762,7 @@ namespace hgw
 					{
 						enemy_grid[i][j].second.setPosition(enemy_verticalLines[0].getPosition().x + i * ENEMY_BLOCK_SIZE,
 							enemy_verticalLines[0].getPosition().y + j * ENEMY_BLOCK_SIZE);
+						enemy_grid[i][j].second.setSize(sf::Vector2f(ENEMY_BLOCK_SIZE, ENEMY_BLOCK_SIZE));
 					}
 				}
 			}

@@ -50,22 +50,34 @@ namespace hgw
 
 	void NetworkManager::sendPacket(sf::Packet &packet, sf::TcpSocket &tcpSocket)
 	{
-		tcpSocket.send(packet);
+		if (tcpSocket.send(packet) != sf::Socket::Done)
+		{
+			std::cout << "[tcp socket] packet not sent" << std::endl;
+		}
 	}
 
 	void NetworkManager::sendPacket(sf::Packet &packet, sf::UdpSocket &udpSocket, sf::IpAddress ip, unsigned short port)
 	{
-		udpSocket.send(packet, ip, port);
+		if (udpSocket.send(packet, ip, port) != sf::Socket::Done)
+		{
+			std::cout << "[udp socket] packet not sent" << std::endl;
+		}
 	}
 
 	void NetworkManager::recievePacket(sf::Packet &packet, sf::TcpSocket &tcpSocket)
 	{
-		tcpSocket.receive(packet);
+		if (tcpSocket.receive(packet) != sf::Socket::Done)
+		{
+			std::cout << "[tcp socket] packet not recieved" << std::endl;
+		}
 	}
 
 	void NetworkManager::recievePacket(sf::Packet &packet, sf::UdpSocket &udpSocket, sf::IpAddress ip, unsigned short port)
 	{
-		udpSocket.receive(packet, ip, port);
+		if (udpSocket.receive(packet, ip, port) != sf::Socket::Done)
+		{
+			std::cout << "[udp socket] packet not recieved" << std::endl;
+		}	
 	}
 	
 	bool NetworkManager::listenForConnection(unsigned short port, sf::TcpSocket &client)
