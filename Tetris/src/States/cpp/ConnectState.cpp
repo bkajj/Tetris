@@ -53,6 +53,10 @@ namespace hgw
 		waitingForConnectionText.setFont(font);
 		waitingForConnectionText.setCharacterSize(50);
 
+		joinMatchText.setString("JOIN MATCH");
+		joinMatchText.setFont(font);
+		joinMatchText.setCharacterSize(50);
+
 		createGameText.setPosition((APP_WIDTH - createGameText.getGlobalBounds().width) / 2, 300);
 		joinGameText.setPosition((APP_WIDTH - joinGameText.getGlobalBounds().width) / 2, createGameText.getPosition().y + 100);
 		localIPText.setPosition((APP_WIDTH - localIPText.getGlobalBounds().width) / 2, 150);
@@ -64,6 +68,8 @@ namespace hgw
 
 		serverIpText.setPosition((APP_WIDTH - serverIpText.getGlobalBounds().width) / 2, ipConnectText.getPosition().y + 50);
 		serverPortText.setPosition((APP_WIDTH - serverPortText.getGlobalBounds().width) / 2, portConnectText.getPosition().y + 50);
+
+		joinMatchText.setPosition((APP_WIDTH - joinMatchText.getGlobalBounds().width) / 2, 500);
 
 		ipFloatRect = sf::FloatRect{ ipConnectText.getPosition().x - 20, ipConnectText.getPosition().y + 50,
 							   	 ipConnectText.getGlobalBounds().width + 40, ipConnectText.getGlobalBounds().height + 50 };
@@ -121,6 +127,17 @@ namespace hgw
 					isTypingPort = true;
 					cursorChanged = true;
 				}
+				else if (_data->input.IsTextClicked(joinMatchText, sf::Mouse::Left, event.type, _data->window)) //join game text
+				{
+					ipToConnectTo = sf::IpAddress(ipDigitsEntered);
+					portToConnectTo = std::stoi(portDigitsEntered);
+
+					if (_data->network.addTcpSocket("enemy", ipToConnectTo, portToConnectTo))
+					{
+						_data->machine.AddState(StateRef(new GameState(_data, true)));
+					}
+				}
+				
 				if (event.type == sf::Event::KeyPressed)
 				{
 					if (isTypingIp)
@@ -168,21 +185,6 @@ namespace hgw
 						else if (portDigitsEntered.size() == 5)
 						{
 							isPortFullyEnterd = true;
-						}
-					}
-
-					if ((event.key.code == sf::Keyboard::Enter || event.key.code == sf::Keyboard::Return) && isIpFullyEnterd && isPortFullyEnterd) //joining game
-					{
-						ipToConnectTo = sf::IpAddress(ipDigitsEntered);
-						portToConnectTo = std::stoi(portDigitsEntered);
-						_data->network.addTcpSocket("socket", ipToConnectTo, portToConnectTo);
-						
-						//portToConnectTo = std::stoi(portDigitsEntered);
-						//ipToConnectTo = sf::IpAddress("127.0.0.1"); //temp connection with localhost
-
-						if (_data->network.addTcpSocket("enemy", "127.0.0.1", portToConnectTo))
-						{
-							_data->machine.AddState(StateRef(new GameState(_data, true)));
 						}
 					}
 				}
@@ -278,6 +280,8 @@ namespace hgw
 			_data->window.draw(ipConnectText);
 			_data->window.draw(serverIpText);
 			_data->window.draw(serverPortText);
+			_data->window.draw(joinMatchText);
+
 		}
 		
 		_data->window.display();

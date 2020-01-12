@@ -45,5 +45,6 @@ namespace hgw
 		sf::FloatRect ipFloatRect, portFloatRect;
 		sf::TcpSocket socket;
 		bool cursorChanged = false;
+		sf::Text joinMatchText;
 	};
 }
