@@ -17,9 +17,7 @@ namespace hgw
 		void Update(float dt);
 		void Draw(float dt);
 
-		std::string strigToIP(std::string str);
-		std::string stringToPort(std::string str);
-		char getPressedDigit(sf::Event event);
+		char getPressedDigit(sf::Event event, bool withDot);
 
 	private:
 		GameDataRef _data;
@@ -37,12 +35,15 @@ namespace hgw
 		sf::TcpSocket client;
 		std::future<bool> gameCreated;
 
-		sf::Text ipConnectText, portConnectText; //join game
+		sf::Text ipConnectText, portConnectText, serverIpText, serverPortText; //join game
 		sf::IpAddress ipToConnectTo;
 		unsigned short portToConnectTo;
-		bool isTypingIp = false, isTypingPort = false;
+		bool isTypingIp = true, isTypingPort = false;
 		bool isIpFullyEnterd = false, isPortFullyEnterd = false;
 		std::string ipDigitsEntered = "", portDigitsEntered = "";
+		std::string textCursor = "|";
+		sf::FloatRect ipFloatRect, portFloatRect;
 		sf::TcpSocket socket;
+		bool cursorChanged = false;
 	};
 }

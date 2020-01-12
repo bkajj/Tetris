@@ -11,10 +11,10 @@ namespace hgw
 		~InputManager() {}
 
 		bool IsSpriteHeld(sf::Sprite object, sf::Mouse::Button button, sf::RenderWindow &window);
-		bool IsSpriteHeld(sf::IntRect intRect, sf::Mouse::Button button, sf::RenderWindow &window);
+		bool IsIntRectHeld(sf::IntRect intRect, sf::Mouse::Button button, sf::RenderWindow &window);
 
 		bool IsSpriteClicked(sf::Sprite object, sf::Mouse::Button button, sf::Event::EventType eventType, sf::RenderWindow &window);
-		bool IsSpriteClicked(sf::IntRect intRect, sf::Mouse::Button button, sf::Event::EventType eventType, sf::RenderWindow &window);
+		bool IsIntRectClicked(sf::IntRect intRect, sf::Mouse::Button button, sf::Event::EventType eventType, sf::RenderWindow &window);
 
 		bool IsSpriteReleased(sf::Sprite object, sf::Mouse::Button button, sf::Event::EventType eventType, sf::RenderWindow &window);
 

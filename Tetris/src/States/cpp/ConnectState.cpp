@@ -33,13 +33,21 @@ namespace hgw
 		localPortText.setFont(font);
 		localPortText.setCharacterSize(50);
 
-		ipConnectText.setString("IP TO CONNECT TO:\n   _.___.___.__");
+		ipConnectText.setString("SERVER IP:");
 		ipConnectText.setFont(font);
 		ipConnectText.setCharacterSize(50);
 
-		portConnectText.setString("PORT TO CONNECT TO:\n	   _____");
+		portConnectText.setString("SERVER PORT:");
 		portConnectText.setFont(font);
 		portConnectText.setCharacterSize(50);
+		
+		serverIpText.setString("|");
+		serverIpText.setFont(font);
+		serverIpText.setCharacterSize(50);
+
+		serverPortText.setString("");
+		serverPortText.setFont(font);
+		serverPortText.setCharacterSize(50);
 
 		waitingForConnectionText.setString("WAITING FOR CONNECTION");
 		waitingForConnectionText.setFont(font);
@@ -53,6 +61,15 @@ namespace hgw
 		ipConnectText.setPosition((APP_WIDTH - ipConnectText.getGlobalBounds().width) / 2, 200);
 		portConnectText.setPosition((APP_WIDTH - portConnectText.getGlobalBounds().width) / 2, ipConnectText.getPosition().y + 150);
 		waitingForConnectionText.setPosition((APP_WIDTH - waitingForConnectionText.getGlobalBounds().width) / 2, localPortText.getPosition().y + 70);
+
+		serverIpText.setPosition((APP_WIDTH - serverIpText.getGlobalBounds().width) / 2, ipConnectText.getPosition().y + 50);
+		serverPortText.setPosition((APP_WIDTH - serverPortText.getGlobalBounds().width) / 2, portConnectText.getPosition().y + 50);
+
+		ipFloatRect = sf::FloatRect{ ipConnectText.getPosition().x - 20, ipConnectText.getPosition().y + 50,
+							   	 ipConnectText.getGlobalBounds().width + 40, ipConnectText.getGlobalBounds().height + 50 };
+
+		portFloatRect = sf::FloatRect{ portConnectText.getPosition().x - 20, portConnectText.getPosition().y + 50,
+								 portConnectText.getGlobalBounds().width + 40, portConnectText.getGlobalBounds().height + 50 };
 	}
 
 	void ConnectState::HandleInput()
@@ -88,35 +105,43 @@ namespace hgw
 			}
 			else if (isJoiningGame) //join game clicked
 			{
-				if (_data->input.IsTextClicked(ipConnectText, sf::Mouse::Left, event.type, _data->window, sf::Vector2i(1, 2))) //ip to connect to text
+				if ((_data->input.IsTextClicked(ipConnectText, sf::Mouse::Left, event.type, _data->window) ||
+					_data->input.IsIntRectHeld(sf::IntRect(ipFloatRect), sf::Mouse::Left, _data->window) ||
+					_data->input.IsTextClicked(serverIpText, sf::Mouse::Left, event.type, _data->window)) && !isTypingIp) //ip to connect to text
 				{
 					isTypingIp = true;
 					isTypingPort = false;
+					cursorChanged = true;
 				}
-				else if (_data->input.IsTextClicked(portConnectText, sf::Mouse::Left, event.type, _data->window, sf::Vector2i(1, 2))) //port to connect to text
+				else if ((_data->input.IsTextClicked(portConnectText, sf::Mouse::Left, event.type, _data->window) ||
+						 _data->input.IsIntRectHeld(sf::IntRect(portFloatRect), sf::Mouse::Left, _data->window) || 
+					   	 _data->input.IsTextClicked(serverPortText, sf::Mouse::Left, event.type, _data->window)) && !isTypingPort ) //port to connect to text
 				{
 					isTypingIp = false;
 					isTypingPort = true;
+					cursorChanged = true;
 				}
 				if (event.type == sf::Event::KeyPressed)
 				{
-					char digitPressed = getPressedDigit(event);
-
 					if (isTypingIp)
 					{
+						char digitPressed = getPressedDigit(event, true);
+
 						if ((event.key.code == sf::Keyboard::BackSpace || event.key.code == sf::Keyboard::Backspace) && ipDigitsEntered.size() > 0) //removing ip digit
 						{
 							isIpFullyEnterd = false;
 							ipDigitsEntered.erase(ipDigitsEntered.end() - 1);
-							ipConnectText.setString("IP TO CONNECT TO:\n   " + strigToIP(ipDigitsEntered));
+							serverIpText.setString(ipDigitsEntered);
+							serverIpText.setPosition((APP_WIDTH - serverIpText.getGlobalBounds().width) / 2, serverIpText.getPosition().y); //adjust when writing
 						}
-						else if (ipDigitsEntered.size() < 9 && digitPressed != 'X') //adding ip digit
+						else if (ipDigitsEntered.size() < 15 && digitPressed != 'X') //adding ip digit
 						{
 							isIpFullyEnterd = false;
 							ipDigitsEntered += digitPressed;
-							ipConnectText.setString("IP TO CONNECT TO:\n   " + strigToIP(ipDigitsEntered));
+							serverIpText.setString(ipDigitsEntered);
+							serverIpText.setPosition((APP_WIDTH - serverIpText.getGlobalBounds().width) / 2, serverIpText.getPosition().y); //adjust when writing
 						}
-						else if (ipDigitsEntered.size() == 9)
+						else if (ipDigitsEntered.size() == 15)
 						{
 							isIpFullyEnterd = true;
 						}
@@ -124,17 +149,21 @@ namespace hgw
 
 					if (isTypingPort)
 					{
+						char digitPressed = getPressedDigit(event, false);
+
 						if ((event.key.code == sf::Keyboard::BackSpace || event.key.code == sf::Keyboard::Backspace) && portDigitsEntered.size() > 0) //removing ip digit
 						{
 							isPortFullyEnterd = false;
 							portDigitsEntered.erase(portDigitsEntered.end() - 1);
-							portConnectText.setString("PORT TO CONNECT TO:\n       " + stringToPort(portDigitsEntered));
+							serverPortText.setString(portDigitsEntered);
+							serverPortText.setPosition((APP_WIDTH - serverPortText.getGlobalBounds().width) / 2, serverPortText.getPosition().y); //adjust when writing
 						}
 						else if (portDigitsEntered.size() < 5 && digitPressed != 'X') //adding ip digit
 						{
 							isPortFullyEnterd = false;
 							portDigitsEntered += digitPressed;
-							portConnectText.setString("PORT TO CONNECT TO:\n       " + stringToPort(portDigitsEntered));
+							serverPortText.setString(portDigitsEntered);
+							serverPortText.setPosition((APP_WIDTH - serverPortText.getGlobalBounds().width) / 2, serverPortText.getPosition().y); //adjust when writing
 						}
 						else if (portDigitsEntered.size() == 5)
 						{
@@ -144,7 +173,7 @@ namespace hgw
 
 					if ((event.key.code == sf::Keyboard::Enter || event.key.code == sf::Keyboard::Return) && isIpFullyEnterd && isPortFullyEnterd) //joining game
 					{
-						ipToConnectTo = sf::IpAddress(strigToIP(ipDigitsEntered));
+						ipToConnectTo = sf::IpAddress(ipDigitsEntered);
 						portToConnectTo = std::stoi(portDigitsEntered);
 						_data->network.addTcpSocket("socket", ipToConnectTo, portToConnectTo);
 						
@@ -163,9 +192,9 @@ namespace hgw
 
 	void ConnectState::Update(float dt)
 	{
-		if (isCreatingGame)
+		if (waitingClock.getElapsedTime().asMilliseconds() >= 1000 || cursorChanged) //dots animation/cursor animation
 		{
-			if (waitingClock.getElapsedTime().asMilliseconds() >= 1000) //dots animation
+			if (isCreatingGame)
 			{
 				if (dotsGoingForward) //adding dots
 				{
@@ -189,9 +218,33 @@ namespace hgw
 						dotsGoingForward = true;
 					}
 				}
-
 				waitingForConnectionText.setString("WAITING FOR CONNECTION" + waitingDots);
 				waitingClock.restart();
+			}
+			else if (isJoiningGame)
+			{
+				if (cursorChanged || textCursor == "")
+				{
+					textCursor = "|";
+				}
+				else if (textCursor == "|")
+				{
+					textCursor = "";
+				}
+
+				if (isTypingIp)
+				{
+					serverIpText.setString(ipDigitsEntered + textCursor);
+					serverPortText.setString(portDigitsEntered);
+				}
+				else if(isTypingPort)
+				{
+					serverIpText.setString(ipDigitsEntered);
+					serverPortText.setString(portDigitsEntered + textCursor);
+				}
+				
+				waitingClock.restart();
+				cursorChanged = false;
 			}
 		}
 
@@ -199,6 +252,9 @@ namespace hgw
 		{
 			_data->machine.AddState(StateRef(new GameState(_data, true)));
 		}
+
+		std::cout << "Mouse X: " << _data->input.GetMousePosition(_data->window).x << "  Y: " << _data->input.GetMousePosition(_data->window).y << std::endl;
+		std::cout << "Top Rect X: " << ipFloatRect.left << "  Top Rect Y: " << ipFloatRect.top << std::endl;
 	}
 
 	void ConnectState::Draw(float dt)
@@ -220,40 +276,14 @@ namespace hgw
 		{
 			_data->window.draw(portConnectText);
 			_data->window.draw(ipConnectText);
+			_data->window.draw(serverIpText);
+			_data->window.draw(serverPortText);
 		}
 		
 		_data->window.display();
 	}
 
-	std::string ConnectState::strigToIP(std::string str)
-	{
-		std::string templ = "_.___.___.__";
-
-		for (int i = 0, j = 0; i < str.size(); i++, j++)
-		{
-			if (j == 1 || j == 5 || j == 9)
-			{
-				j++;
-			}
-			templ[j] = str[i];
-		}
-
-		return templ;
-	}
-
-	std::string ConnectState::stringToPort(std::string str)
-	{
-		std::string templ = "_____";
-
-		for (int i = 0; i < str.size(); i++)
-		{
-			templ[i] = str[i];
-		}
-
-		return templ;
-	}
-
-	char ConnectState::getPressedDigit(sf::Event event) //if X returned - no key was pressed
+	char ConnectState::getPressedDigit(sf::Event event, bool withDot) //if X returned - no key was pressed
 	{
 		char keyPressed = 'X';
 
@@ -308,6 +338,15 @@ namespace hgw
 		case sf::Keyboard::Numpad9:
 			keyPressed = '9';
 			break;
+
+		case sf::Keyboard::Period:
+			keyPressed = '.';
+			break;
+		}
+
+		if (keyPressed == '.' && !withDot)
+		{
+			keyPressed = 'X';
 		}
 
 		return keyPressed;

@@ -19,7 +19,7 @@ namespace hgw
 		return false;
 	}
 
-	bool InputManager::IsSpriteHeld(sf::IntRect intRect,
+	bool InputManager::IsIntRectHeld(sf::IntRect intRect,
 		sf::Mouse::Button button, sf::RenderWindow &window)
 	{
 		if (sf::Mouse::isButtonPressed(button) &&
@@ -47,7 +47,7 @@ namespace hgw
 		return false;
 	}
 
-	bool InputManager::IsSpriteClicked(sf::IntRect intRect, sf::Mouse::Button button,
+	bool InputManager::IsIntRectClicked(sf::IntRect intRect, sf::Mouse::Button button,
 		sf::Event::EventType eventType, sf::RenderWindow &window)
 	{
 		if (eventType == sf::Event::EventType::MouseButtonPressed &&
