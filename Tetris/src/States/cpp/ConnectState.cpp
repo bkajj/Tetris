@@ -102,6 +102,8 @@ namespace hgw
 					localport = _data->network._tcpServer.getLocalPort();
 					localPortText.setString("Your Port: " + std::to_string(localport));
 
+					
+
 					waitingClock.restart();
 				}
 				else if (_data->input.IsTextClicked(joinGameText, sf::Mouse::Left, event.type, _data->window)) //join game text
@@ -255,8 +257,8 @@ namespace hgw
 			_data->machine.AddState(StateRef(new GameState(_data, true)));
 		}
 
-		std::cout << "Mouse X: " << _data->input.GetMousePosition(_data->window).x << "  Y: " << _data->input.GetMousePosition(_data->window).y << std::endl;
-		std::cout << "Top Rect X: " << ipFloatRect.left << "  Top Rect Y: " << ipFloatRect.top << std::endl;
+		//std::cout << "Mouse X: " << _data->input.GetMousePosition(_data->window).x << "  Y: " << _data->input.GetMousePosition(_data->window).y << std::endl;
+		//std::cout << "Top Rect X: " << ipFloatRect.left << "  Top Rect Y: " << ipFloatRect.top << std::endl;
 	}
 
 	void ConnectState::Draw(float dt)

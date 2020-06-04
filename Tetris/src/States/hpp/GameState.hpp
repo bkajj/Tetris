@@ -25,7 +25,7 @@ namespace hgw
 		bool willGridExceed_X(float offestX);
 		bool willGridExceed_Y(float offsetY);
 			
-		void instaPlace();
+		void instaPlace(bool enemy);
 		void setColor(sf::Color color);
 		void setOffsetData();
 
@@ -42,7 +42,6 @@ namespace hgw
 		int rotationState = 0;
 
 	private:
-
 		sf::Vector2f* pivot;
 		bool isGhost;	
 	};
@@ -58,8 +57,8 @@ namespace hgw
 		void Draw(float dt);
 
 		void setNextFigures(bool classicColor);
-		std::vector<int> checkForRow();
-		void destroyFilledRows();
+		std::vector<int> checkForRow(bool enemy = false);
+		void destroyFilledRows(bool enemy = false);
 
 		std::string insertZeros(int value, int digits);
 		
@@ -70,9 +69,15 @@ namespace hgw
 
 		int totalRowsCleaned;
 		int score;
+
+		int enemy_totalRowsCleaned;
+		int enemy_score;
+
 		static std::fstream dataFile;
 	
 	private:
+		void spaceClicked(bool enemy);
+
 		GameDataRef _data;
 		bool multiplayer;
 		sf::Sound clear1, clear2, clear3, clear4;
@@ -80,6 +85,7 @@ namespace hgw
 
 		std::array<int, 30> level = { 48, 43, 38, 33, 28, 23, 18, 13, 8, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1 };
 		unsigned int currLvl = 0;
+		unsigned int enemy_currLvl = 0;
 		sf::Text scoreText, highScoreText, nextFigureText, linesText, statsText, levelText;
 		std::unordered_map<Figure::FigureType, std::pair<Figure, int>> stats;
 		std::unordered_map<Figure::FigureType, sf::Text> eachStatText;
@@ -89,6 +95,8 @@ namespace hgw
 
 		std::array<sf::RectangleShape, 11> verticalLines, enemy_verticalLines;
 		std::array<sf::RectangleShape, 21> horizontalLines, enemy_horizontalLines;
+
+		sf::Packet myMoves;
 	};
 
 	int random(int min, int max);

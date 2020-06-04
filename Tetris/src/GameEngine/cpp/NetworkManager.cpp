@@ -95,6 +95,7 @@ namespace hgw
 		}
 
 		std::cout << "[server] Connection accepted successfully" << std::endl;
+		std::cout << client.getRemoteAddress() << std::endl;
 		return true;
 	}
 

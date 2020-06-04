@@ -11,43 +11,6 @@
 #include <map>
 #include <filesystem>
 
-sf::Packet&operator<<(sf::Packet& packet, std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10>& grid)
-{
-	for (int i = 0; i < 10; i++)
-	{
-		for (int j = 0; j < 20; j++)
-		{
-			sf::Uint8 a = 12, b = 255;
-			packet << grid[i][j].first;
-			packet << grid[i][j].second.getFillColor().r;
-			packet << grid[i][j].second.getFillColor().g;
-			packet << grid[i][j].second.getFillColor().b;
-			packet << grid[i][j].second.getFillColor().a;
-		}
-	}
-
-	return packet;
-}
-
-sf::Packet&operator>>(sf::Packet& packet, std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10>& grid)
-{
-	for (int i = 0; i < 10; i++)
-	{
-		for (int j = 0; j < 20; j++)
-		{
-			sf::Color col;
-			packet >> grid[i][j].first;
-			packet >> col.r;
-			packet >> col.g;
-			packet >> col.b;
-			packet >> col.a;
-			grid[i][j].second.setFillColor(col);
-		}
-	}
-
-	return packet;
-}
-
 namespace hgw
 {
 #pragma region Figure
@@ -197,13 +160,24 @@ namespace hgw
 		moveFigure(sf::Vector2f(0, -1)); //adjust height
 	}
 
-	void Figure::instaPlace()
+	void Figure::instaPlace(bool enemy)
 	{
-		for (int i = 0; i < 4; i++) //set current figure coords and position to ghost's
+		if (enemy)
 		{
-			GameState::currentFigure.blocks[i].setPosition(GameState::ghostFigure.blocks[i].getPosition());
-			GameState::currentFigure.gridCoords[i] = GameState::ghostFigure.gridCoords[i];
+			for (int i = 0; i < 4; i++) //set current figure coords and position to ghost's
+			{
+				GameState::enemy_currentFigure.blocks[i].setPosition(GameState::enemy_ghostFigure.blocks[i].getPosition());
+				GameState::enemy_currentFigure.gridCoords[i] = GameState::enemy_ghostFigure.gridCoords[i];
+			}
 		}
+		else
+		{
+			for (int i = 0; i < 4; i++) //set current figure coords and position to ghost's
+			{
+				GameState::currentFigure.blocks[i].setPosition(GameState::ghostFigure.blocks[i].getPosition());
+				GameState::currentFigure.gridCoords[i] = GameState::ghostFigure.gridCoords[i];
+			}
+		}		
 	}
 
 	void Figure::Rotate(bool clockwise, bool shouldOffest)
@@ -428,6 +402,63 @@ namespace hgw
 		this->multiplayer = multiplayer;
 	}
 
+	void GameState::spaceClicked(bool enemy)
+	{
+		if (enemy)
+		{
+			enemy_currentFigure.instaPlace(enemy);
+
+			if (enemy_currentFigure.areCoordsGood())
+			{
+				for (int i = 0; i < 4; i++) //add to grid
+				{
+					enemy_grid[to_uns(enemy_currentFigure.gridCoords[i].x)][to_uns(enemy_currentFigure.gridCoords[i].y)] = std::make_pair(true, enemy_currentFigure.blocks[i]);
+				}
+			}
+
+			destroyFilledRows(); //clear lines
+			setNextFigures(_data->gameData.gameData.originalColors); //create next figures
+
+			for (int i = 0; i < 10; i++) //check for lose condition
+			{
+				if (enemy_grid[i][0].first == true)
+				{
+					_data->music.Stop("gameMusic");
+					_data->machine.AddState(StateRef(new GameOverState(_data)));
+				}
+			}
+		}
+		else
+		{
+			myMoves << sf::Keyboard::Space;
+
+			currentFigure.instaPlace(enemy);
+
+			if (currentFigure.areCoordsGood())
+			{
+				for (int i = 0; i < 4; i++) //add to grid
+				{
+					grid[to_uns(currentFigure.gridCoords[i].x)][to_uns(currentFigure.gridCoords[i].y)] = std::make_pair(true, currentFigure.blocks[i]);
+				}
+
+				stats[currentFigure._type_].second++; //update statistics
+				eachStatText[currentFigure._type_].setString(insertZeros(stats[currentFigure._type_].second, 3)); //update statistics text
+			}
+
+			destroyFilledRows(); //clear lines
+			setNextFigures(_data->gameData.gameData.originalColors); //create next figures
+
+			for (int i = 0; i < 10; i++) //check for lose condition
+			{
+				if (grid[i][0].first == true)
+				{
+					_data->music.Stop("gameMusic");
+					_data->machine.AddState(StateRef(new GameOverState(_data)));
+				}
+			}
+		}
+	}
+
 	void GameState::Init()
 	{
 		_data->music.Play("gameMusic");
@@ -601,6 +632,8 @@ namespace hgw
 			{
 				if (event.key.code == sf::Keyboard::Space)
 				{
+					myMoves << sf::Keyboard::Space;
+
 					currentFigure.instaPlace();
 
 					if (currentFigure.areCoordsGood())
@@ -628,16 +661,24 @@ namespace hgw
 				}
 				else if (event.key.code == sf::Keyboard::X) //clockwise rotation
 				{
+					
+					
+					myMoves << sf::Keyboard::X;
+
 					currentFigure.Rotate(true, true); 
 					ghostFigure.updateGhostCoords();
 				}
 				else if (event.key.code == sf::Keyboard::Z) //counterclockwise rotation
 				{
+					myMoves << sf::Keyboard::Z;
+
 					currentFigure.Rotate(false, true);
 					ghostFigure.updateGhostCoords();
 				}	
 				else if (event.key.code == sf::Keyboard::P) //game pause
 				{
+					myMoves << sf::Keyboard::P;
+
 					_data->machine.AddState(StateRef(new SettingsState(_data, true)), false);
 				}
 			}
@@ -663,6 +704,11 @@ namespace hgw
 		if ((dropClock.getElapsedTime() >= sf::seconds(dropSpeed * dt) || //if need to move figure down
 			(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !isDownKeyPressed)))
 		{
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !isDownKeyPressed)
+			{
+				myMoves << sf::Keyboard::Down;
+			}
+
 			if (currentFigure.willGridExceed_Y(1) || currentFigure.willBlockOverlapBlock(0, 1)) //if can't move
 			{
 				if (currentFigure.areCoordsGood()) //maybe can put all to this and else is game loss!!!!!!!!!!
@@ -708,6 +754,8 @@ namespace hgw
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && moveClock.getElapsedTime() >= sf::seconds(dt * 6) &&
 			!currentFigure.willGridExceed_X(1) && !currentFigure.willBlockOverlapBlock(1, 0)) //move right
 		{
+			myMoves << sf::Keyboard::Right;
+
 			currentFigure.moveFigure(sf::Vector2f(1, 0));
 			ghostFigure.updateGhostCoords();
 
@@ -724,48 +772,32 @@ namespace hgw
 
 		if (multiplayer)
 		{
-			sf::Packet gridPacket;
-
-			if (_data->network.getTcpClientsSize() == 0)
+			sf::Packet packet;
+			std::string dupa;
+			if (_data->network.getTcpClientsSize() == 0) //send from client
+			{	
+				packet << "WYSYLAM Z CLIENTA";
+				_data->network.sendPacket(myMoves, _data->network.getTcpSocket("enemy"));
+				packet.clear();
+				_data->network.recievePacket(myMoves, _data->network.getTcpSocket("enemy"));
+			}
+			else //send from server
 			{
-				gridPacket << grid;
-				_data->network.sendPacket(gridPacket, _data->network.getTcpSocket("enemy"));
-
-				gridPacket.clear();
-
-				_data->network.recievePacket(gridPacket, _data->network.getTcpSocket("enemy"));
-				gridPacket >> enemy_grid;
-
-				for (int i = 0; i < 10; i++)
+				packet << "WYSYLAM Z SERVERA";
+				_data->network.sendPacket(myMoves, _data->network.getTcpClient("enemy"));
+				packet.clear();
+				_data->network.recievePacket(packet, _data->network.getTcpClient("enemy"));
+			}
+			while (!myMoves.endOfPacket())
+			{
+				unsigned int key;
+				myMoves >> key;
+				switch (key)
 				{
-					for (int j = 0; j < 20; j++)
-					{
-						enemy_grid[i][j].second.setPosition(enemy_verticalLines[0].getPosition().x + i * ENEMY_BLOCK_SIZE,
-															enemy_verticalLines[0].getPosition().y + j * ENEMY_BLOCK_SIZE);
-						enemy_grid[i][j].second.setSize(sf::Vector2f(ENEMY_BLOCK_SIZE, ENEMY_BLOCK_SIZE));
-					}
+					
 				}
 			}
-			else
-			{
-				gridPacket << grid;
-				_data->network.sendPacket(gridPacket, _data->network.getTcpClient("enemy"));
-
-				gridPacket.clear();
-
-				_data->network.recievePacket(gridPacket, _data->network.getTcpClient("enemy"));
-				gridPacket >> enemy_grid;
-
-				for (int i = 0; i < 10; i++)
-				{
-					for (int j = 0; j < 20; j++)
-					{
-						enemy_grid[i][j].second.setPosition(enemy_verticalLines[0].getPosition().x + i * ENEMY_BLOCK_SIZE,
-							enemy_verticalLines[0].getPosition().y + j * ENEMY_BLOCK_SIZE);
-						enemy_grid[i][j].second.setSize(sf::Vector2f(ENEMY_BLOCK_SIZE, ENEMY_BLOCK_SIZE));
-					}
-				}
-			}
+			std::cout << dupa << std::endl;
 		}
 	}
 
@@ -837,8 +869,7 @@ namespace hgw
 			}
 		}
 		
-		
-		for (auto &n : eachStatText) // draw statictic counter texts
+		for (auto &n : eachStatText) //draw statictic counter texts
 		{
 			_data->window.draw(n.second);
 		}
@@ -861,71 +892,109 @@ namespace hgw
 		_data->window.display();
 	}
 
-	void GameState::destroyFilledRows()
+	void GameState::destroyFilledRows(bool enemy)
 	{
-		std::vector<int> filledRows = checkForRow();
+		std::vector<int> filledRows = checkForRow(enemy);
 		int rowsLost = 0; //how much rows got destroyed on 1 figure place
+
 		if (filledRows.size() > 0)//if there is at least one row to destroy
 		{
-			for (int i = 0; i < filledRows.size(); i++) //iterates through destroyed rows Y indexes
+			if (enemy)
 			{
-				for (int j = 0; j < 10; j++) //iterates through destroyed rows X indexes
+				for (int i = 0; i < filledRows.size(); i++) //iterates through destroyed rows Y indexes
 				{
-					for (int k = filledRows[i]; k > 0; k--) //move down all blocks from above deleted block
+					for (int j = 0; j < 10; j++) //iterates through destroyed rows X indexes
 					{
-						grid[j][k] = grid[j][k - 1];
-						grid[j][k].second.setPosition(grid[j][k].second.getPosition().x, grid[j][k].second.getPosition().y + BLOCK_SIZE);
+						for (int k = filledRows[i]; k > 0; k--) //move down all blocks from above deleted block
+						{
+							enemy_grid[j][k] = enemy_grid[j][k - 1];
+							enemy_grid[j][k].second.setPosition(enemy_grid[j][k].second.getPosition().x, enemy_grid[j][k].second.getPosition().y + ENEMY_BLOCK_SIZE);
+						}
+					}
+					rowsLost++;
+					if (i != filledRows.size() - 1)
+					{
+						filledRows[i + 1] += rowsLost; //change next filled row index, cause all block above target were moved down
 					}
 				}
-				rowsLost++;
-				if (i != filledRows.size() - 1)
+				enemy_totalRowsCleaned += rowsLost;
+
+				if (totalRowsCleaned % 10 == 0) //increase level if needed
 				{
-					filledRows[i + 1] += rowsLost; //change next filled row index, cause all block above target were moved down
+					enemy_currLvl++;
 				}
 			}
-
-			totalRowsCleaned += rowsLost;
-
-			switch (rowsLost) //update score and play proper sound
+			else
 			{
-			case 1:
-				score += 40 * (currLvl + 1);
-				_data->sounds.Play("clear1");
-				break;
-			case 2:
-				score += 100 * (currLvl + 1);
-				_data->sounds.Play("clear2");
-				break;
-			case 3:
-				score += 300 * (currLvl + 1);
-				_data->sounds.Play("clear3");
-				break;
-			case 4:
-				score += 1200 * (currLvl + 1);
-				_data->sounds.Play("clear4");
+				for (int i = 0; i < filledRows.size(); i++)
+				{
+					for (int j = 0; j < 10; j++)
+					{
+						for (int k = filledRows[i]; k > 0; k--)
+						{
+							grid[j][k] = grid[j][k - 1];
+							grid[j][k].second.setPosition(grid[j][k].second.getPosition().x, grid[j][k].second.getPosition().y + BLOCK_SIZE);
+						}
+					}
+					rowsLost++;
+					if (i != filledRows.size() - 1)
+					{
+						filledRows[i + 1] += rowsLost;
+					}
+				}
+				totalRowsCleaned += rowsLost;
+
+				switch (rowsLost) //update score and play proper sound
+				{
+				case 1:
+					score += 40 * (currLvl + 1);
+					_data->sounds.Play("clear1");
+					break;
+				case 2:
+					score += 100 * (currLvl + 1);
+					_data->sounds.Play("clear2");
+					break;
+				case 3:
+					score += 300 * (currLvl + 1);
+					_data->sounds.Play("clear3");
+					break;
+				case 4:
+					score += 1200 * (currLvl + 1);
+					_data->sounds.Play("clear4");
+				}
+
+				//GameState::rowsCleanedtext.setString("Score: " + score); //causes nice bug
+				GameState::scoreText.setString("Score:\n" + insertZeros(score, 6));
+
+				if (score > _data->gameData.gameData.highScore) //if current score is higher than highscore
+				{
+					_data->gameData.gameData.highScore = score;
+					highScoreText.setString("Top:\n" + insertZeros(score, 6)); //update highscore text
+				}
+
+				if (totalRowsCleaned % 10 == 0) //increase level if needed
+				{
+					currLvl++;
+					levelText.setString("Level:\n  " + insertZeros(currLvl, 2));
+				}
+
+				linesText.setString("Lines: " + insertZeros(totalRowsCleaned, 3)); //update lines counter text
 			}
-
-			//GameState::rowsCleanedtext.setString("Score: " + score);// causes nice bug
-			GameState::scoreText.setString("Score:\n" + insertZeros(score, 6));
-
-			if (score > _data->gameData.gameData.highScore) //if current score is higher than highscore
-			{
-				_data->gameData.gameData.highScore = score;
-				highScoreText.setString("Top:\n" + insertZeros(score, 6)); //update highscore text
-			}
-
-			if (totalRowsCleaned % 10 == 0) //increase level if needed
-			{
-				currLvl++;
-				levelText.setString("Level:\n  " + insertZeros(currLvl, 2));
-			}
-
-			linesText.setString("Lines: " + insertZeros(totalRowsCleaned, 3)); //update lines counter text
-		}		
+		}	
 	}
 
-	std::vector<int> GameState::checkForRow() //returns indexes of filled rows
+	std::vector<int> GameState::checkForRow(bool enemy) //returns indexes of filled rows
 	{
+		std::array<std::array<std::pair<bool, sf::RectangleShape>, 20>, 10> *grid;
+		if (enemy)
+		{
+			grid = &GameState::enemy_grid;
+		}
+		else
+		{
+			grid = &GameState::grid;
+		}
+
 		std::vector<int> filledRows;
 		bool filled = true;
 
@@ -934,7 +1003,7 @@ namespace hgw
 			filled = true;
 			for (int j = 0; j < 10; j++) //iterates through grid Xs
 			{
-				if (grid[j][i].first == false) //if row is not filled -> skip i iteration
+				if ((*grid)[j][i].first == false) //if row is not filled -> skip i iteration
 				{
 					filled = false;
 					break;
