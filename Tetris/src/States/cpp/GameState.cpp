@@ -634,7 +634,7 @@ namespace hgw
 				{
 					myMoves << sf::Keyboard::Space;
 
-					currentFigure.instaPlace();
+					//currentFigure.instaPlace();
 
 					if (currentFigure.areCoordsGood())
 					{

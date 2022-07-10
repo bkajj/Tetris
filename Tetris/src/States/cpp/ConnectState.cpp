@@ -94,15 +94,30 @@ namespace hgw
 				{
 					isCreatingGame = true;
 
-					_data->network.addClient("enemy");
+					//_data->network.addClient("enemy");
 					//start listening from other thread, cause sf::TcpListener::listen() blocks thread from which is called
-					gameCreated = std::async( &NetworkManager::listenForConnection, &_data->network, sf::Socket::AnyPort, std::ref(_data->network.getTcpClient("enemy")));
-					std::this_thread::sleep_for(std::chrono::milliseconds(1)); //listenForConnetction must be called first in order to get localport
+					//gameCreated = std::async( &NetworkManager::listenForConnection, &_data->network, sf::Socket::AnyPort, std::ref(_data->network.getTcpClient("enemy")));
+					//std::this_thread::sleep_for(std::chrono::milliseconds(1)); //listenForConnetction must be called first in order to get localport
 
-					localport = _data->network._tcpServer.getLocalPort();
+					sf::TcpListener tcpListener;
+					sf::TcpSocket enemy;
+					localport = tcpListener.getLocalPort();
 					localPortText.setString("Your Port: " + std::to_string(localport));
 
-					
+					if (tcpListener.listen(localport) != sf::Socket::Done)
+					{
+						std::cout << "Listener listen error\n";
+					}
+
+					if (tcpListener.accept(enemy) == sf::Socket::Done)
+					{
+						std::cout << "Listener accept error\n";
+					}
+					else
+					{
+						std::cout << "Connected!!!\n";
+						//_data->machine.AddState(StateRef(new GameState(_data, true)));
+					}
 
 					waitingClock.restart();
 				}
@@ -134,9 +149,16 @@ namespace hgw
 					ipToConnectTo = sf::IpAddress(ipDigitsEntered);
 					portToConnectTo = std::stoi(portDigitsEntered);
 
-					if (_data->network.addTcpSocket("enemy", ipToConnectTo, portToConnectTo))
+					sf::TcpSocket tcpSocket;
+					sf::Socket::Status connectStatus = tcpSocket.connect(ipToConnectTo, portToConnectTo);
+
+					if (connectStatus == sf::Socket::Status::Done)
 					{
 						_data->machine.AddState(StateRef(new GameState(_data, true)));
+					}
+					else
+					{
+						std::cout << "Socket connect error\n";
 					}
 				}
 				
