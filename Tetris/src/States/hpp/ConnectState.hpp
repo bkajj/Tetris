@@ -7,6 +7,7 @@
 
 namespace hgw
 {
+	
 	class ConnectState : public State
 	{
 	public:
@@ -18,12 +19,16 @@ namespace hgw
 		void Draw(float dt);
 
 		char getPressedDigit(sf::Event event, bool withDot);
+		bool listen();
 
 	private:
 		GameDataRef _data;
 
 		sf::Text createGameText, joinGameText; //join or create choice
 		bool isJoiningGame = false, isCreatingGame = false;
+
+		sf::TcpSocket tcpSocket;
+		sf::TcpListener tcpListener;
 
 		sf::Text localIPText, localPortText; //create game
 		std::thread connectionThread;
@@ -32,7 +37,6 @@ namespace hgw
 		std::string waitingDots = "";
 		bool dotsGoingForward = true;
 		unsigned short localport = 0;
-		sf::TcpSocket client;
 		std::future<bool> gameCreated;
 
 		sf::Text ipConnectText, portConnectText, serverIpText, serverPortText; //join game
@@ -43,7 +47,6 @@ namespace hgw
 		std::string ipDigitsEntered = "", portDigitsEntered = "";
 		std::string textCursor = "|";
 		sf::FloatRect ipFloatRect, portFloatRect;
-		sf::TcpSocket socket;
 		bool cursorChanged = false;
 		sf::Text joinMatchText;
 	};

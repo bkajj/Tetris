@@ -36,3 +36,8 @@ x64/
 .vs/
 Tetris/x64/
 
+# Solution
+.sln
+.vcxproj
+.vcxproj.filters
+.vcxproj.user

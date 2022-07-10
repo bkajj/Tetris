@@ -12,6 +12,25 @@ namespace hgw
 		this->_data = _data;
 	}
 
+	bool ConnectState::listen()
+	{
+		if (tcpListener.listen(localport) != sf::Socket::Done)
+		{
+			std::cout << "Listener listen error\n";
+			return false;
+		}
+
+		if (tcpListener.accept(tcpSocket) != sf::Socket::Done)
+		{
+			std::cout << "Listener accept error\n";
+			return false;
+		}
+		
+		std::cout << "Connected!!!\n";
+		//_data->machine.AddState(StateRef(new GameState(_data, true)));
+		return true;
+	}
+
 	void ConnectState::Init()
 	{
 		_data->graphics.LoadFont("font", FONT_PATH);
@@ -96,28 +115,11 @@ namespace hgw
 
 					//_data->network.addClient("enemy");
 					//start listening from other thread, cause sf::TcpListener::listen() blocks thread from which is called
-					//gameCreated = std::async( &NetworkManager::listenForConnection, &_data->network, sf::Socket::AnyPort, std::ref(_data->network.getTcpClient("enemy")));
-					//std::this_thread::sleep_for(std::chrono::milliseconds(1)); //listenForConnetction must be called first in order to get localport
-
-					sf::TcpListener tcpListener;
-					sf::TcpSocket enemy;
+					gameCreated = std::async(&ConnectState::listen, this);
+					std::this_thread::sleep_for(std::chrono::milliseconds(1)); //listen must be called first in order to get localport
+	
 					localport = tcpListener.getLocalPort();
 					localPortText.setString("Your Port: " + std::to_string(localport));
-
-					if (tcpListener.listen(localport) != sf::Socket::Done)
-					{
-						std::cout << "Listener listen error\n";
-					}
-
-					if (tcpListener.accept(enemy) == sf::Socket::Done)
-					{
-						std::cout << "Listener accept error\n";
-					}
-					else
-					{
-						std::cout << "Connected!!!\n";
-						//_data->machine.AddState(StateRef(new GameState(_data, true)));
-					}
 
 					waitingClock.restart();
 				}
