@@ -36,6 +36,7 @@
     <ClInclude Include="src\GameEngine\hpp\NetworkManager.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="sfml-window-d-2.dll" />
     <None Include="openal32.dll" />
     <None Include="sfml-audio-2.dll" />
     <None Include="sfml-audio-d-2.dll" />
@@ -46,6 +47,5 @@
     <None Include="sfml-system-2.dll" />
     <None Include="sfml-system-d-2.dll" />
     <None Include="sfml-window-2.dll" />
-    <None Include="sfml-window-d-2.dll" />
   </ItemGroup>
 </Project>

@@ -82,7 +82,7 @@ namespace hgw
 			else if (_data->input.IsTextClicked(singlePlayerText, sf::Mouse::Button::Left, event.type, _data->window))
 			{
 				_data->music.Pause("menuMusic");
-				_data->machine.AddState(StateRef(new GameState(_data, true)));
+				_data->machine.AddState(StateRef(new GameState(_data, false)));
 			}
 			else if (_data->input.IsTextClicked(multiPlayerText, sf::Mouse::Button::Left, event.type, _data->window))
 			{
